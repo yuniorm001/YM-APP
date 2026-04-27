@@ -1,0 +1,828 @@
+import { useState, useEffect, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Target,
+  CalendarBlank,
+  Trash,
+  Info,
+  CheckCircle,
+  Export,
+  ArrowCounterClockwise,
+  Bank,
+  Sparkle,
+  Lightning,
+  Plus,
+  Wallet,
+  Receipt,
+  Coins,
+  Crown,
+  TrendUp
+} from '@phosphor-icons/react';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
+
+const getIncomeEntryDate = (entry, fallbackDate) => entry?.date || entry?.createdAt || fallbackDate;
+
+const isSameMonth = (dateA, dateB) => {
+  const a = new Date(dateA);
+  const b = new Date(dateB);
+  return a.getMonth() === b.getMonth() && a.getFullYear() === b.getFullYear();
+};
+
+const createPrimaryIncomeEntry = (amount, currentDate, source = 'Ingreso principal', frequency = 'monthly') => ({
+  id: `income-primary-${new Date(currentDate).getFullYear()}-${new Date(currentDate).getMonth() + 1}`,
+  amount: Number(amount || 0),
+  source,
+  type: 'primary',
+  frequency,
+  date: currentDate,
+  createdAt: currentDate
+});
+
+const formatSourceText = (value) => {
+  if (!value) return '';
+  const normalized = value.replace(/\s+/g, ' ').trimStart();
+  return normalized.charAt(0).toUpperCase() + normalized.slice(1).toLowerCase();
+};
+
+const formatMoney = (value) => Number(value || 0).toLocaleString('es-MX', { minimumFractionDigits: 2 });
+
+const frequencyLabels = {
+  weekly: 'Semanal',
+  biweekly: 'Quincenal',
+  monthly: 'Mensual',
+  'one-time': 'Único'
+};
+
+const typeLabels = {
+  primary: 'Principal',
+  extra: 'Extra'
+};
+
+const createEmptyIncomeForm = (currentDate) => ({
+  amount: '',
+  source: '',
+  frequency: 'weekly',
+  type: 'extra',
+  date: new Date(currentDate).toISOString().split('T')[0]
+});
+
+export default function Settings({ data, onUpdate, onReset }) {
+  const { cash, goals, currentDate, expenses = [] } = data;
+
+  const monthEntries = useMemo(
+    () => (cash?.entries || []).filter((entry) => isSameMonth(getIncomeEntryDate(entry, currentDate), currentDate)),
+    [cash?.entries, currentDate]
+  );
+
+  const primaryEntry = monthEntries.find((entry) => entry.type === 'primary');
+
+  const [primaryIncome, setPrimaryIncome] = useState(primaryEntry?.amount?.toString() || cash?.income?.toString() || '0');
+  const [primarySource, setPrimarySource] = useState(primaryEntry?.source || 'Ingreso principal');
+  const [primaryFrequency, setPrimaryFrequency] = useState(primaryEntry?.frequency || 'monthly');
+  const [goalType, setGoalType] = useState(goals?.type || 'weekly');
+  const [goalAmount, setGoalAmount] = useState(goals?.amount?.toString() || '0');
+  const [entries, setEntries] = useState(cash?.entries || []);
+  const [incomeForm, setIncomeForm] = useState(createEmptyIncomeForm(currentDate));
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [incomeError, setIncomeError] = useState('');
+
+  useEffect(() => {
+    const freshMonthEntries = (cash?.entries || []).filter((entry) => isSameMonth(getIncomeEntryDate(entry, currentDate), currentDate));
+    const freshPrimary = freshMonthEntries.find((entry) => entry.type === 'primary');
+    setPrimaryIncome(freshPrimary?.amount?.toString() || '0');
+    setPrimarySource(freshPrimary?.source || 'Ingreso principal');
+    setPrimaryFrequency(freshPrimary?.frequency || 'monthly');
+    setGoalType(goals?.type || 'weekly');
+    setGoalAmount(goals?.amount?.toString() || '0');
+    setEntries(cash?.entries || []);
+    setIncomeForm(createEmptyIncomeForm(currentDate));
+  }, [cash?.entries, goals?.type, goals?.amount, currentDate]);
+
+  const handleNumberChange = (setter) => (e) => {
+    const value = e.target.value;
+    const filtered = value.replace(/[^0-9.]/g, '');
+    const parts = filtered.split('.');
+    if (parts.length > 2) {
+      setter(parts[0] + '.' + parts.slice(1).join(''));
+    } else {
+      setter(filtered);
+    }
+  };
+
+  const monthCashSpent = (expenses || [])
+    .filter((e) => {
+      const expDate = new Date(e.date);
+      const current = new Date(currentDate);
+      return expDate.getMonth() === current.getMonth() && expDate.getFullYear() === current.getFullYear() && e.method === 'Cash';
+    })
+    .reduce((sum, e) => sum + e.amount, 0);
+
+  const currentMonthEntries = entries.filter((entry) => isSameMonth(getIncomeEntryDate(entry, currentDate), currentDate));
+  const previewPrimary = Number(primaryIncome) || 0;
+  const extrasForMonth = currentMonthEntries.filter((entry) => entry.type !== 'primary');
+  const principalAmount = currentMonthEntries.find((entry) => entry.type === 'primary') ? previewPrimary : previewPrimary;
+  const principalIncome = previewPrimary;
+  const extraMonthIncome = extrasForMonth.reduce((sum, entry) => sum + Number(entry.amount || 0), 0);
+  const monthlyCashIncome = principalIncome + extraMonthIncome;
+  const cashAvailable = monthlyCashIncome - monthCashSpent;
+  const incomeCount = currentMonthEntries.length > 0 ? currentMonthEntries.length : (previewPrimary > 0 ? 1 : 0);
+
+  const handleIncomeFormChange = (field, value) => {
+    setIncomeForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleAddIncomeEntry = () => {
+    const amount = parseFloat(incomeForm.amount) || 0;
+    const source = formatSourceText(incomeForm.source);
+    if (amount <= 0) {
+      setIncomeError('Debes indicar un monto válido para el ingreso.');
+      return;
+    }
+    if (!source.trim()) {
+      setIncomeError('Debes indicar de dónde proviene ese ingreso.');
+      return;
+    }
+
+    const entryDate = incomeForm.date ? new Date(`${incomeForm.date}T12:00:00`).toISOString() : new Date().toISOString();
+    const newEntry = {
+      id: `income-${incomeForm.type}-${Date.now()}`,
+      amount,
+      source,
+      type: incomeForm.type,
+      frequency: incomeForm.frequency,
+      date: entryDate,
+      createdAt: entryDate
+    };
+
+    setEntries((prev) => {
+      if (newEntry.type === 'primary') {
+        return [
+          ...prev.filter((entry) => !(entry.type === 'primary' && isSameMonth(getIncomeEntryDate(entry, currentDate), entryDate))),
+          newEntry
+        ];
+      }
+      return [...prev, newEntry];
+    });
+
+    if (newEntry.type === 'primary') {
+      setPrimaryIncome(String(amount));
+      setPrimarySource(source);
+      setPrimaryFrequency(newEntry.frequency);
+    }
+
+    setIncomeForm(createEmptyIncomeForm(currentDate));
+    setIncomeError('');
+  };
+
+  const handleRemoveIncomeEntry = (id) => {
+    setEntries((prev) => prev.filter((entry) => entry.id !== id));
+  };
+
+  const handleSave = () => {
+    const primaryAmount = parseFloat(primaryIncome) || 0;
+    const primarySavedSource = formatSourceText(primarySource) || 'Ingreso principal';
+    const primaryDate = currentDate;
+    const monthExtras = entries.filter((entry) => isSameMonth(getIncomeEntryDate(entry, currentDate), currentDate) && entry.type !== 'primary');
+    const otherMonthEntries = entries.filter((entry) => !isSameMonth(getIncomeEntryDate(entry, currentDate), currentDate));
+    const updatedPrimary = createPrimaryIncomeEntry(primaryAmount, primaryDate, primarySavedSource, primaryFrequency);
+    const updatedEntries = [
+      ...otherMonthEntries,
+      updatedPrimary,
+      ...monthExtras
+    ];
+    const updatedMonthIncome = [updatedPrimary, ...monthExtras].reduce((sum, entry) => sum + Number(entry.amount || 0), 0);
+
+    onUpdate({
+      cash: {
+        income: updatedMonthIncome,
+        entries: updatedEntries
+      },
+      goals: { type: goalType, amount: parseFloat(goalAmount) || 0 }
+    });
+    setEntries(updatedEntries);
+    setSaved(true);
+    setIncomeError('');
+    setTimeout(() => setSaved(false), 2000);
+  };
+
+  const handleExport = () => {
+    const doc = new jsPDF();
+    const { expenses = [], cards = [], cash, goals } = data;
+    const incomeEntries = (cash?.entries || []).filter((entry) => isSameMonth(getIncomeEntryDate(entry, currentDate), currentDate));
+
+    doc.setFontSize(20);
+    doc.setTextColor(42, 77, 59);
+    doc.text('GastosPro - Reporte Financiero', 14, 20);
+
+    doc.setFontSize(10);
+    doc.setTextColor(115, 117, 115);
+    doc.text(`Generado: ${new Date().toLocaleDateString('es-MX', {
+      year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+    })}`, 14, 28);
+
+    let yPos = 40;
+
+    doc.setFontSize(14);
+    doc.setTextColor(42, 77, 59);
+    doc.text('Resumen de Efectivo', 14, yPos);
+    yPos += 8;
+
+    doc.setFontSize(10);
+    doc.setTextColor(26, 28, 26);
+    doc.text(`Ingreso total del mes: $${(cash?.income || 0).toLocaleString('es-MX')}`, 14, yPos);
+    yPos += 6;
+    doc.text(`Disponible actual: $${cashAvailable.toLocaleString('es-MX')}`, 14, yPos);
+    yPos += 6;
+    doc.text(`Gastado este mes: $${monthCashSpent.toLocaleString('es-MX')}`, 14, yPos);
+    yPos += 12;
+
+    if (incomeEntries.length > 0) {
+      doc.setFontSize(14);
+      doc.setTextColor(42, 77, 59);
+      doc.text('Ingresos del mes', 14, yPos);
+      yPos += 8;
+
+      autoTable(doc, {
+        startY: yPos,
+        head: [['Fecha', 'Origen', 'Tipo', 'Frecuencia', 'Monto']],
+        body: incomeEntries.map((entry) => [
+          new Date(getIncomeEntryDate(entry, currentDate)).toLocaleDateString('es-MX', { day: '2-digit', month: 'short' }),
+          entry.source,
+          typeLabels[entry.type] || entry.type,
+          frequencyLabels[entry.frequency] || entry.frequency,
+          `$${Number(entry.amount || 0).toLocaleString('es-MX')}`
+        ]),
+        theme: 'grid',
+        headStyles: { fillColor: [42, 77, 59], textColor: [255, 255, 255] },
+        styles: { fontSize: 9 },
+        margin: { left: 14, right: 14 }
+      });
+      yPos = doc.lastAutoTable.finalY + 12;
+    }
+
+    doc.setFontSize(14);
+    doc.setTextColor(42, 77, 59);
+    doc.text('Meta de Gastos', 14, yPos);
+    yPos += 8;
+
+    doc.setFontSize(10);
+    doc.setTextColor(26, 28, 26);
+    doc.text(`Tipo: ${goals?.type === 'weekly' ? 'Semanal' : 'Mensual'}`, 14, yPos);
+    yPos += 6;
+    doc.text(`Monto: $${(goals?.amount || 0).toLocaleString('es-MX')}`, 14, yPos);
+    yPos += 12;
+
+    if (cards.length > 0) {
+      doc.setFontSize(14);
+      doc.setTextColor(42, 77, 59);
+      doc.text('Tarjetas de Crédito', 14, yPos);
+      yPos += 8;
+
+      const cardData = cards.map((card) => [
+        card.name,
+        `$${card.limit.toLocaleString('es-MX')}`,
+        `$${card.used.toLocaleString('es-MX')}`,
+        `$${(card.limit - card.used).toLocaleString('es-MX')}`,
+        `${((card.used / card.limit) * 100).toFixed(1)}%`
+      ]);
+
+      autoTable(doc, {
+        startY: yPos,
+        head: [['Tarjeta', 'Límite', 'Usado', 'Disponible', 'Uso %']],
+        body: cardData,
+        theme: 'grid',
+        headStyles: { fillColor: [42, 77, 59], textColor: [255, 255, 255] },
+        styles: { fontSize: 9 },
+        margin: { left: 14, right: 14 }
+      });
+
+      yPos = doc.lastAutoTable.finalY + 12;
+    }
+
+    if (expenses.length > 0) {
+      if (yPos > 200) {
+        doc.addPage();
+        yPos = 20;
+      }
+
+      doc.setFontSize(14);
+      doc.setTextColor(42, 77, 59);
+      doc.text('Gastos del Mes Actual', 14, yPos);
+      yPos += 8;
+
+      const monthExpenses = expenses.filter((e) => {
+        const expDate = new Date(e.date);
+        const current = new Date(data.currentDate);
+        return expDate.getMonth() === current.getMonth() && expDate.getFullYear() === current.getFullYear();
+      });
+
+      if (monthExpenses.length > 0) {
+        const expenseData = monthExpenses.map((exp) => [
+          new Date(exp.date).toLocaleDateString('es-MX', { day: '2-digit', month: 'short' }),
+          exp.name,
+          exp.category,
+          exp.method === 'Cash' ? 'Efectivo' : 'Tarjeta',
+          `$${exp.amount.toLocaleString('es-MX')}`
+        ]);
+
+        autoTable(doc, {
+          startY: yPos,
+          head: [['Fecha', 'Descripción', 'Categoría', 'Método', 'Monto']],
+          body: expenseData,
+          theme: 'grid',
+          headStyles: { fillColor: [42, 77, 59], textColor: [255, 255, 255] },
+          styles: { fontSize: 8 },
+          margin: { left: 14, right: 14 },
+          columnStyles: {
+            0: { cellWidth: 25 },
+            1: { cellWidth: 50 },
+            2: { cellWidth: 30 },
+            3: { cellWidth: 25 },
+            4: { cellWidth: 30, halign: 'right' }
+          }
+        });
+
+        yPos = doc.lastAutoTable.finalY + 8;
+        const monthTotal = monthExpenses.reduce((sum, e) => sum + e.amount, 0);
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'bold');
+        doc.text(`Total gastado este mes: $${monthTotal.toLocaleString('es-MX')}`, 14, yPos);
+      }
+    }
+
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i += 1) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(115, 117, 115);
+      doc.text(
+        `Página ${i} de ${pageCount} - GastosPro © ${new Date().getFullYear()}`,
+        doc.internal.pageSize.getWidth() / 2,
+        doc.internal.pageSize.getHeight() - 10,
+        { align: 'center' }
+      );
+    }
+
+    doc.save(`GastosPro-${new Date().toISOString().split('T')[0]}.pdf`);
+  };
+
+  const sortedMonthEntries = [...currentMonthEntries].sort(
+    (a, b) => new Date(getIncomeEntryDate(b, currentDate)) - new Date(getIncomeEntryDate(a, currentDate))
+  );
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="space-y-6"
+      data-testid="settings-view"
+    >
+      <div>
+        <p className="label-uppercase mb-1">Preferencias</p>
+        <h1 className="font-heading text-3xl sm:text-4xl font-light text-[#1A1C1A] tracking-tight">
+          Configuración
+        </h1>
+      </div>
+
+      <div className="rounded-3xl p-6 bg-gradient-to-br from-[#2A4D3B] to-[#1E3A2B] text-white overflow-hidden relative shadow-xl">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute -right-20 -top-20 w-60 h-60 rounded-full border border-white/30" />
+          <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full border border-white/20" />
+        </div>
+
+        <div className="relative space-y-6">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
+              <Coins weight="fill" className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h3 className="font-heading font-semibold text-xl">Ingresos del mes</h3>
+              <p className="text-sm text-white/70">Registra ingreso principal, ingresos extra y la frecuencia real con la que cobra tu cliente.</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="p-4 rounded-xl bg-white/10 backdrop-blur">
+              <p className="text-xs text-white/60 font-medium uppercase tracking-wider">Ingreso principal</p>
+              <p className="metric-value text-2xl text-white mt-1">${formatMoney(principalIncome)}</p>
+              <p className="text-xs text-white/60 mt-1">{frequencyLabels[primaryFrequency]} · {formatSourceText(primarySource || 'Ingreso principal')}</p>
+            </div>
+            <div className="p-4 rounded-xl bg-white/10 backdrop-blur">
+              <p className="text-xs text-white/60 font-medium uppercase tracking-wider">Ingresos extra</p>
+              <p className="metric-value text-2xl text-white mt-1">${formatMoney(extraMonthIncome)}</p>
+              <p className="text-xs text-white/60 mt-1">{extrasForMonth.length} movimiento(s) adicional(es)</p>
+            </div>
+            <div className="p-4 rounded-xl bg-white/10 backdrop-blur">
+              <p className="text-xs text-white/60 font-medium uppercase tracking-wider">Disponible en cash</p>
+              <p className="metric-value text-2xl text-white mt-1">${formatMoney(cashAvailable)}</p>
+              <p className="text-xs text-white/60 mt-1">{incomeCount} ingreso(s) registrados este mes</p>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-white/15 bg-white/10 p-4 space-y-4">
+            <div className="flex items-center gap-2">
+              <Crown weight="fill" className="w-5 h-5 text-[#F4D38F]" />
+              <p className="font-semibold">Ingreso principal del cliente</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+              <div>
+                <label className="text-sm font-semibold text-white/80 block mb-2">Monto</label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg text-white/60">$</span>
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    value={primaryIncome}
+                    onChange={handleNumberChange(setPrimaryIncome)}
+                    className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 pl-9 text-white placeholder-white/40 focus:outline-none focus:border-white/40"
+                    placeholder="0.00"
+                    autoComplete="off"
+                    data-testid="income-input"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-white/80 block mb-2">Proveniente de</label>
+                <input
+                  type="text"
+                  value={primarySource}
+                  onChange={(e) => setPrimarySource(formatSourceText(e.target.value))}
+                  className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-white/40"
+                  placeholder="Ej. Trabajo"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-white/80 block mb-2">Frecuencia</label>
+                <select
+                  value={primaryFrequency}
+                  onChange={(e) => setPrimaryFrequency(e.target.value)}
+                  className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-white/40"
+                >
+                  <option value="weekly" className="text-[#1A1C1A]">Semanal</option>
+                  <option value="biweekly" className="text-[#1A1C1A]">Quincenal</option>
+                  <option value="monthly" className="text-[#1A1C1A]">Mensual</option>
+                  <option value="one-time" className="text-[#1A1C1A]">Único</option>
+                </select>
+              </div>
+              <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex items-center gap-3">
+                <TrendUp weight="duotone" className="w-5 h-5 text-[#9FD1AF]" />
+                <p className="text-sm text-white/80">Este ingreso alimenta todo el cash disponible de la app.</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-white/15 bg-white/10 p-4 space-y-4">
+            <div className="flex items-center gap-2">
+              <Plus weight="bold" className="w-5 h-5 text-white" />
+              <p className="font-semibold">Agregar ingreso adicional</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
+              <div>
+                <label className="text-sm font-semibold text-white/80 block mb-2">Monto</label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg text-white/60">$</span>
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    value={incomeForm.amount}
+                    onChange={handleNumberChange((value) => handleIncomeFormChange('amount', value))}
+                    className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 pl-9 text-white placeholder-white/40 focus:outline-none focus:border-white/40"
+                    placeholder="0.00"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-sm font-semibold text-white/80 block mb-2">Tipo</label>
+                <select
+                  value={incomeForm.type}
+                  onChange={(e) => handleIncomeFormChange('type', e.target.value)}
+                  className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-white/40"
+                >
+                  <option value="extra" className="text-[#1A1C1A]">Extra</option>
+                  <option value="primary" className="text-[#1A1C1A]">Principal</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="text-sm font-semibold text-white/80 block mb-2">Frecuencia</label>
+                <select
+                  value={incomeForm.frequency}
+                  onChange={(e) => handleIncomeFormChange('frequency', e.target.value)}
+                  className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-white/40"
+                >
+                  <option value="weekly" className="text-[#1A1C1A]">Semanal</option>
+                  <option value="biweekly" className="text-[#1A1C1A]">Quincenal</option>
+                  <option value="monthly" className="text-[#1A1C1A]">Mensual</option>
+                  <option value="one-time" className="text-[#1A1C1A]">Único</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="text-sm font-semibold text-white/80 block mb-2">Fecha</label>
+                <input
+                  type="date"
+                  value={incomeForm.date}
+                  onChange={(e) => handleIncomeFormChange('date', e.target.value)}
+                  className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-white/40"
+                />
+              </div>
+
+              <button
+                type="button"
+                onClick={handleAddIncomeEntry}
+                className="h-[50px] px-5 rounded-xl bg-white text-[#1E3A2B] font-semibold flex items-center justify-center gap-2 hover:bg-[#F2F0EB] transition-all"
+              >
+                <Plus weight="bold" className="w-4 h-4" />
+                Agregar
+              </button>
+            </div>
+
+            <div>
+              <label className="text-sm font-semibold text-white/80 block mb-2">Proveniente de</label>
+              <input
+                type="text"
+                value={incomeForm.source}
+                onChange={(e) => handleIncomeFormChange('source', formatSourceText(e.target.value))}
+                className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-white/40"
+                placeholder="Ej. Trabajo, venta, reembolso, Uber"
+              />
+            </div>
+          </div>
+
+          {incomeError && (
+            <div className="p-3 rounded-xl bg-[#9C382A]/25 border border-white/10 text-sm text-white">
+              {incomeError}
+            </div>
+          )}
+
+          <div className="flex items-start gap-3 p-3 rounded-xl bg-white/10">
+            <Info weight="fill" className="w-5 h-5 text-white/60 flex-shrink-0 mt-0.5" />
+            <p className="text-sm text-white/70">
+              Todo queda sincronizado con el resto de la app: el ingreso principal y cada ingreso extra actualizan el <span className="font-semibold text-white">cash disponible</span>, el resumen, los gastos en efectivo y el reporte PDF.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="premium-card p-6">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#F2F0EB] to-[#EAE8E3] flex items-center justify-center shadow-sm">
+            <Wallet weight="fill" className="w-6 h-6 text-[#2A4D3B]" />
+          </div>
+          <div>
+            <h3 className="font-heading font-semibold text-xl text-[#1A1C1A]">Historial de ingresos del mes</h3>
+            <p className="text-sm text-[#737573]">Cada ingreso queda guardado con origen, tipo y frecuencia para no romper la lectura real del dinero que entra.</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-5">
+          <div className="p-4 rounded-xl bg-gradient-to-br from-[#F2F0EB] to-[#EAE8E3]">
+            <p className="text-xs text-[#737573] font-semibold uppercase tracking-wider mb-1">Total del mes</p>
+            <p className="metric-value text-2xl text-[#1A1C1A]">${formatMoney(monthlyCashIncome)}</p>
+          </div>
+          <div className="p-4 rounded-xl bg-gradient-to-br from-[#F2F0EB] to-[#EAE8E3]">
+            <p className="text-xs text-[#737573] font-semibold uppercase tracking-wider mb-1">Principal</p>
+            <p className="metric-value text-2xl text-[#1A1C1A]">${formatMoney(principalIncome)}</p>
+          </div>
+          <div className="p-4 rounded-xl bg-gradient-to-br from-[#F2F0EB] to-[#EAE8E3]">
+            <p className="text-xs text-[#737573] font-semibold uppercase tracking-wider mb-1">Extras</p>
+            <p className="metric-value text-2xl text-[#1A1C1A]">${formatMoney(extraMonthIncome)}</p>
+          </div>
+          <div className="p-4 rounded-xl bg-gradient-to-br from-[#F2F0EB] to-[#EAE8E3]">
+            <p className="text-xs text-[#737573] font-semibold uppercase tracking-wider mb-1">Cash disponible</p>
+            <p className={`metric-value text-2xl ${cashAvailable >= 0 ? 'text-[#2A4D3B]' : 'text-[#B65C47]'}`}>${formatMoney(cashAvailable)}</p>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          {sortedMonthEntries.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-[#D6D3CD] p-5 text-sm text-[#737573]">
+              Aún no hay ingresos registrados este mes.
+            </div>
+          ) : sortedMonthEntries.map((entry) => (
+            <div key={entry.id} className="rounded-2xl border border-[#ECE9E2] p-4 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 bg-[#FCFCFB]">
+              <div className="flex items-start gap-3">
+                <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${entry.type === 'primary' ? 'bg-[#2A4D3B]/10' : 'bg-[#D48B3F]/10'}`}>
+                  {entry.type === 'primary' ? (
+                    <Bank weight="fill" className="w-5 h-5 text-[#2A4D3B]" />
+                  ) : (
+                    <Receipt weight="fill" className="w-5 h-5 text-[#D48B3F]" />
+                  )}
+                </div>
+                <div>
+                  <p className="font-semibold text-[#1A1C1A]">{entry.source}</p>
+                  <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-[#737573]">
+                    <span>{typeLabels[entry.type] || entry.type}</span>
+                    <span>·</span>
+                    <span>{frequencyLabels[entry.frequency] || entry.frequency}</span>
+                    <span>·</span>
+                    <span>{new Date(getIncomeEntryDate(entry, currentDate)).toLocaleDateString('es-MX', { day: '2-digit', month: 'long' })}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 justify-between lg:justify-end">
+                <p className="metric-value text-xl text-[#1A1C1A]">${formatMoney(entry.amount)}</p>
+                {entry.type !== 'primary' && (
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveIncomeEntry(entry.id)}
+                    className="w-10 h-10 rounded-xl bg-[#B65C47]/10 hover:bg-[#B65C47]/15 text-[#B65C47] flex items-center justify-center transition-all"
+                    title="Eliminar ingreso"
+                  >
+                    <Trash weight="fill" className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="premium-card p-6">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#B65C47] to-[#9C382A] flex items-center justify-center shadow-lg shadow-[#B65C47]/20">
+            <Target weight="fill" className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h3 className="font-heading font-semibold text-xl text-[#1A1C1A]">Meta Inteligente</h3>
+            <p className="text-sm text-[#737573]">Define tu límite de gastos para mantener el control</p>
+          </div>
+        </div>
+
+        <div className="space-y-5">
+          <div>
+            <label className="text-sm font-semibold text-[#1A1C1A] block mb-3">Tipo de meta</label>
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                onClick={() => setGoalType('weekly')}
+                className={`p-5 rounded-xl border-2 transition-all hover:shadow-md ${goalType === 'weekly' ? 'border-[#2A4D3B] bg-[#2A4D3B]/5 shadow-lg' : 'border-[#E6E6E3] hover:border-[#2A4D3B]/30'}`}
+                data-testid="goal-weekly"
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <Lightning weight="fill" className={`w-5 h-5 ${goalType === 'weekly' ? 'text-[#2A4D3B]' : 'text-[#737573]'}`} />
+                  <p className={`font-semibold ${goalType === 'weekly' ? 'text-[#2A4D3B]' : 'text-[#1A1C1A]'}`}>Semanal</p>
+                </div>
+                <p className="text-xs text-[#737573]">Límite por cada semana del mes</p>
+              </button>
+              <button
+                onClick={() => setGoalType('monthly')}
+                className={`p-5 rounded-xl border-2 transition-all hover:shadow-md ${goalType === 'monthly' ? 'border-[#2A4D3B] bg-[#2A4D3B]/5 shadow-lg' : 'border-[#E6E6E3] hover:border-[#2A4D3B]/30'}`}
+                data-testid="goal-monthly"
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <CalendarBlank weight="fill" className={`w-5 h-5 ${goalType === 'monthly' ? 'text-[#2A4D3B]' : 'text-[#737573]'}`} />
+                  <p className={`font-semibold ${goalType === 'monthly' ? 'text-[#2A4D3B]' : 'text-[#1A1C1A]'}`}>Mensual</p>
+                </div>
+                <p className="text-xs text-[#737573]">Límite total para el mes completo</p>
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label className="text-sm font-semibold text-[#1A1C1A] block mb-2">Monto de meta</label>
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl text-[#737573]">$</span>
+              <input
+                type="text"
+                inputMode="decimal"
+                value={goalAmount}
+                onChange={handleNumberChange(setGoalAmount)}
+                className="premium-input pl-10 text-xl font-mono"
+                placeholder="0.00"
+                autoComplete="off"
+                data-testid="goal-amount-input"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="premium-card p-6">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#D48B3F] to-[#B65C47] flex items-center justify-center shadow-lg shadow-[#D48B3F]/20">
+            <CalendarBlank weight="fill" className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h3 className="font-heading font-semibold text-xl text-[#1A1C1A]">Período Actual</h3>
+            <p className="text-sm text-[#737573]">Información del periodo activo</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="p-4 rounded-xl bg-gradient-to-br from-[#F2F0EB] to-[#EAE8E3]">
+            <p className="text-xs text-[#737573] font-semibold uppercase tracking-wider mb-1">Mes actual</p>
+            <p className="font-semibold text-[#1A1C1A] capitalize">
+              {new Date(currentDate).toLocaleDateString('es', { month: 'long', year: 'numeric' })}
+            </p>
+          </div>
+          <div className="p-4 rounded-xl bg-gradient-to-br from-[#F2F0EB] to-[#EAE8E3]">
+            <p className="text-xs text-[#737573] font-semibold uppercase tracking-wider mb-1">Semana actual</p>
+            <p className="font-semibold text-[#1A1C1A]">Semana {Math.ceil(new Date(currentDate).getDate() / 7)}</p>
+          </div>
+          <div className="p-4 rounded-xl bg-gradient-to-br from-[#F2F0EB] to-[#EAE8E3]">
+            <p className="text-xs text-[#737573] font-semibold uppercase tracking-wider mb-1">Día actual</p>
+            <p className="font-semibold text-[#1A1C1A] capitalize">
+              {new Date(currentDate).toLocaleDateString('es', { weekday: 'long' })}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="premium-card p-6">
+        <h3 className="font-heading font-semibold text-xl text-[#1A1C1A] mb-4">Acciones</h3>
+        <div className="space-y-3">
+          <button
+            onClick={handleExport}
+            className="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-[#E6E6E3] hover:bg-[#F2F0EB] hover:border-[#2A4D3B]/30 transition-all text-left group"
+            data-testid="export-data"
+          >
+            <div className="w-12 h-12 rounded-xl bg-[#2A4D3B]/10 flex items-center justify-center group-hover:bg-[#2A4D3B] transition-colors">
+              <Export weight="fill" className="w-6 h-6 text-[#2A4D3B] group-hover:text-white transition-colors" />
+            </div>
+            <div>
+              <p className="font-semibold text-[#1A1C1A]">Exportar datos en PDF</p>
+              <p className="text-xs text-[#737573]">Incluye ingresos del mes, gastos, tarjetas y resumen financiero</p>
+            </div>
+          </button>
+
+          <button
+            onClick={() => setShowResetConfirm(true)}
+            className="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-[#B65C47]/30 hover:bg-[#B65C47]/5 transition-all text-left group"
+            data-testid="reset-data-btn"
+          >
+            <div className="w-12 h-12 rounded-xl bg-[#B65C47]/10 flex items-center justify-center">
+              <Trash weight="fill" className="w-6 h-6 text-[#B65C47]" />
+            </div>
+            <div>
+              <p className="font-semibold text-[#B65C47]">Reiniciar datos</p>
+              <p className="text-xs text-[#737573]">Elimina gastos, tarjetas, ingresos del mes y pone los ingresos del mes y meta en $0</p>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <div className="sticky bottom-20 md:bottom-4 z-30">
+        <button
+          onClick={handleSave}
+          className={`w-full flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-semibold shadow-lg transition-all ${saved ? 'bg-[#2A4D3B] text-white shadow-[#2A4D3B]/30' : 'bg-gradient-to-r from-[#2A4D3B] to-[#1E3A2B] text-white shadow-[#2A4D3B]/30 hover:shadow-xl hover:-translate-y-0.5'}`}
+          data-testid="save-settings"
+        >
+          {saved ? (
+            <>
+              <CheckCircle weight="fill" className="w-5 h-5" />
+              <span>Cambios guardados</span>
+            </>
+          ) : (
+            <span>Guardar cambios</span>
+          )}
+        </button>
+      </div>
+
+      <AnimatePresence>
+        {showResetConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay"
+            onClick={(e) => e.target === e.currentTarget && setShowResetConfirm(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="w-full max-w-sm bg-white rounded-3xl shadow-2xl p-6 text-center"
+            >
+              <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-[#B65C47]/10 flex items-center justify-center">
+                <ArrowCounterClockwise weight="fill" className="w-10 h-10 text-[#B65C47]" />
+              </div>
+              <h3 className="font-heading font-semibold text-2xl text-[#1A1C1A] mb-2">¿Reiniciar todo?</h3>
+              <p className="text-[#737573] mb-6">
+                Se eliminarán todos tus gastos, tarjetas, ingresos del mes y meta de gastos. Esta acción no se puede deshacer.
+              </p>
+              <div className="flex gap-3">
+                <button onClick={() => setShowResetConfirm(false)} className="flex-1 btn-secondary" data-testid="cancel-reset">
+                  Cancelar
+                </button>
+                <button
+                  onClick={() => {
+                    onReset();
+                    setShowResetConfirm(false);
+                  }}
+                  className="flex-1 bg-[#B65C47] text-white rounded-full py-3 font-semibold hover:bg-[#9C382A] transition-colors"
+                  data-testid="confirm-reset"
+                >
+                  Reiniciar
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+}

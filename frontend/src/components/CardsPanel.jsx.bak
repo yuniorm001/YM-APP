@@ -1,0 +1,698 @@
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  CreditCard as CreditCardIcon,
+  Plus,
+  Trash,
+  PencilSimple,
+  WarningCircle,
+  CheckCircle,
+  CaretRight,
+  CalendarBlank,
+  Warning,
+  Sparkle,
+  Clock,
+  CurrencyDollar
+} from '@phosphor-icons/react';
+
+const CARD_TYPES = [
+  { id: 'visa', name: 'Visa', gradient: 'credit-card-black' },
+  { id: 'mastercard', name: 'Mastercard', gradient: 'credit-card-green' },
+  { id: 'amex', name: 'American Express', gradient: 'credit-card-gold' },
+  { id: 'discover', name: 'Discover', gradient: 'credit-card-sand' },
+  { id: 'capital', name: 'Capital One', gradient: 'credit-card-black' },
+  { id: 'other', name: 'Otro', gradient: 'credit-card-sand' }
+];
+
+// Función para capitalizar primera letra
+const capitalizeFirst = (str) => {
+  if (!str) return '';
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+};
+
+// Función para formatear texto mientras se escribe
+const formatTextInput = (value) => {
+  if (!value) return '';
+  const words = value.split(' ');
+  return words.map((word, index) => {
+    if (index === 0 && word.length > 0) {
+      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    }
+    return word.toLowerCase();
+  }).join(' ');
+};
+
+export default function CardsPanel({ cards, onAdd, onEdit, onDelete }) {
+  const [showForm, setShowForm] = useState(false);
+  const [editingCard, setEditingCard] = useState(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    type: 'visa',
+    number: '',
+    limit: '',
+    used: '',
+    paymentDate: ''
+  });
+  const [error, setError] = useState('');
+
+  const totalLimit = cards.reduce((sum, c) => sum + c.limit, 0);
+  const totalUsed = cards.reduce((sum, c) => sum + c.used, 0);
+  const totalUtilization = totalLimit > 0 ? (totalUsed / totalLimit) * 100 : 0;
+
+  // Validación en tiempo real cuando cambian limit o used
+  useEffect(() => {
+    const limitNum = parseFloat(formData.limit) || 0;
+    const usedNum = parseFloat(formData.used) || 0;
+    
+    if (usedNum > limitNum && limitNum > 0) {
+      setError('El uso no puede exceder el límite de la tarjeta');
+    } else {
+      setError('');
+    }
+  }, [formData.limit, formData.used]);
+
+  // Handler para campo de nombre (solo texto)
+  const handleNameChange = (value) => {
+    const filtered = value.replace(/[0-9]/g, '');
+    setFormData(prev => ({ ...prev, name: formatTextInput(filtered) }));
+  };
+
+  // Handler para campos numéricos (solo números)
+  const handleNumberChange = (field, value) => {
+    const filtered = value.replace(/[^0-9.]/g, '');
+    const parts = filtered.split('.');
+    if (parts.length > 2) {
+      setFormData(prev => ({ ...prev, [field]: parts[0] + '.' + parts.slice(1).join('') }));
+    } else {
+      setFormData(prev => ({ ...prev, [field]: filtered }));
+    }
+  };
+
+  // Handler para últimos 4 dígitos (solo números)
+  const handleCardNumberChange = (value) => {
+    const filtered = value.replace(/\D/g, '').slice(0, 4);
+    setFormData(prev => ({ ...prev, number: filtered }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    const limitNum = parseFloat(formData.limit) || 0;
+    const usedNum = parseFloat(formData.used) || 0;
+    
+    // Validación: uso no puede exceder límite
+    if (usedNum > limitNum) {
+      setError('El uso no puede exceder el límite de la tarjeta');
+      return;
+    }
+
+    if (formData.number.length !== 4) {
+      setError('Los últimos 4 dígitos de la tarjeta son obligatorios');
+      return;
+    }
+
+    // Validación: fecha de pago es obligatoria
+    if (!formData.paymentDate) {
+      setError('La fecha de pago es obligatoria');
+      return;
+    }
+    
+    const cardData = {
+      ...formData,
+      limit: limitNum,
+      used: usedNum
+    };
+
+    if (editingCard) {
+      onEdit({ ...editingCard, ...cardData });
+    } else {
+      onAdd(cardData);
+    }
+
+    resetForm();
+  };
+
+  const resetForm = () => {
+    setFormData({ name: '', type: 'visa', number: '', limit: '', used: '', paymentDate: '' });
+    setEditingCard(null);
+    setShowForm(false);
+    setError('');
+  };
+
+  const startEdit = (card) => {
+    setFormData({
+      name: card.name,
+      type: card.type,
+      number: card.number,
+      limit: card.limit.toString(),
+      used: card.used.toString(),
+      paymentDate: card.paymentDate || ''
+    });
+    setEditingCard(card);
+    setShowForm(true);
+    setError('');
+  };
+
+  const getUtilizationStatus = (used, limit) => {
+    const pct = limit > 0 ? (used / limit) * 100 : 0;
+    if (pct >= 100) return { label: 'Sin crédito', color: '#9C382A', isFull: true };
+    if (pct <= 10) return { label: 'Saludable', color: '#2A4D3B', isFull: false };
+    if (pct <= 15) return { label: 'En Riesgo', color: '#D48B3F', isFull: false };
+    return { label: 'Crítico', color: '#9C382A', isFull: false };
+  };
+
+  // Calcular disponible y si está llena
+  const getCardAvailable = (card) => {
+    const available = card.limit - card.used;
+    return available > 0 ? available : 0;
+  };
+
+  // Calcular días restantes para el pago
+  const getDaysUntilPayment = (paymentDate) => {
+    if (!paymentDate) return null;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const payment = new Date(paymentDate);
+    payment.setHours(0, 0, 0, 0);
+    const diffTime = payment - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
+  // Mensaje de asesor financiero según días restantes
+  const getPaymentAdvice = (daysLeft, cardName, used) => {
+    if (daysLeft === null || daysLeft > 5) return null;
+    
+    if (daysLeft <= 0) {
+      return {
+        type: 'urgent',
+        title: '⚠️ Fecha de pago vencida',
+        message: `Tu tarjeta ${cardName} tiene un pago pendiente. Te recomiendo liquidarla hoy para evitar intereses y cargos moratorios que pueden afectar tu historial crediticio.`,
+        color: '#9C382A'
+      };
+    } else if (daysLeft <= 2) {
+      return {
+        type: 'critical',
+        title: '🚨 Pago muy próximo',
+        message: `Solo quedan ${daysLeft} día${daysLeft > 1 ? 's' : ''} para el corte de ${cardName}. Mi consejo: realiza el pago hoy para evitar sorpresas. Si planeas usarla, considera que el cargo entrará al próximo periodo.`,
+        color: '#9C382A'
+      };
+    } else if (daysLeft <= 5) {
+      return {
+        type: 'warning',
+        title: '📅 Fecha de pago cerca',
+        message: `Faltan ${daysLeft} días para el pago de ${cardName}. Te sugiero preparar el pago de $${used.toLocaleString('es-MX')} o al menos el mínimo. Evita nuevos cargos si no es necesario.`,
+        color: '#D48B3F'
+      };
+    }
+    return null;
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="space-y-6"
+      data-testid="cards-panel"
+    >
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <p className="label-uppercase mb-1">Portafolio</p>
+          <h1 className="font-heading text-3xl sm:text-4xl font-light text-[#1A1C1A] tracking-tight">
+            Mis Tarjetas
+          </h1>
+        </div>
+        <button
+          onClick={() => setShowForm(true)}
+          className="flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-[#2A4D3B] to-[#1E3A2B] text-white font-semibold shadow-lg shadow-[#2A4D3B]/20 hover:shadow-xl hover:-translate-y-0.5 transition-all"
+          data-testid="add-card-btn"
+        >
+          <Plus weight="bold" className="w-5 h-5" />
+          <span>Nueva Tarjeta</span>
+        </button>
+      </div>
+
+      {/* Total Credit Overview */}
+      <div className="premium-card p-6 bg-gradient-to-br from-white to-[#FAFAF9]" data-testid="credit-overview">
+        <div className="flex flex-col lg:flex-row lg:items-center gap-6">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-2">
+              <Sparkle weight="fill" className="w-4 h-4 text-[#D48B3F]" />
+              <p className="label-uppercase">Utilización Total del Crédito</p>
+            </div>
+            <div className="flex items-end gap-3 flex-wrap">
+              <span className="metric-value text-4xl sm:text-5xl text-[#1A1C1A]">
+                {totalUtilization.toFixed(1)}%
+              </span>
+              <span className={`px-3 py-1.5 rounded-full text-sm font-semibold mb-2`}
+                style={{ backgroundColor: `${getUtilizationStatus(totalUsed, totalLimit).color}15`, color: getUtilizationStatus(totalUsed, totalLimit).color }}>
+                {getUtilizationStatus(totalUsed, totalLimit).label}
+              </span>
+            </div>
+            <p className="text-[#737573] mt-2">
+              <span className="metric-value text-[#1A1C1A]">${totalUsed.toLocaleString('es-MX')}</span>
+              {' '}de{' '}
+              <span className="metric-value">${totalLimit.toLocaleString('es-MX')}</span>
+              {' '}utilizados
+            </p>
+            
+            {/* Alerta si no hay crédito disponible */}
+            {totalUtilization >= 100 && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-4 p-4 rounded-xl bg-[#9C382A]/10 border border-[#9C382A]/20 flex items-center gap-3"
+              >
+                <div className="w-10 h-10 rounded-full bg-[#9C382A]/20 flex items-center justify-center flex-shrink-0">
+                  <Warning weight="fill" className="w-5 h-5 text-[#9C382A]" />
+                </div>
+                <div>
+                  <p className="font-semibold text-[#9C382A]">Sin crédito disponible</p>
+                  <p className="text-sm text-[#9C382A]/80">Has alcanzado el límite total de tus tarjetas.</p>
+                </div>
+              </motion.div>
+            )}
+          </div>
+
+          <div className="w-full lg:w-72">
+            <div className="progress-bar h-4 rounded-full overflow-hidden relative">
+              <div
+                className="progress-fill h-full rounded-full transition-all duration-500"
+                style={{
+                  width: `${Math.min(totalUtilization, 100)}%`,
+                  backgroundColor: getUtilizationStatus(totalUsed, totalLimit).color
+                }}
+              />
+              {/* Marcadores de 10%, 15% y 20% */}
+              <div className="absolute top-0 left-[10%] w-0.5 h-full bg-[#2A4D3B]/40" />
+              <div className="absolute top-0 left-[15%] w-0.5 h-full bg-[#D48B3F]/40" />
+              <div className="absolute top-0 left-[20%] w-0.5 h-full bg-[#9C382A]/40" />
+            </div>
+            <div className="flex justify-between mt-2 text-xs text-[#737573] font-medium">
+              <span>0%</span>
+              <div className="flex items-center gap-3">
+                <span className="flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-[#2A4D3B]"></span>
+                  10%
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-[#D48B3F]"></span>
+                  15%
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-[#9C382A]"></span>
+                  20%
+                </span>
+              </div>
+              <span>100%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Cards Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <AnimatePresence mode="popLayout">
+          {cards.map((card, index) => {
+            const utilization = card.limit > 0 ? (card.used / card.limit) * 100 : 0;
+            const cardType = CARD_TYPES.find(t => t.id === card.type) || CARD_TYPES[5];
+            const status = getUtilizationStatus(card.used, card.limit);
+            const available = getCardAvailable(card);
+            const daysLeft = getDaysUntilPayment(card.paymentDate);
+            const paymentAdvice = getPaymentAdvice(daysLeft, card.name, card.used);
+
+            return (
+              <motion.div
+                key={card.id}
+                layout
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1, transition: { delay: index * 0.1 } }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="group"
+                data-testid={`card-item-${card.id}`}
+              >
+                {/* Alerta de fecha de pago próxima - Estilo Asesor Financiero */}
+                {paymentAdvice && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mb-3 p-4 rounded-2xl border-2 shadow-lg"
+                    style={{ 
+                      backgroundColor: `${paymentAdvice.color}08`,
+                      borderColor: `${paymentAdvice.color}30`
+                    }}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div 
+                        className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                        style={{ backgroundColor: `${paymentAdvice.color}20` }}
+                      >
+                        <Clock weight="fill" className="w-5 h-5" style={{ color: paymentAdvice.color }} />
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-bold text-sm" style={{ color: paymentAdvice.color }}>
+                          {paymentAdvice.title}
+                        </p>
+                        <p className="text-xs text-[#737573] mt-1 leading-relaxed">
+                          {paymentAdvice.message}
+                        </p>
+                        {daysLeft !== null && daysLeft > 0 && (
+                          <div className="mt-2 flex items-center gap-2">
+                            <span 
+                              className="px-2 py-1 rounded-full text-[10px] font-bold uppercase"
+                              style={{ backgroundColor: paymentAdvice.color, color: 'white' }}
+                            >
+                              {daysLeft} día{daysLeft > 1 ? 's' : ''} restante{daysLeft > 1 ? 's' : ''}
+                            </span>
+                            <span className="text-xs text-[#737573]">
+                              Deuda actual: <span className="font-semibold">${card.used.toLocaleString('es-MX')}</span>
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* Card Visual */}
+                <div className={`${cardType.gradient} rounded-2xl p-5 aspect-[1.6/1] relative overflow-hidden shadow-xl hover:shadow-2xl transition-shadow ${status.isFull ? 'opacity-70' : ''}`}>
+                  {/* Card Pattern */}
+                  <div className="absolute inset-0 opacity-10">
+                    <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full border border-white/30" />
+                    <div className="absolute -right-5 -top-5 w-32 h-32 rounded-full border border-white/20" />
+                  </div>
+
+                  {/* Sin crédito badge */}
+                  {status.isFull && (
+                    <div className="absolute top-3 right-3 px-2.5 py-1 bg-[#9C382A] rounded-full shadow-lg">
+                      <span className="text-[10px] font-bold text-white uppercase tracking-wide">Sin crédito</span>
+                    </div>
+                  )}
+
+                  {/* Payment soon badge */}
+                  {!status.isFull && daysLeft !== null && daysLeft <= 5 && (
+                    <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full shadow-lg"
+                      style={{ backgroundColor: daysLeft <= 2 ? '#9C382A' : '#D48B3F' }}>
+                      <span className="text-[10px] font-bold text-white uppercase tracking-wide">
+                        {daysLeft <= 0 ? 'Vencida' : `${daysLeft}d pago`}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Card Content */}
+                  <div className="relative h-full flex flex-col justify-between">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p className={`text-xs font-semibold uppercase tracking-wider ${cardType.gradient.includes('sand') ? 'text-[#737573]' : 'text-white/70'}`}>
+                          {cardType.name}
+                        </p>
+                        <p className={`font-semibold mt-1 ${cardType.gradient.includes('sand') ? 'text-[#1A1C1A]' : 'text-white'}`}>
+                          {card.name}
+                        </p>
+                      </div>
+                      <CreditCardIcon weight="fill" className={`w-8 h-8 ${cardType.gradient.includes('sand') ? 'text-[#737573]' : 'text-white/80'}`} />
+                    </div>
+
+                    <div>
+                      <p className={`font-mono text-lg tracking-wider ${cardType.gradient.includes('sand') ? 'text-[#1A1C1A]' : 'text-white'}`}>
+                        •••• •••• •••• {card.number.slice(-4) || '0000'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Card Details */}
+                <div className="premium-card mt-3 p-4">
+                  {/* Alerta individual si no hay crédito */}
+                  {status.isFull && (
+                    <div className="mb-3 p-3 rounded-xl bg-[#9C382A]/10 flex items-center gap-2">
+                      <Warning weight="fill" className="w-4 h-4 text-[#9C382A]" />
+                      <span className="text-xs text-[#9C382A] font-semibold">No tienes crédito disponible</span>
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <p className="text-xs text-[#737573] font-medium">Uso actual</p>
+                      <p className="metric-value text-lg" style={{ color: status.color }}>
+                        {utilization.toFixed(1)}%
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-[#737573] font-medium">Límite</p>
+                      <p className="metric-value text-lg text-[#1A1C1A]">
+                        ${card.limit.toLocaleString('es-MX')}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="progress-bar h-2.5 mb-3 rounded-full overflow-hidden">
+                    <div
+                      className="progress-fill h-full rounded-full transition-all duration-500"
+                      style={{ width: `${Math.min(utilization, 100)}%`, backgroundColor: status.color }}
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-[#737573]">
+                      Usado: <span className="metric-value text-[#1A1C1A]">${card.used.toLocaleString('es-MX')}</span>
+                    </span>
+                    <span className="text-[#737573]">
+                      Disponible: <span className={`metric-value ${available > 0 ? 'text-[#2A4D3B]' : 'text-[#9C382A]'}`}>${available.toLocaleString('es-MX')}</span>
+                    </span>
+                  </div>
+
+                  {card.paymentDate && (
+                    <div className="flex items-center gap-2 mt-3 pt-3 border-t border-[#E6E6E3] text-sm text-[#737573]">
+                      <CalendarBlank weight="fill" className="w-4 h-4 text-[#D48B3F]" />
+                      <span>Próximo pago: <span className="font-semibold">{new Date(card.paymentDate).toLocaleDateString('es', { day: 'numeric', month: 'short' })}</span></span>
+                    </div>
+                  )}
+
+                  {/* Actions */}
+                  <div className="flex items-center gap-2 mt-3 pt-3 border-t border-[#E6E6E3]">
+                    <button
+                      onClick={() => startEdit(card)}
+                      className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold text-[#737573] hover:bg-[#F2F0EB] transition-colors"
+                      data-testid={`edit-card-${card.id}`}
+                    >
+                      <PencilSimple weight="fill" className="w-4 h-4" />
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => onDelete(card.id)}
+                      className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold text-[#B65C47] hover:bg-[#B65C47]/10 transition-colors"
+                      data-testid={`delete-card-${card.id}`}
+                    >
+                      <Trash weight="fill" className="w-4 h-4" />
+                      Eliminar
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
+
+        {/* Empty State */}
+        {cards.length === 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="md:col-span-2 lg:col-span-3 premium-card p-12 text-center"
+          >
+            <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-[#F2F0EB] to-[#E6E6E3] flex items-center justify-center">
+              <CreditCardIcon weight="duotone" className="w-10 h-10 text-[#737573]" />
+            </div>
+            <h3 className="font-heading font-semibold text-xl text-[#1A1C1A] mb-2">Sin tarjetas</h3>
+            <p className="text-[#737573] mb-6">Agrega tu primera tarjeta de crédito para empezar</p>
+            <button
+              onClick={() => setShowForm(true)}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#2A4D3B] to-[#1E3A2B] text-white font-semibold shadow-lg"
+            >
+              <Plus weight="bold" className="w-5 h-5" />
+              <span>Agregar Tarjeta</span>
+            </button>
+          </motion.div>
+        )}
+      </div>
+
+      {/* Add/Edit Card Modal */}
+      <AnimatePresence>
+        {showForm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay"
+            onClick={(e) => e.target === e.currentTarget && resetForm()}
+            data-testid="card-modal"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden"
+            >
+              <div className="p-6 border-b border-[#E6E6E3] bg-gradient-to-r from-[#FAFAF9] to-[#F5F4F1]">
+                <h2 className="font-heading text-xl font-semibold text-[#1A1C1A]">
+                  {editingCard ? 'Editar Tarjeta' : 'Nueva Tarjeta'}
+                </h2>
+                <p className="text-sm text-[#737573] mt-1">Registra los datos de tu tarjeta de crédito</p>
+              </div>
+
+              <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                {/* Error message */}
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-4 rounded-xl bg-[#9C382A]/10 border border-[#9C382A]/20 flex items-center gap-3"
+                  >
+                    <Warning weight="fill" className="w-5 h-5 text-[#9C382A] flex-shrink-0" />
+                    <p className="text-sm text-[#9C382A] font-semibold">{error}</p>
+                  </motion.div>
+                )}
+
+                <div>
+                  <label className="text-sm font-semibold text-[#1A1C1A] block mb-2">Nombre de la tarjeta</label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => handleNameChange(e.target.value)}
+                    placeholder="Mi tarjeta principal"
+                    className="premium-input"
+                    required
+                    autoComplete="off"
+                    data-testid="card-name-input"
+                  />
+                  <p className="text-xs text-[#737573] mt-1">Solo letras. Primera letra mayúscula.</p>
+                </div>
+
+                <div>
+                  <label className="text-sm font-semibold text-[#1A1C1A] block mb-2">Tipo de tarjeta</label>
+                  <select
+                    value={formData.type}
+                    onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value }))}
+                    className="premium-input"
+                    data-testid="card-type-select"
+                  >
+                    {CARD_TYPES.map((type) => (
+                      <option key={type.id} value={type.id}>{type.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-sm font-semibold text-[#1A1C1A] block mb-2">Últimos 4 dígitos</label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={formData.number}
+                    onChange={(e) => handleCardNumberChange(e.target.value)}
+                    placeholder="1234"
+                    className="premium-input font-mono text-lg tracking-widest"
+                    maxLength={4}
+                    required
+                    autoComplete="off"
+                    data-testid="card-number-input"
+                  />
+                  <p className="text-xs text-[#737573] mt-1">Campo obligatorio. Solo números (4 dígitos).</p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-semibold text-[#1A1C1A] block mb-2">Límite de crédito</label>
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      value={formData.limit}
+                      onChange={(e) => handleNumberChange('limit', e.target.value)}
+                      placeholder="50000"
+                      className="premium-input font-mono"
+                      required
+                      autoComplete="off"
+                      data-testid="card-limit-input"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-[#1A1C1A] block mb-2">Uso actual</label>
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      value={formData.used}
+                      onChange={(e) => handleNumberChange('used', e.target.value)}
+                      placeholder="0"
+                      className={`premium-input font-mono ${error ? 'border-[#9C382A] focus:border-[#9C382A]' : ''}`}
+                      autoComplete="off"
+                      data-testid="card-used-input"
+                    />
+                  </div>
+                </div>
+
+                {/* Preview de utilización en tiempo real */}
+                {formData.limit && (
+                  <div className="p-4 rounded-xl bg-gradient-to-r from-[#F2F0EB] to-[#EAE8E3]">
+                    <div className="flex items-center justify-between text-sm mb-2">
+                      <span className="text-[#737573] font-medium">Vista previa</span>
+                      <span className="metric-value" style={{ color: getUtilizationStatus(parseFloat(formData.used) || 0, parseFloat(formData.limit) || 1).color }}>
+                        {((parseFloat(formData.used) || 0) / (parseFloat(formData.limit) || 1) * 100).toFixed(1)}% utilizado
+                      </span>
+                    </div>
+                    <div className="progress-bar h-2.5 rounded-full overflow-hidden">
+                      <div
+                        className="progress-fill h-full rounded-full transition-all duration-300"
+                        style={{
+                          width: `${Math.min(((parseFloat(formData.used) || 0) / (parseFloat(formData.limit) || 1) * 100), 100)}%`,
+                          backgroundColor: getUtilizationStatus(parseFloat(formData.used) || 0, parseFloat(formData.limit) || 1).color
+                        }}
+                      />
+                    </div>
+                    <div className="flex justify-between mt-2 text-xs text-[#737573]">
+                      <span>Disponible: <span className="font-semibold">${((parseFloat(formData.limit) || 0) - (parseFloat(formData.used) || 0)).toLocaleString('es-MX')}</span></span>
+                    </div>
+                  </div>
+                )}
+
+                <div>
+                  <label className="text-sm font-semibold text-[#1A1C1A] block mb-2">
+                    Fecha de corte/pago <span className="text-[#B65C47]">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.paymentDate}
+                    onChange={(e) => setFormData(prev => ({ ...prev, paymentDate: e.target.value }))}
+                    className={`premium-input ${!formData.paymentDate && error?.includes('fecha') ? 'border-[#9C382A]' : ''}`}
+                    required
+                    data-testid="card-payment-date"
+                  />
+                  <p className="text-xs text-[#737573] mt-1">Campo obligatorio</p>
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={resetForm}
+                    className="flex-1 btn-secondary"
+                    data-testid="cancel-card-btn"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={!!error}
+                    className={`flex-1 btn-primary ${error ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    data-testid="save-card-btn"
+                  >
+                    {editingCard ? 'Guardar cambios' : 'Agregar tarjeta'}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+}
