@@ -200,15 +200,17 @@ export default function LoginScreen({ onGuestAccess, onProviderSelect, onEmailCo
               </span>
             </button>
 
-            <button
-              type="button"
-              onClick={otpRequested ? handleSendCode : () => onGuestAccess?.()}
-              disabled={isTransitioning || isRequestingCode || isDirectAdmin}
-              className="group relative flex h-[3.6rem] w-full items-center justify-center gap-3 overflow-hidden rounded-full border border-[#7eb49f]/18 bg-[linear-gradient(135deg,rgba(255,255,255,0.055),rgba(74,124,111,0.11))] px-5 text-[14px] font-semibold uppercase tracking-[0.2em] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.055),0_12px_30px_rgba(0,0,0,0.18)] transition-all duration-300 hover:border-[#9ad2b9]/35 hover:bg-[linear-gradient(135deg,rgba(255,255,255,0.075),rgba(74,124,111,0.17))] disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {otpRequested ? <PaperPlaneTilt size={20} weight="bold" className="relative z-10" /> : <UsersThree size={20} weight="fill" className="relative z-10" />}
-              <span className="relative z-10">{isDirectAdmin ? 'Acceso admin detectado' : (otpRequested ? 'Reenviar código' : 'Entrar como invitado')}</span>
-            </button>
+              {otpRequested && !isDirectAdmin ? (
+              <button
+                type="button"
+                onClick={handleSendCode}
+                disabled={isTransitioning || isRequestingCode}
+                className="group relative flex h-[3.6rem] w-full items-center justify-center gap-3 overflow-hidden rounded-full border border-[#7eb49f]/18 bg-[linear-gradient(135deg,rgba(255,255,255,0.055),rgba(74,124,111,0.11))] px-5 text-[14px] font-semibold uppercase tracking-[0.2em] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.055),0_12px_30px_rgba(0,0,0,0.18)] transition-all duration-300 hover:border-[#9ad2b9]/35 hover:bg-[linear-gradient(135deg,rgba(255,255,255,0.075),rgba(74,124,111,0.17))] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <PaperPlaneTilt size={20} weight="bold" className="relative z-10" />
+                <span className="relative z-10">Reenviar código</span>
+              </button>
+            ) : null}
           </div>
 
           <div className="mt-6 grid grid-cols-3 gap-2 rounded-[24px] border border-white/[0.06] bg-white/[0.025] p-2 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
