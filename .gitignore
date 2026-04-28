@@ -4,3 +4,6 @@ dist/
 frontend/dist/
 .env
 .env.local
+backend/.env
+frontend/.env
+frontend/.env.local
