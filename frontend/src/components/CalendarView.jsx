@@ -83,7 +83,7 @@ export default function CalendarView({ expenses, currentDate }) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="mobile-responsive-root space-y-6 w-full max-w-full min-w-0 overflow-hidden"
+      className="space-y-6"
       data-testid="calendar-view"
     >
       {/* Header */}
@@ -151,13 +151,13 @@ export default function CalendarView({ expenses, currentDate }) {
       </div>
 
       {/* Calendar Grid */}
-      <div className="premium-card calendar-mobile-safe w-full max-w-full min-w-0 overflow-hidden">
+      <div className="premium-card overflow-hidden">
         {/* Day Headers */}
-        <div className="grid grid-cols-7 border-b border-[#E6E6E3] min-w-0">
+        <div className="grid grid-cols-7 border-b border-[#E6E6E3]">
           {dayNames.map((day) => (
             <div
               key={day}
-              className="min-w-0 p-2 sm:p-3 text-center text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[#737573]"
+              className="p-3 text-center text-xs font-bold uppercase tracking-wider text-[#737573]"
             >
               <span className="hidden sm:inline">{day}</span>
               <span className="sm:hidden">{day.charAt(0)}</span>
@@ -168,7 +168,7 @@ export default function CalendarView({ expenses, currentDate }) {
         {/* Weeks */}
         <div className="divide-y divide-[#E6E6E3]">
           {weeks.map((week, weekIndex) => (
-            <div key={weekIndex} className="grid grid-cols-7 divide-x divide-[#E6E6E3] min-w-0">
+            <div key={weekIndex} className="grid grid-cols-7 divide-x divide-[#E6E6E3]">
               {week.map((date, dayIndex) => {
                 const dayExpenses = getExpensesForDate(date);
                 const dayTotal = dayExpenses.reduce((sum, e) => sum + e.amount, 0);
@@ -179,12 +179,12 @@ export default function CalendarView({ expenses, currentDate }) {
                 return (
                   <div
                     key={dayIndex}
-                    className={`min-w-0 overflow-hidden min-h-[72px] sm:min-h-[100px] p-1.5 sm:p-3 transition-colors ${
+                    className={`min-h-[80px] sm:min-h-[100px] p-2 sm:p-3 transition-colors ${
                       today ? 'bg-[#2A4D3B]/5' : hasExpenses ? 'bg-[#F2F0EB]/50' : 'hover:bg-[#F2F0EB]/30'
                     } ${!inMonth ? 'opacity-40' : ''}`}
                     data-testid={`calendar-day-${date.toISOString().split('T')[0]}`}
                   >
-                    <div className="flex min-w-0 items-center justify-between gap-1 mb-1">
+                    <div className="flex items-center justify-between mb-1">
                       <span className={`text-sm font-medium ${
                         today
                           ? 'w-7 h-7 rounded-full bg-[#2A4D3B] text-white flex items-center justify-center'
@@ -200,7 +200,7 @@ export default function CalendarView({ expenses, currentDate }) {
                     </div>
 
                     {/* Mobile: Just dots */}
-                    <div className="sm:hidden flex min-w-0 flex-wrap gap-0.5 overflow-hidden">
+                    <div className="sm:hidden flex flex-wrap gap-0.5">
                       {dayExpenses.slice(0, 4).map((expense, i) => (
                         <Circle
                           key={i}
@@ -215,7 +215,7 @@ export default function CalendarView({ expenses, currentDate }) {
                     </div>
 
                     {/* Desktop: Expense list */}
-                    <div className="hidden sm:block min-w-0 space-y-1 overflow-hidden">
+                    <div className="hidden sm:block space-y-1">
                       {dayExpenses.slice(0, 2).map((expense) => (
                         <div
                           key={expense.id}
