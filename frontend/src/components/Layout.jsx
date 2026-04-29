@@ -513,9 +513,22 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
         }`}
         data-testid="main-content"
       >
-        <div className="max-w-7xl mx-auto p-3 md:p-5 lg:p-7 pb-8 md:pb-6">
-          <div className="app-shell relative rounded-[28px] md:rounded-[34px] px-3 py-4 md:px-5 md:py-5 lg:px-6 lg:py-6">
-          {children}</div>
+        <div
+          className={`mx-auto max-w-7xl box-border ${
+            isMobile && ['home', 'expenses', 'calendar'].includes(activeTab)
+              ? 'px-5 py-4'
+              : 'p-3'
+          } md:p-5 lg:p-7 pb-8 md:pb-6`}
+        >
+          <div
+            className={`app-shell relative box-border rounded-[28px] md:rounded-[34px] ${
+              isMobile && ['home', 'expenses', 'calendar'].includes(activeTab)
+                ? 'px-4 py-5'
+                : 'px-3 py-4'
+            } md:px-5 md:py-5 lg:px-6 lg:py-6`}
+          >
+            {children}
+          </div>
         </div>
       </main>
 
