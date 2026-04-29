@@ -3223,3 +3223,217 @@ button[class*="bg-gradient-to-r"]:active,
 .admin-access-modal--fullscreen .admin-access-modal-list {
   padding-top: clamp(.85rem, 1.4vw, 1.15rem);
 }
+
+/* Mobile responsive hardening for Admin Access panel - prevents right-side clipping on iPhone/Safari */
+html,
+body,
+#root {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+.admin-access-panel,
+.admin-access-panel * {
+  max-width: 100%;
+}
+
+.admin-console-card,
+.admin-access-layout,
+.admin-create-panel,
+.admin-list-panel,
+.admin-create-form-body,
+.admin-access-list,
+.admin-user-row,
+.admin-row-controls {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.admin-input-wrap,
+.admin-select-wrap,
+.admin-clean-input,
+.admin-mini-input,
+.admin-primary-btn,
+.admin-view-more-wrap,
+.admin-view-more-btn {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.admin-clean-input[type="date"],
+.admin-mini-input[type="date"] {
+  display: block;
+  overflow: hidden;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.admin-user-row p {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.admin-user-row .admin-pill {
+  max-width: 100%;
+  white-space: normal;
+  line-height: 1.15;
+}
+
+.admin-view-more-btn {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: .65rem;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .admin-console-card {
+    padding-left: .85rem !important;
+    padding-right: .85rem !important;
+  }
+
+  .admin-access-layout {
+    gap: 1rem !important;
+  }
+
+  .admin-create-panel,
+  .admin-list-panel {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    border-radius: 26px !important;
+    padding: 1rem !important;
+  }
+
+  .admin-access-layout--stacked .admin-create-form-body {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: .95rem !important;
+  }
+
+  .admin-access-layout--stacked .admin-create-form-body > div {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .admin-clean-input {
+    min-height: 56px;
+    border-radius: 20px;
+    padding-left: .95rem;
+    padding-right: .95rem;
+    font-size: 16px;
+  }
+
+  .admin-input-wrap .admin-clean-input {
+    padding-left: 2.85rem;
+  }
+
+  .admin-quick-chip {
+    width: 100%;
+    min-width: 0;
+    min-height: 50px;
+    padding: .72rem .5rem;
+    border-radius: 20px;
+    font-size: clamp(.78rem, 3.35vw, .92rem);
+    white-space: normal;
+    text-align: center;
+  }
+
+  .admin-primary-btn {
+    min-height: 62px;
+    border-radius: 24px;
+    white-space: normal;
+  }
+
+  .admin-access-list {
+    width: 100%;
+    max-width: 100%;
+    overflow: visible;
+    padding-right: 0 !important;
+    gap: .9rem;
+  }
+
+  .admin-user-row {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    border-radius: 26px;
+    padding: 1rem;
+  }
+
+  .admin-avatar {
+    width: 54px;
+    height: 54px;
+    border-radius: 18px;
+  }
+
+  .admin-user-row .admin-delete-btn,
+  .admin-user-row .admin-locked-badge {
+    width: 100%;
+    min-height: 54px;
+    border-radius: 22px;
+  }
+
+  .admin-row-controls {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: .75rem;
+  }
+
+  .admin-mini-input {
+    width: 100%;
+    min-height: 45px;
+    font-size: 16px;
+  }
+
+  .admin-view-more-wrap {
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+  }
+
+  .admin-view-more-btn {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 64px;
+    border-radius: 26px;
+    padding: .9rem .75rem;
+    font-size: clamp(.78rem, 3.5vw, .95rem);
+    letter-spacing: .14em;
+  }
+}
+
+@media (max-width: 390px) {
+  .admin-console-card {
+    padding-left: .65rem !important;
+    padding-right: .65rem !important;
+  }
+
+  .admin-create-panel,
+  .admin-list-panel {
+    padding: .85rem !important;
+    border-radius: 24px !important;
+  }
+
+  .admin-quick-chip {
+    min-height: 46px;
+    font-size: .78rem;
+  }
+
+  .admin-user-row {
+    padding: .85rem;
+  }
+}
