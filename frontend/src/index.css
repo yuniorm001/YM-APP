@@ -3603,3 +3603,62 @@ input[type='date'].premium-input,
     letter-spacing: 0.14em;
   }
 }
+
+/* =========================================================
+   FIX FINAL - RESTAURAR PADDING PREMIUM EN MOBILE
+   Solo afecta Inicio, Gastos y Calendario.
+   No toca Tarjetas, Admin, Settings ni lógica.
+========================================================= */
+
+@media (max-width: 767px) {
+  [data-testid="dashboard"],
+  [data-testid="expenses-list"],
+  [data-testid="calendar-view"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: clamp(1rem, 4.5vw, 1.35rem) !important;
+    padding-right: clamp(1rem, 4.5vw, 1.35rem) !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+  }
+
+  [data-testid="dashboard"] > *,
+  [data-testid="expenses-list"] > *,
+  [data-testid="calendar-view"] > * {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  [data-testid="dashboard"] .premium-card,
+  [data-testid="dashboard"] .hero-surface,
+  [data-testid="dashboard"] .smart-pulse-card,
+  [data-testid="expenses-list"] .premium-card,
+  [data-testid="expenses-list"] .hero-surface,
+  [data-testid="calendar-view"] .premium-card,
+  [data-testid="calendar-view"] .hero-surface {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    border-radius: clamp(1.45rem, 5vw, 2rem) !important;
+  }
+
+  [data-testid="dashboard"] .smart-pulse-hero {
+    padding-left: clamp(1rem, 4vw, 1.25rem) !important;
+    padding-right: clamp(1rem, 4vw, 1.25rem) !important;
+  }
+}
+
+/* iPhone muy pequeño */
+@media (max-width: 380px) {
+  [data-testid="dashboard"],
+  [data-testid="expenses-list"],
+  [data-testid="calendar-view"] {
+    padding-left: 0.9rem !important;
+    padding-right: 0.9rem !important;
+  }
+
+  [data-testid="dashboard"] .smart-pulse-hero {
+    padding-left: 0.85rem !important;
+    padding-right: 0.85rem !important;
+  }
+}
