@@ -3437,3 +3437,330 @@ body,
     padding: .85rem;
   }
 }
+
+/* =========================================================
+   GOD-LEVEL MOBILE RESPONSIVE HARDENING - FULL APP
+   Objetivo: cero cortes laterales, cero scroll horizontal,
+   inputs/fechas/botones perfectos en iPhone/Safari/Android.
+   ========================================================= */
+html,
+body,
+#root {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden !important;
+  touch-action: manipulation;
+}
+
+body {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+img,
+svg,
+canvas,
+video {
+  max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+button {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.premium-input,
+.admin-clean-input,
+.admin-mini-input,
+input[type="text"],
+input[type="email"],
+input[type="number"],
+input[type="date"],
+select,
+textarea {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* Date inputs: Safari/iPhone tends to clip native date text on the right.
+   This forces the native field to respect the card width. */
+input[type="date"].premium-input,
+input[type="date"].admin-clean-input,
+input[type="date"].admin-mini-input,
+.mobile-date-input {
+  display: block;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  min-height: 58px;
+  line-height: 1.2;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  overflow: hidden;
+  color: #1A1C1A;
+  background-clip: padding-box;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input[type="date"]::-webkit-date-and-time-value {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  text-align: left;
+  line-height: 1.2;
+  padding: 0;
+  margin: 0;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  flex-shrink: 0;
+  margin-left: auto;
+  max-width: 1.3rem;
+  opacity: .72;
+}
+
+.mobile-date-wrap,
+.card-date-field {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Full-screen modals: premium mobile behavior */
+.app-mobile-safe-modal,
+.app-mobile-safe-modal * {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.mobile-modal-sheet {
+  width: 100vw !important;
+  max-width: 100vw !important;
+  min-width: 0 !important;
+  overflow-x: hidden !important;
+}
+
+.mobile-modal-body {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
+}
+
+.mobile-modal-header,
+.mobile-modal-progress,
+.mobile-modal-footer {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.btn-modal-primary,
+.btn-modal-secondary,
+.btn-modal-danger {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  white-space: normal;
+  text-align: center;
+  line-height: 1.15;
+  overflow: hidden;
+}
+
+/* Cards and content grids across the app */
+.premium-card,
+.fintech-details-card,
+.hero-surface,
+.smart-pulse-card,
+[class*="rounded-["],
+[class*="grid"],
+[class*="flex"] {
+  min-width: 0;
+}
+
+.section-heading,
+.smart-pulse-topline,
+.smart-pulse-brand,
+.smart-pulse-badges {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.metric-value,
+.metric-caption,
+.section-subtle,
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+span {
+  min-width: 0;
+}
+
+/* Long text/email protection. */
+.break-mobile,
+.admin-user-row p,
+.admin-access-modal p,
+.admin-access-panel p,
+[data-testid="card-modal"] p,
+[data-testid="income-modal"] p,
+[data-testid="expense-modal"] p {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+@media (max-width: 767px) {
+  .premium-input,
+  .admin-clean-input,
+  .admin-mini-input,
+  select,
+  textarea {
+    font-size: 16px !important; /* prevents iOS zoom and clipping */
+  }
+
+  .premium-input {
+    min-height: 56px;
+    border-radius: 18px;
+    padding-left: .95rem;
+    padding-right: .95rem;
+  }
+
+  input[type="date"].premium-input,
+  input[type="date"].admin-clean-input,
+  input[type="date"].admin-mini-input,
+  .mobile-date-input {
+    min-height: 60px;
+    border-radius: 18px;
+    padding-left: .95rem !important;
+    padding-right: .95rem !important;
+    font-size: 16px !important;
+  }
+
+  .card-editor-modal .mobile-modal-header h2 {
+    font-size: clamp(1.05rem, 5vw, 1.35rem);
+    line-height: 1.05;
+  }
+
+  .card-editor-modal .mobile-modal-header p {
+    font-size: .78rem;
+    line-height: 1.25;
+  }
+
+  .card-editor-modal .mobile-modal-body label,
+  .admin-access-panel label,
+  .admin-access-modal label {
+    letter-spacing: .02em;
+  }
+
+  .card-editor-modal .mobile-modal-footer > div,
+  .mobile-modal-footer > div {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .btn-modal-primary,
+  .btn-modal-secondary,
+  .btn-modal-danger {
+    min-height: 56px;
+    padding-left: .85rem;
+    padding-right: .85rem;
+    font-size: clamp(.88rem, 3.75vw, 1rem);
+  }
+
+  /* Any two-column grid in modals must collapse cleanly on phone. */
+  [data-testid="card-modal"] .grid,
+  [data-testid="income-modal"] .grid,
+  [data-testid="expense-modal"] .grid,
+  [data-testid="card-payment-modal"] .grid,
+  [data-testid="card-goal-modal"] .grid,
+  [data-testid="card-recommendation-modal"] .grid {
+    min-width: 0;
+  }
+
+  /* Prevent right-side clipping from decorative widths. */
+  [class*="sm:min-w-["],
+  [class*="lg:min-w-["] {
+    min-width: 0;
+  }
+
+  .premium-card {
+    overflow: hidden;
+  }
+}
+
+@media (max-width: 430px) {
+  .mobile-modal-body {
+    padding-left: .875rem !important;
+    padding-right: .875rem !important;
+  }
+
+  .mobile-modal-header,
+  .mobile-modal-progress,
+  .mobile-modal-footer {
+    padding-left: .875rem !important;
+    padding-right: .875rem !important;
+  }
+
+  .premium-input {
+    min-height: 54px;
+  }
+
+  input[type="date"].premium-input,
+  .mobile-date-input {
+    min-height: 58px;
+  }
+
+  .section-heading {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 380px) {
+  .mobile-modal-body {
+    padding-left: .7rem !important;
+    padding-right: .7rem !important;
+  }
+
+  .mobile-modal-header,
+  .mobile-modal-progress,
+  .mobile-modal-footer {
+    padding-left: .7rem !important;
+    padding-right: .7rem !important;
+  }
+
+  .btn-modal-primary,
+  .btn-modal-secondary,
+  .btn-modal-danger {
+    min-height: 54px;
+    font-size: .88rem;
+  }
+}
