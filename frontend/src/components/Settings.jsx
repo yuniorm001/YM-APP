@@ -1168,7 +1168,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                   className="settings-action-primary"
                   data-testid="open-income-history-modal"
                 >
-                  Ingresos registrados
+                  Ver ingresos registrados
                 </button>
               </div>
             )}
