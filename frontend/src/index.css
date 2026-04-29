@@ -3672,3 +3672,18 @@ input[type='date'].premium-input,
     padding-right: 14px !important;
   }
 }
+
+
+
+body::before {
+  content: "CAMBIO CSS ACTIVO";
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999999999;
+  background: red;
+  color: white;
+  font-size: 18px;
+  font-weight: 900;
+  padding: 10px 16px;
+}
