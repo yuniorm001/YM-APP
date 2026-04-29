@@ -162,8 +162,8 @@ export default function Statistics({ data }) {
       </div>
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="premium-card p-5">
+      <div className="grid w-full min-w-0 grid-cols-1 min-[390px]:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="premium-card w-full max-w-full min-w-0 overflow-hidden p-4 sm:p-5">
           <div className="flex items-center gap-2 mb-3">
             <ChartBar weight="duotone" className="w-5 h-5 text-[#2A4D3B]" />
             <span className="label-uppercase text-[10px]">Este mes</span>
@@ -174,7 +174,7 @@ export default function Statistics({ data }) {
           <p className="text-xs text-[#737573] mt-1">{monthExpenses.length} gastos</p>
         </div>
 
-        <div className="premium-card p-5">
+        <div className="premium-card w-full max-w-full min-w-0 overflow-hidden p-4 sm:p-5">
           <div className="flex items-center gap-2 mb-3">
             <Lightning weight="duotone" className="w-5 h-5 text-[#D48B3F]" />
             <span className="label-uppercase text-[10px]">Promedio/día</span>
@@ -185,7 +185,7 @@ export default function Statistics({ data }) {
           <p className="text-xs text-[#737573] mt-1">{daysWithExpenses} días activos</p>
         </div>
 
-        <div className="premium-card p-5">
+        <div className="premium-card w-full max-w-full min-w-0 overflow-hidden p-4 sm:p-5">
           <div className="flex items-center gap-2 mb-3">
             <TrendUp weight="duotone" className="w-5 h-5 text-[#B65C47]" />
             <span className="label-uppercase text-[10px]">Proyección</span>
@@ -196,7 +196,7 @@ export default function Statistics({ data }) {
           <p className="text-xs text-[#737573] mt-1">{daysRemaining} días restantes</p>
         </div>
 
-        <div className="premium-card p-5">
+        <div className="premium-card w-full max-w-full min-w-0 overflow-hidden p-4 sm:p-5">
           <div className="flex items-center gap-2 mb-3">
             <Target weight="duotone" className="w-5 h-5 text-[#2A4D3B]" />
             <span className="label-uppercase text-[10px]">vs Ingreso (Cash)</span>
@@ -214,12 +214,12 @@ export default function Statistics({ data }) {
       </div>
 
       {/* Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid w-full min-w-0 grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
         {/* Category Breakdown */}
-        <div className="premium-card p-6">
+        <div className="premium-card w-full max-w-full min-w-0 overflow-hidden p-4 sm:p-6">
           <h3 className="font-heading font-medium text-lg text-[#1A1C1A] mb-4">Por Categoría</h3>
           {categoryData.length > 0 ? (
-            <div className="flex flex-col sm:flex-row items-center gap-6">
+            <div className="flex min-w-0 flex-col sm:flex-row items-center gap-5 sm:gap-6">
               <div className="w-40 h-40 flex-shrink-0">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -239,14 +239,14 @@ export default function Statistics({ data }) {
                   </PieChart>
                 </ResponsiveContainer>
               </div>
-              <div className="flex-1 w-full space-y-2">
+              <div className="min-w-0 flex-1 w-full space-y-2">
                 {categoryData.map((cat) => (
-                  <div key={cat.name} className="flex items-center gap-3">
+                  <div key={cat.name} className="flex min-w-0 items-center gap-3">
                     <span className="text-lg">{cat.icon}</span>
                     <div className="flex-1">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm text-[#1A1C1A]">{cat.name}</span>
-                        <span className="metric-value text-sm">${cat.value.toLocaleString('es-MX')}</span>
+                      <div className="flex min-w-0 flex-wrap items-center justify-between gap-2 mb-1">
+                        <span className="min-w-0 break-words text-sm text-[#1A1C1A]">{cat.name}</span>
+                        <span className="metric-value shrink-0 text-sm">${cat.value.toLocaleString('es-MX')}</span>
                       </div>
                       <div className="progress-bar h-1.5">
                         <div
@@ -269,7 +269,7 @@ export default function Statistics({ data }) {
         </div>
 
         {/* Weekly Comparison */}
-        <div className="premium-card p-6">
+        <div className="premium-card w-full max-w-full min-w-0 overflow-hidden p-4 sm:p-6">
           <h3 className="font-heading font-medium text-lg text-[#1A1C1A] mb-4">Comparación Semanal</h3>
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
@@ -294,7 +294,7 @@ export default function Statistics({ data }) {
 
 
       {/* Daily Trend 7 Days */}
-      <div className="premium-card p-6">
+      <div className="premium-card w-full max-w-full min-w-0 overflow-hidden p-4 sm:p-6">
         <h3 className="font-heading font-medium text-lg text-[#1A1C1A] mb-4">Últimos 7 Días</h3>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
@@ -313,7 +313,7 @@ export default function Statistics({ data }) {
 
 
       {/* Daily Trend */}
-      <div className="premium-card p-6">
+      <div className="premium-card w-full max-w-full min-w-0 overflow-hidden p-4 sm:p-6">
         <h3 className="font-heading font-medium text-lg text-[#1A1C1A] mb-4">Tendencia de 30 Días</h3>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
@@ -356,7 +356,7 @@ export default function Statistics({ data }) {
 
       {/* Payment Methods */}
       {methodData.length > 0 && (
-        <div className="premium-card p-6">
+        <div className="premium-card w-full max-w-full min-w-0 overflow-hidden p-4 sm:p-6">
           <h3 className="font-heading font-medium text-lg text-[#1A1C1A] mb-4">Método de Pago</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {methodData.map((method) => (

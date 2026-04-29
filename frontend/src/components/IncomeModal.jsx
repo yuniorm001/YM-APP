@@ -519,7 +519,7 @@ export default function IncomeModal({ isOpen, onClose, data, onUpdate }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-stretch justify-stretch bg-[#F7F5F0]"
+          className="fixed inset-0 z-50 flex items-stretch justify-stretch bg-[#F7F5F0] overflow-hidden"
           data-testid="income-modal"
         >
           <motion.div
@@ -527,10 +527,10 @@ export default function IncomeModal({ isOpen, onClose, data, onUpdate }) {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: '100%', opacity: 0 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="w-full h-full bg-white overflow-hidden flex flex-col"
+            className="w-full h-[100dvh] min-h-0 max-w-full bg-white overflow-hidden flex flex-col"
           >
-            <div className="p-5 border-b border-[#E6E6E3] flex items-center justify-between flex-shrink-0 bg-gradient-to-r from-[#FAFAF9] to-[#F5F4F1]">
-              <div className="flex items-center gap-3">
+            <div className="px-4 sm:px-5 py-4 sm:py-5 border-b border-[#E6E6E3] flex min-w-0 items-center justify-between gap-3 flex-shrink-0 bg-gradient-to-r from-[#FAFAF9] to-[#F5F4F1]">
+              <div className="flex min-w-0 items-center gap-3">
                 <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#2A7B5F] to-[#1F5E47] flex items-center justify-center shadow-lg shadow-[#2A7B5F]/20">
                   <Coins weight="fill" className="w-5 h-5 text-white" />
                 </div>
@@ -548,7 +548,7 @@ export default function IncomeModal({ isOpen, onClose, data, onUpdate }) {
               </button>
             </div>
 
-            <div className="px-5 py-3 flex gap-2 flex-shrink-0 bg-white">
+            <div className="px-4 sm:px-5 py-3 flex gap-2 flex-shrink-0 bg-white">
               {[1, 2, 3].map((s) => (
                 <div
                   key={s}
@@ -559,9 +559,9 @@ export default function IncomeModal({ isOpen, onClose, data, onUpdate }) {
               ))}
             </div>
 
-            <div className="flex-1 overflow-y-auto p-5 bg-[#FAFAF9] space-y-5">
-              <div className="p-4 rounded-2xl bg-gradient-to-r from-[#F2F6F3] to-[#EEF4F0] border border-[#E6EDE8]">
-                <div className="grid grid-cols-3 gap-3">
+            <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 sm:px-5 py-4 sm:py-5 bg-[#FAFAF9] space-y-5">
+              <div className="w-full max-w-full min-w-0 overflow-hidden p-4 rounded-2xl bg-gradient-to-r from-[#F2F6F3] to-[#EEF4F0] border border-[#E6EDE8]">
+                <div className="grid w-full min-w-0 grid-cols-1 min-[390px]:grid-cols-3 gap-3">
                   <div>
                     <p className="text-[11px] uppercase tracking-wider text-[#737573] font-semibold">Principal</p>
                     <p className="metric-value text-lg text-[#1E3A2B] mt-1">${formatMoney(principalIncome)}</p>
@@ -591,7 +591,7 @@ export default function IncomeModal({ isOpen, onClose, data, onUpdate }) {
                   <motion.div key="flow-step-1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
                     <div>
                       <label className="text-sm font-semibold text-[#1A1C1A] block mb-3">¿Qué quieres registrar?</label>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="grid w-full min-w-0 grid-cols-1 sm:grid-cols-2 gap-4">
                         <button
                           type="button"
                           onClick={() => handleSelectFlow('primary')}
@@ -653,7 +653,7 @@ export default function IncomeModal({ isOpen, onClose, data, onUpdate }) {
                   <motion.div key="flow-step-2-primary" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-5">
                     <div>
                       <label className="text-sm font-semibold text-[#1A1C1A] block mb-3">¿Cada cuánto cobras?</label>
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div className="grid w-full min-w-0 grid-cols-1 sm:grid-cols-3 gap-3">
                         {incomeFrequencyOptions.map((option) => {
                           const isActive = primaryFrequency === option.value;
                           return (
@@ -672,7 +672,7 @@ export default function IncomeModal({ isOpen, onClose, data, onUpdate }) {
 
                     <div>
                       <label className="text-sm font-semibold text-[#1A1C1A] block mb-3">Tipo de ingreso</label>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="grid w-full min-w-0 grid-cols-1 sm:grid-cols-2 gap-3">
                         {[
                           { value: 'fixed', title: 'Fijo', desc: 'Siempre cobras el mismo monto.' },
                           { value: 'variable', title: 'Variable', desc: 'El monto cambia en cada ciclo.' },
@@ -699,7 +699,7 @@ export default function IncomeModal({ isOpen, onClose, data, onUpdate }) {
                         type="date"
                         value={primaryPayDate}
                         onChange={(e) => setPrimaryPayDate(e.target.value)}
-                        className="premium-input"
+                        className="premium-input mobile-date-input"
                       />
                       <p className="text-xs text-[#737573] mt-1.5">La app usa esta fecha para calcular tus ciclos automáticos.</p>
                     </div>
@@ -717,7 +717,7 @@ export default function IncomeModal({ isOpen, onClose, data, onUpdate }) {
                           value={incomeForm.amount}
                           onChange={handleNumberChange((value) => handleIncomeFormChange('amount', value))}
                           placeholder="0.00"
-                          className="premium-input px-4 text-2xl font-mono"
+                          className="premium-input px-4 text-xl sm:text-2xl font-mono"
                         />
                       </div>
                     </div>
@@ -728,7 +728,7 @@ export default function IncomeModal({ isOpen, onClose, data, onUpdate }) {
                         type="date"
                         value={incomeForm.date}
                         onChange={(e) => handleIncomeFormChange('date', e.target.value)}
-                        className="premium-input"
+                        className="premium-input mobile-date-input"
                       />
                     </div>
 
@@ -754,7 +754,7 @@ export default function IncomeModal({ isOpen, onClose, data, onUpdate }) {
                             value={primaryIncome}
                             onChange={handleNumberChange(setPrimaryIncome)}
                             placeholder="0.00"
-                            className="premium-input px-4 text-2xl font-mono"
+                            className="premium-input px-4 text-xl sm:text-2xl font-mono"
                           />
                         </div>
                         <p className="text-xs text-[#737573] mt-1.5">Estimado mensual: ${formatMoney(principalIncome)}</p>
@@ -780,7 +780,7 @@ export default function IncomeModal({ isOpen, onClose, data, onUpdate }) {
                                   value={variableCycleAmount}
                                   onChange={handleNumberChange(setVariableCycleAmount)}
                                   placeholder="0.00"
-                                  className="premium-input px-4 text-2xl font-mono"
+                                  className="premium-input px-4 text-xl sm:text-2xl font-mono"
                                 />
                               </div>
                             </div>
@@ -797,10 +797,10 @@ export default function IncomeModal({ isOpen, onClose, data, onUpdate }) {
                     <div className="p-4 rounded-2xl border border-[#E6E6E3] bg-white">
                       <p className="text-sm font-semibold text-[#1A1C1A] mb-3">Resumen</p>
                       <div className="space-y-2 text-sm text-[#737573]">
-                        <div className="flex items-center justify-between gap-3"><span>Frecuencia</span><span className="font-semibold text-[#1A1C1A]">{primaryFrequencyLabel}</span></div>
-                        <div className="flex items-center justify-between gap-3"><span>Tipo</span><span className="font-semibold text-[#1A1C1A]">{primaryIncomeType === 'fixed' ? 'Fijo' : 'Variable'}</span></div>
-                        <div className="flex items-center justify-between gap-3"><span>Fecha base</span><span className="font-semibold text-[#1A1C1A]">{new Date(`${primaryPayDate}T12:00:00`).toLocaleDateString('es-MX')}</span></div>
-                        <div className="flex items-center justify-between gap-3"><span>Impacto mensual</span><span className="font-semibold text-[#1E3A2B]">${formatMoney(principalIncome)}</span></div>
+                        <div className="flex min-w-0 flex-wrap items-center justify-between gap-3"><span>Frecuencia</span><span className="font-semibold text-[#1A1C1A]">{primaryFrequencyLabel}</span></div>
+                        <div className="flex min-w-0 flex-wrap items-center justify-between gap-3"><span>Tipo</span><span className="font-semibold text-[#1A1C1A]">{primaryIncomeType === 'fixed' ? 'Fijo' : 'Variable'}</span></div>
+                        <div className="flex min-w-0 flex-wrap items-center justify-between gap-3"><span>Fecha base</span><span className="font-semibold text-[#1A1C1A]">{new Date(`${primaryPayDate}T12:00:00`).toLocaleDateString('es-MX')}</span></div>
+                        <div className="flex min-w-0 flex-wrap items-center justify-between gap-3"><span>Impacto mensual</span><span className="font-semibold text-[#1E3A2B]">${formatMoney(principalIncome)}</span></div>
                       </div>
                     </div>
                   </motion.div>
@@ -815,7 +815,7 @@ export default function IncomeModal({ isOpen, onClose, data, onUpdate }) {
                         value={incomeForm.source}
                         onChange={(e) => handleIncomeFormChange('source', e.target.value)}
                         placeholder="Ej: Trabajo, venta, reembolso, Uber"
-                        className="premium-input text-lg"
+                        className="premium-input text-base sm:text-lg"
                         autoComplete="off"
                       />
                       <p className="text-xs text-[#737573] mt-1.5">Solo letras. La primera palabra quedará con mayúscula.</p>
@@ -824,9 +824,9 @@ export default function IncomeModal({ isOpen, onClose, data, onUpdate }) {
                     <div className="p-4 rounded-2xl border border-[#E6E6E3] bg-white">
                       <p className="text-sm font-semibold text-[#1A1C1A] mb-3">Resumen</p>
                       <div className="space-y-2 text-sm text-[#737573]">
-                        <div className="flex items-center justify-between gap-3"><span>Monto</span><span className="font-semibold text-[#1E3A2B]">${formatMoney(incomeForm.amount || 0)}</span></div>
-                        <div className="flex items-center justify-between gap-3"><span>Fecha</span><span className="font-semibold text-[#1A1C1A]">{incomeForm.date ? new Date(`${incomeForm.date}T12:00:00`).toLocaleDateString('es-MX') : '—'}</span></div>
-                        <div className="flex items-center justify-between gap-3"><span>Origen</span><span className="font-semibold text-[#1A1C1A]">{incomeForm.source || 'Pendiente'}</span></div>
+                        <div className="flex min-w-0 flex-wrap items-center justify-between gap-3"><span>Monto</span><span className="font-semibold text-[#1E3A2B]">${formatMoney(incomeForm.amount || 0)}</span></div>
+                        <div className="flex min-w-0 flex-wrap items-center justify-between gap-3"><span>Fecha</span><span className="font-semibold text-[#1A1C1A]">{incomeForm.date ? new Date(`${incomeForm.date}T12:00:00`).toLocaleDateString('es-MX') : '—'}</span></div>
+                        <div className="flex min-w-0 flex-wrap items-center justify-between gap-3"><span>Origen</span><span className="font-semibold text-[#1A1C1A]">{incomeForm.source || 'Pendiente'}</span></div>
                       </div>
                     </div>
 
@@ -839,13 +839,13 @@ export default function IncomeModal({ isOpen, onClose, data, onUpdate }) {
               </AnimatePresence>
             </div>
 
-            <div className="p-5 border-t border-[#E6E6E3] bg-white flex gap-3 flex-shrink-0">
+            <div className="px-4 sm:px-5 py-4 sm:py-5 border-t border-[#E6E6E3] bg-white flex flex-col-reverse sm:flex-row gap-3 flex-shrink-0 pb-[calc(1rem+env(safe-area-inset-bottom,0px))]">
               {flowStep > 1 ? (
-                <button onClick={handlePreviousStep} className="flex-1 btn-modal-secondary">
+                <button onClick={handlePreviousStep} className="flex-1 w-full btn-modal-secondary">
                   Atrás
                 </button>
               ) : (
-                <button onClick={handleClose} className="flex-1 btn-modal-secondary">
+                <button onClick={handleClose} className="flex-1 w-full btn-modal-secondary">
                   Cerrar
                 </button>
               )}
@@ -854,14 +854,14 @@ export default function IncomeModal({ isOpen, onClose, data, onUpdate }) {
                 <button
                   onClick={handleNextStep}
                   disabled={!canGoNext() && flowStep !== 1}
-                  className={`flex-1 btn-modal-primary ${!canGoNext() && flowStep !== 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`flex-1 w-full btn-modal-primary ${!canGoNext() && flowStep !== 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   Continuar
                 </button>
               ) : (
                 <button
                   onClick={incomeFlow === 'primary' ? completePrimaryFlow : completeAdditionalFlow}
-                  className="flex-1 btn-modal-primary"
+                  className="flex-1 w-full btn-modal-primary"
                 >
                   {incomeFlow === 'primary' ? (primarySaved ? 'Ingreso guardado' : 'Guardar ingreso') : 'Guardar ingreso'}
                 </button>

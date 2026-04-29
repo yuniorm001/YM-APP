@@ -68,7 +68,7 @@ export default function ExpensesList({ expenses, onEdit, onDelete }) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-6"
+      className="mobile-responsive-root space-y-6 w-full max-w-full min-w-0 overflow-hidden"
       data-testid="expenses-list"
     >
       <div className="hero-surface p-5 sm:p-6 text-white">
@@ -91,7 +91,7 @@ export default function ExpensesList({ expenses, onEdit, onDelete }) {
         </div>
       </div>
 
-      <div className="premium-card p-4">
+      <div className="premium-card w-full max-w-full min-w-0 overflow-hidden p-4">
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="flex-1">
             <input
@@ -99,14 +99,14 @@ export default function ExpensesList({ expenses, onEdit, onDelete }) {
               placeholder="Buscar gastos..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="premium-input px-5"
+              className="premium-input min-w-0 px-4 sm:px-5"
               data-testid="search-expenses"
             />
           </div>
 
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-2 px-4 py-3 rounded-xl border transition-colors ${
+            className={`flex w-full sm:w-auto max-w-full min-w-0 items-center justify-center gap-2 px-4 py-3 rounded-xl border transition-colors ${
               showFilters || filter !== 'all'
                 ? 'bg-[#2A4D3B] text-white border-[#2A4D3B]'
                 : 'bg-white border-[#E6E6E3] text-[#737573] hover:border-[#2A4D3B]'
@@ -177,18 +177,18 @@ export default function ExpensesList({ expenses, onEdit, onDelete }) {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0, transition: { delay: index * 0.05 } }}
                   exit={{ opacity: 0, scale: 0.9 }}
-                  className="premium-card p-4 sm:p-5"
+                  className="premium-card w-full max-w-full min-w-0 overflow-hidden p-4 sm:p-5"
                   data-testid={`expense-item-${expense.id}`}
                 >
-                  <div className="flex items-center gap-4">
+                  <div className="flex w-full min-w-0 flex-col gap-4 xs:flex-row sm:flex-row">
                     <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: `${CATEGORY_COLORS[expense.category]}15` }}>
                       <span className="text-2xl">{CATEGORY_ICONS[expense.category]}</span>
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2">
+                      <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                         <div className="min-w-0">
-                          <h3 className="font-medium text-[#1A1C1A] truncate">{expense.name}</h3>
+                          <h3 className="min-w-0 max-w-full break-words font-medium text-[#1A1C1A] leading-tight">{expense.name}</h3>
                           <div className="flex items-center gap-2 mt-1 flex-wrap">
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium" style={{ backgroundColor: `${CATEGORY_COLORS[expense.category]}15`, color: CATEGORY_COLORS[expense.category] }}>
                               {expense.category}
@@ -205,7 +205,7 @@ export default function ExpensesList({ expenses, onEdit, onDelete }) {
                             )}
                           </div>
                         </div>
-                        <div className="text-right flex-shrink-0">
+                        <div className="w-full text-left sm:w-auto sm:text-right flex-shrink-0">
                           <p className="metric-value text-lg text-[#1A1C1A]">-${formatCurrency(expense.amount)}</p>
                           <p className="text-xs text-[#737573] mt-1">{new Date(expense.date).toLocaleDateString('es', { day: 'numeric', month: 'short' })}</p>
                         </div>
@@ -232,12 +232,12 @@ export default function ExpensesList({ expenses, onEdit, onDelete }) {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-end gap-2 mt-4 pt-4 border-t border-[#E6E6E3]">
-                    <button onClick={() => onEdit(expense)} className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-[#737573] hover:bg-[#F2F0EB] transition-colors" data-testid={`edit-expense-${expense.id}`}>
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center sm:justify-end gap-2 mt-4 pt-4 border-t border-[#E6E6E3]">
+                    <button onClick={() => onEdit(expense)} className="flex w-full sm:w-auto items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium text-[#737573] hover:bg-[#F2F0EB] transition-colors" data-testid={`edit-expense-${expense.id}`}>
                       <PencilSimple weight="duotone" className="w-4 h-4" />
                       Editar
                     </button>
-                    <button onClick={() => onDelete(expense.id)} className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-[#B65C47] hover:bg-[#B65C47]/10 transition-colors" data-testid={`delete-expense-${expense.id}`}>
+                    <button onClick={() => onDelete(expense.id)} className="flex w-full sm:w-auto items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium text-[#B65C47] hover:bg-[#B65C47]/10 transition-colors" data-testid={`delete-expense-${expense.id}`}>
                       <Trash weight="duotone" className="w-4 h-4" />
                       Eliminar
                     </button>

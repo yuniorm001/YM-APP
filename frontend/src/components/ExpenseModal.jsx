@@ -282,7 +282,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cards, editingEx
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-stretch justify-stretch bg-[#F7F5F0]"
+          className="fixed inset-0 z-50 flex items-stretch justify-stretch bg-[#F7F5F0] overflow-hidden"
           data-testid="expense-modal"
         >
           <motion.div
@@ -290,7 +290,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cards, editingEx
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: '100%', opacity: 0 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="w-full h-full bg-white overflow-hidden flex flex-col"
+            className="w-full h-[100dvh] min-h-0 max-w-full bg-white overflow-hidden flex flex-col"
           >
             <div className="p-5 border-b border-[#E6E6E3] flex items-center justify-between flex-shrink-0 bg-gradient-to-r from-[#FAFAF9] to-[#F5F4F1]">
               <div className="flex items-center gap-3">
@@ -357,7 +357,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cards, editingEx
                         value={name}
                         onChange={handleNameChange}
                         placeholder="Ej: Almuerzo, Uber, Netflix..."
-                        className="premium-input text-lg"
+                        className="premium-input text-base sm:text-lg"
                         autoFocus
                         autoComplete="off"
                         data-testid="expense-name-input"
@@ -374,7 +374,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cards, editingEx
                           value={amount}
                           onChange={handleAmountChange}
                           placeholder="0.00"
-                          className="premium-input px-4 text-2xl font-mono"
+                          className="premium-input px-4 text-xl sm:text-2xl font-mono"
                           autoComplete="off"
                           data-testid="expense-amount-input"
                         />
@@ -412,7 +412,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cards, editingEx
                 {step === 2 && (
                   <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                     <label className="text-sm font-semibold text-[#1A1C1A] block mb-4">Selecciona una categoría</label>
-                    <div className="grid grid-cols-3 gap-3">
+                    <div className="grid w-full min-w-0 grid-cols-1 min-[390px]:grid-cols-3 gap-3">
                       {CATEGORIES.map((cat) => (
                         <button
                           key={cat.id}
@@ -454,7 +454,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cards, editingEx
 
                     <label className="text-sm font-semibold text-[#1A1C1A] block mb-2">¿Cómo pagaste?</label>
 
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid w-full min-w-0 grid-cols-1 min-[390px]:grid-cols-2 gap-3">
                       <button
                         onClick={() => { setMethod('Cash'); setSelectedCard(''); }}
                         disabled={cashAvailable <= 0}
@@ -648,9 +648,9 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cards, editingEx
               </AnimatePresence>
             </div>
 
-            <div className="p-5 border-t border-[#E6E6E3] flex gap-3 flex-shrink-0 safe-area-bottom bg-gradient-to-r from-[#FAFAF9] to-[#F5F4F1]">
+            <div className="px-4 sm:px-5 py-4 sm:py-5 border-t border-[#E6E6E3] flex flex-col-reverse sm:flex-row gap-3 flex-shrink-0 safe-area-bottom bg-gradient-to-r from-[#FAFAF9] to-[#F5F4F1]">
               {step > 1 && (
-                <button onClick={() => setStep(step - 1)} className="flex-1 btn-modal-secondary" data-testid="prev-step">
+                <button onClick={() => setStep(step - 1)} className="flex-1 w-full btn-modal-secondary" data-testid="prev-step">
                   Atrás
                 </button>
               )}
@@ -659,7 +659,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cards, editingEx
                 <button
                   onClick={() => setStep(step + 1)}
                   disabled={step === 1 && (!name.trim() || !amount || !hasAnySaldo)}
-                  className={`flex-1 btn-modal-primary ${step === 1 && (!name.trim() || !amount || !hasAnySaldo) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`flex-1 w-full btn-modal-primary ${step === 1 && (!name.trim() || !amount || !hasAnySaldo) ? 'opacity-50 cursor-not-allowed' : ''}`}
                   data-testid="next-step"
                 >
                   Siguiente
@@ -672,7 +672,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cards, editingEx
                     (method === 'Tarjeta' && cards.length > 0 && !anyCardHasCredit) ||
                     (method === 'Cash' && hasInsufficientCash)
                   }
-                  className={`flex-1 btn-primary ${(
+                  className={`flex-1 w-full btn-primary ${(
                     (method === 'Tarjeta' && (!selectedCard || hasInsufficientCredit)) ||
                     (method === 'Tarjeta' && cards.length > 0 && !anyCardHasCredit) ||
                     (method === 'Cash' && hasInsufficientCash)
@@ -761,10 +761,10 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cards, editingEx
 
               <div className="border-t border-[#E6E6E3] bg-gradient-to-r from-[#FAFAF9] to-[#F5F4F1] px-5 py-5 safe-area-bottom flex-shrink-0">
                 <div className="mx-auto flex w-full max-w-[760px] flex-col-reverse gap-3 sm:flex-row">
-                  <button onClick={handleCancelExpense} className="flex-1 btn-modal-secondary" data-testid="cancel-expense-btn">
+                  <button onClick={handleCancelExpense} className="flex-1 w-full btn-modal-secondary" data-testid="cancel-expense-btn">
                     Cancelar gasto
                   </button>
-                  <button onClick={handleContinueAnyway} className="flex-1 btn-modal-primary" data-testid="continue-anyway-btn">
+                  <button onClick={handleContinueAnyway} className="flex-1 w-full btn-modal-primary" data-testid="continue-anyway-btn">
                     Continuar de todas formas
                   </button>
                 </div>

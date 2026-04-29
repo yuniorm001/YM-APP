@@ -1192,7 +1192,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: '100%', opacity: 0 }}
                     transition={{ type: 'spring', damping: 26, stiffness: 280 }}
-                    className="relative h-[100dvh] min-h-[100dvh] w-screen max-w-none bg-white rounded-none shadow-none overflow-hidden flex flex-col min-h-0 mobile-modal-sheet"
+                    className="relative h-[100dvh] min-h-screen w-screen max-w-none bg-white rounded-none shadow-none overflow-hidden flex flex-col min-h-0"
                   >
               <div className="sticky top-0 z-10 w-full border-b border-[#E6E6E3] bg-gradient-to-r from-[#FCFBF8] to-[#F7FBF8] px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex-shrink-0">
                 <div className="mx-auto flex w-full max-w-[1600px] items-start justify-between gap-4">
@@ -1218,7 +1218,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                 </div>
               </div>
 
-              <div className="flex-1 min-h-0 w-full max-w-full overflow-y-auto overflow-x-hidden bg-[#FAFAF9] overscroll-contain px-3.5 sm:px-6 lg:px-8 py-4 sm:py-5 mobile-modal-body">
+              <div className="flex-1 min-h-0 overflow-y-auto bg-[#FAFAF9] overscroll-contain px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
                 <div className="mx-auto w-full max-w-[1600px]">
                 {activeRecommendation ? (
                   <div className="rounded-[26px] border border-[#EAE4DA] bg-white p-4 sm:p-5 shadow-sm overflow-hidden">
@@ -1459,7 +1459,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                       animate={{ y: 0, opacity: 1 }}
                       exit={{ y: '100%', opacity: 0 }}
                       transition={{ type: 'spring', damping: 26, stiffness: 280 }}
-                      className="relative h-[100dvh] min-h-[100dvh] w-screen max-w-none bg-white rounded-none shadow-none overflow-hidden flex flex-col min-h-0 mobile-modal-sheet"
+                      className="relative h-[100dvh] min-h-screen w-screen max-w-none bg-white rounded-none shadow-none overflow-hidden flex flex-col min-h-0"
                     >
                 <div className="sticky top-0 z-10 w-full border-b border-[#E6E6E3] bg-gradient-to-r from-[#FFF8EA] to-[#FCFBF8] px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex-shrink-0">
                   <div className="mx-auto flex w-full max-w-[1600px] items-start justify-between gap-4">
@@ -1484,7 +1484,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                   </div>
                 </div>
 
-                <div className="flex-1 min-h-0 w-full max-w-full overflow-y-auto overflow-x-hidden bg-[#FAFAF9] overscroll-contain px-3.5 sm:px-6 lg:px-8 py-4 sm:py-5 mobile-modal-body">
+                <div className="flex-1 min-h-0 overflow-y-auto bg-[#FAFAF9] overscroll-contain px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
                   <div className="mx-auto w-full max-w-[1600px] space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div className="rounded-2xl border border-[#EAE4DA] bg-white p-4">
@@ -1569,7 +1569,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                   </div>
                 </div>
 
-                <div className="sticky bottom-0 z-10 w-full max-w-full border-t border-[#E6E6E3] bg-[#F5F4F1] px-3.5 sm:px-6 lg:px-8 py-3.5 sm:py-5 flex-shrink-0 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] mobile-modal-footer">
+                <div className="sticky bottom-0 z-10 w-full border-t border-[#E6E6E3] bg-[#F5F4F1] px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex-shrink-0 pb-[calc(1rem+env(safe-area-inset-bottom,0px))]">
                   <div className="mx-auto flex w-full max-w-[1600px] flex-col-reverse gap-3 sm:flex-row justify-end">
                   <button
                     type="button"
@@ -1617,7 +1617,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: '100%', opacity: 0 }}
                     transition={{ type: 'spring', damping: 26, stiffness: 280 }}
-                    className="relative h-[100dvh] min-h-[100dvh] w-screen max-w-none bg-white rounded-none shadow-none overflow-hidden flex flex-col min-h-0 mobile-modal-sheet"
+                    className="relative h-[100dvh] min-h-screen w-screen max-w-none bg-white rounded-none shadow-none overflow-hidden flex flex-col min-h-0"
                   >
               <div className="sticky top-0 z-10 w-full border-b border-[#E6E6E3] bg-gradient-to-r from-[#F7FBF8] to-[#F4F8F5] px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex-shrink-0">
                 <div className="mx-auto flex w-full max-w-[1600px] items-start justify-between gap-4">
@@ -1642,7 +1642,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                 </div>
               </div>
 
-              <div className="flex-1 min-h-0 w-full max-w-full overflow-y-auto overflow-x-hidden bg-[#FAFAF9] overscroll-contain px-3.5 sm:px-6 lg:px-8 py-4 sm:py-5 mobile-modal-body">
+              <div className="flex-1 min-h-0 overflow-y-auto bg-[#FAFAF9] overscroll-contain px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
                 <div className="mx-auto w-full max-w-[1600px]">
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                   <div>
@@ -1724,7 +1724,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="fixed inset-0 z-[100] flex items-stretch justify-stretch modal-overlay overflow-hidden app-mobile-safe-modal card-editor-modal"
+                  className="fixed inset-0 z-[100] flex items-stretch justify-stretch modal-overlay overflow-hidden"
                   onClick={(e) => e.target === e.currentTarget && resetForm()}
                   data-testid="card-modal"
                 >
@@ -1733,11 +1733,11 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: '100%', opacity: 0 }}
                     transition={{ type: 'spring', damping: 26, stiffness: 280 }}
-                    className="relative h-[100dvh] min-h-[100dvh] w-screen max-w-none bg-white rounded-none shadow-none overflow-hidden flex flex-col min-h-0 mobile-modal-sheet"
+                    className="relative h-[100dvh] min-h-screen w-screen max-w-none bg-white rounded-none shadow-none overflow-hidden flex flex-col min-h-0"
                   >
-                    <form onSubmit={handleSubmit} className="flex h-full min-h-0 w-full max-w-full min-w-0 flex-col overflow-hidden bg-white">
-                    <div className="sticky top-0 z-10 w-full max-w-full border-b border-[#E6E6E3] bg-gradient-to-r from-[#FAFAF9] to-[#F5F4F1] px-3.5 sm:px-6 lg:px-8 py-3.5 sm:py-5 flex-shrink-0 mobile-modal-header">
-                      <div className="mx-auto flex w-full max-w-[1600px] min-w-0 items-center justify-between gap-3 sm:gap-4">
+                    <form onSubmit={handleSubmit} className="flex h-full min-h-0 w-full flex-col bg-white">
+                    <div className="sticky top-0 z-10 w-full border-b border-[#E6E6E3] bg-gradient-to-r from-[#FAFAF9] to-[#F5F4F1] px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex-shrink-0">
+                      <div className="mx-auto flex w-full max-w-[1600px] items-center justify-between gap-4">
                         <div className="flex items-center gap-3 min-w-0">
                           <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#2A4D3B] to-[#1E3A2B] flex items-center justify-center shadow-lg shadow-[#2A4D3B]/20 flex-shrink-0">
                             <CreditCardIcon weight="fill" className="w-5 h-5 text-white" />
@@ -1763,14 +1763,14 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                       </div>
                     </div>
 
-                    <div className="sticky top-[76px] sm:top-[93px] z-[9] w-full max-w-full bg-white px-3.5 sm:px-6 lg:px-8 py-2.5 sm:py-3 flex-shrink-0 mobile-modal-progress">
+                    <div className="sticky top-[85px] sm:top-[93px] z-[9] w-full bg-white px-4 sm:px-6 lg:px-8 py-3 flex-shrink-0">
                       <div className="mx-auto flex w-full max-w-[1600px] gap-2">
                         <div className="flex-1 h-1.5 rounded-full bg-gradient-to-r from-[#2A4D3B] to-[#1E3A2B]" />
                       </div>
                     </div>
 
-                    <div className="flex-1 min-h-0 w-full max-w-full overflow-y-auto overflow-x-hidden bg-[#FAFAF9] overscroll-contain px-3.5 sm:px-6 lg:px-8 py-4 sm:py-5 mobile-modal-body">
-                      <div className="mx-auto w-full max-w-[1600px] min-w-0 space-y-4 sm:space-y-5">
+                    <div className="flex-1 min-h-0 overflow-y-auto bg-[#FAFAF9] overscroll-contain px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
+                      <div className="mx-auto w-full max-w-[1600px] min-w-0 space-y-5 mobile-form-stack">
                         {error && (
                           <motion.div
                             initial={{ opacity: 0, y: -10 }}
@@ -1831,7 +1831,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                           <p className="text-xs text-[#737573] mt-1.5">Campo obligatorio. Solo números (4 dígitos).</p>
                         </div>
 
-                        <div className="grid w-full max-w-full min-w-0 grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div className="grid w-full min-w-0 grid-cols-1 sm:grid-cols-2 gap-4">
                           <div>
                             <label className="text-sm font-semibold text-[#1A1C1A] block mb-2">Límite de crédito</label>
                             <input
@@ -1862,8 +1862,8 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                         </div>
 
                         {formData.limit && (
-                          <div className="w-full max-w-full min-w-0 overflow-hidden rounded-2xl bg-gradient-to-r from-[#F2F0EB] to-[#EAE8E3] p-3.5 sm:p-4">
-                            <div className="flex items-center justify-between text-sm mb-2 gap-3">
+                          <div className="w-full max-w-full min-w-0 overflow-hidden p-4 rounded-2xl bg-gradient-to-r from-[#F2F0EB] to-[#EAE8E3]">
+                            <div className="flex min-w-0 flex-wrap items-center justify-between text-sm mb-2 gap-3">
                               <span className="text-[#737573] font-medium">Vista previa de utilización</span>
                               <span className="metric-value text-sm" style={{ color: getUtilizationStatus(parseFloat(formData.used) || 0, parseFloat(formData.limit) || 1).color }}>
                                 {((parseFloat(formData.used) || 0) / (parseFloat(formData.limit) || 1) * 100).toFixed(1)}%
@@ -1885,38 +1885,36 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                           </div>
                         )}
 
-                        <div className="card-date-field w-full max-w-full min-w-0 overflow-hidden">
+                        <div>
                           <label className="text-sm font-semibold text-[#1A1C1A] block mb-2">
                             Fecha de corte/pago <span className="text-[#B65C47]">*</span>
                           </label>
-                          <div className="mobile-date-wrap w-full max-w-full min-w-0 overflow-hidden rounded-[1.1rem]">
-                            <input
-                              type="date"
-                              value={formData.paymentDate}
-                              onChange={(e) => setFormData(prev => ({ ...prev, paymentDate: e.target.value }))}
-                              className={`premium-input mobile-date-input ${!formData.paymentDate && error?.includes('fecha') ? 'border-[#9C382A]' : ''}`}
-                              required
-                              data-testid="card-payment-date"
-                            />
-                          </div>
+                          <input
+                            type="date"
+                            value={formData.paymentDate}
+                            onChange={(e) => setFormData(prev => ({ ...prev, paymentDate: e.target.value }))}
+                            className={`premium-input mobile-date-input ${!formData.paymentDate && error?.includes('fecha') ? 'border-[#9C382A]' : ''}`}
+                            required
+                            data-testid="card-payment-date"
+                          />
                           <p className="text-xs text-[#737573] mt-1.5">Campo obligatorio.</p>
                         </div>
                       </div>
                     </div>
 
-                    <div className="sticky bottom-0 z-10 w-full max-w-full border-t border-[#E6E6E3] bg-[#F5F4F1] px-3.5 sm:px-6 lg:px-8 py-3.5 sm:py-5 flex-shrink-0 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] mobile-modal-footer">
-                      <div className="mx-auto flex w-full max-w-[1600px] min-w-0 flex-col-reverse gap-3 sm:flex-row">
+                    <div className="sticky bottom-0 z-10 w-full border-t border-[#E6E6E3] bg-[#F5F4F1] px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex-shrink-0 pb-[calc(1rem+env(safe-area-inset-bottom,0px))]">
+                      <div className="mx-auto flex w-full max-w-[1600px] flex-col-reverse gap-3 sm:flex-row">
                         <button
                           type="button"
                           onClick={resetForm}
-                          className="flex-1 min-w-0 btn-modal-secondary"
+                          className="flex-1 btn-modal-secondary"
                           data-testid="cancel-card-btn"
                         >
                           Cancelar
                         </button>
                         <button
                           type="submit"
-                          className="flex-1 min-w-0 btn-modal-primary"
+                          className="flex-1 btn-modal-primary"
                           data-testid="save-card-btn"
                         >
                           {editingCard ? 'Guardar cambios' : 'Agregar tarjeta'}

@@ -194,25 +194,25 @@ function PremiumRadialCard({
   return (
     <motion.div
       variants={itemVariants}
-      className={`premium-card p-6 relative overflow-hidden h-full flex flex-col ${tone.glow}`}
+      className={`premium-card w-full max-w-full min-w-0 overflow-hidden p-4 sm:p-6 relative h-full flex flex-col ${tone.glow}`}
       data-testid={testId}
     >
       <div className="absolute inset-x-6 top-0 h-24 rounded-b-[32px] opacity-70 blur-2xl" style={{ background: `linear-gradient(180deg, ${accent}22 0%, transparent 100%)` }} />
       <div className="relative flex h-full flex-col">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex min-w-0 flex-wrap items-start justify-between gap-3 mb-6">
           <div className="flex items-center gap-3 min-w-0">
             <div className="w-11 h-11 rounded-2xl flex items-center justify-center text-white shadow-[0_12px_30px_rgba(0,0,0,0.12)]" style={{ background: `linear-gradient(135deg, ${accent} 0%, #161816 140%)` }}>
               {icon}
             </div>
             <div className="min-w-0">
-              <h3 className="font-heading font-medium text-lg text-[#1A1C1A] leading-none">{title}</h3>
-              <p className="text-sm text-[#737573] mt-1 truncate">{subtitle}</p>
+              <h3 className="font-heading font-medium text-base sm:text-lg text-[#1A1C1A] leading-tight break-words">{title}</h3>
+              <p className="text-sm text-[#737573] mt-1 break-words">{subtitle}</p>
             </div>
           </div>
-          <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${tone.pill}`}>{tone.label}</span>
+          <span className={`shrink-0 px-3 py-1 rounded-full text-xs font-semibold border ${tone.pill}`}>{tone.label}</span>
         </div>
 
-        <div className="relative w-40 h-40 mx-auto mb-5">
+        <div className="relative w-32 h-32 sm:w-40 sm:h-40 mx-auto mb-5">
           <div className="absolute inset-0 rounded-full blur-2xl opacity-50" style={{ background: `radial-gradient(circle, ${accent}24 0%, transparent 70%)` }} />
           <svg className="w-full h-full -rotate-90" viewBox="0 0 144 144">
             <circle cx="72" cy="72" r={radius} fill="none" stroke="#ECE9E2" strokeWidth="12" />
@@ -708,7 +708,7 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="space-y-6"
+      className="mobile-responsive-root space-y-6 w-full max-w-full min-w-0 overflow-hidden"
       data-testid="dashboard"
     >
       <motion.div variants={itemVariants} className="smart-pulse-card premium-card overflow-hidden px-0 py-0" data-testid="smart-credit-ticker">
@@ -874,8 +874,8 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
       <div className="dashboard-main-grid grid grid-cols-1 gap-6 items-stretch">
         <div className="dashboard-insights-stack flex h-full flex-col gap-6">
         {/* Goal Progress */}
-        <motion.div variants={itemVariants} className="premium-card p-6" data-testid="goal-card">
-          <div className="flex items-center justify-between mb-6">
+        <motion.div variants={itemVariants} className="premium-card w-full max-w-full min-w-0 overflow-hidden p-4 sm:p-6" data-testid="goal-card">
+          <div className="flex min-w-0 flex-wrap items-start justify-between gap-3 mb-6">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-[#2A4D3B] flex items-center justify-center">
                 <Target weight="duotone" className="w-5 h-5 text-white" />
