@@ -3603,3 +3603,72 @@ input[type='date'].premium-input,
     letter-spacing: 0.14em;
   }
 }
+
+
+
+/* =========================================================
+   FIX DEFINITIVO MOBILE SPACING - YM APP
+   Restaura aire lateral premium en páginas principales.
+   Fuerza padding real sobre el contenido renderizado.
+========================================================= */
+
+@media (max-width: 767px) {
+  [data-testid="main-content"] {
+    width: 100% !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  [data-testid="main-content"] > div {
+    width: 100% !important;
+    max-width: 100vw !important;
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+    padding-top: 16px !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+  }
+
+  [data-testid="main-content"] .app-shell {
+    width: 100% !important;
+    max-width: calc(100vw - 36px) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+    border-radius: 28px !important;
+  }
+
+  [data-testid="main-content"] .app-shell > * {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  [data-testid="main-content"] section,
+  [data-testid="main-content"] article,
+  [data-testid="main-content"] form,
+  [data-testid="main-content"] .premium-card,
+  [data-testid="main-content"] .hero-surface,
+  [data-testid="main-content"] .smart-pulse-card,
+  [data-testid="main-content"] .smart-pulse-hero {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* iPhone SE / móviles muy pequeños */
+@media (max-width: 380px) {
+  [data-testid="main-content"] > div {
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+
+  [data-testid="main-content"] .app-shell {
+    max-width: calc(100vw - 28px) !important;
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+}
