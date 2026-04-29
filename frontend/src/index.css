@@ -3675,15 +3675,36 @@ input[type='date'].premium-input,
 
 
 
-body::before {
-  content: "CAMBIO CSS ACTIVO";
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 999999999;
-  background: red;
-  color: white;
-  font-size: 18px;
-  font-weight: 900;
-  padding: 10px 16px;
+@media (max-width: 767px) {
+  main,
+  main > div,
+  main > div > div {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+  }
+
+  main > div {
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+
+  main > div > div {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    border-radius: 28px !important;
+  }
+
+  main section,
+  main article,
+  main form,
+  main .premium-card,
+  main .hero-surface,
+  main .smart-pulse-card,
+  main .smart-pulse-hero {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
 }
