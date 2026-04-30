@@ -278,10 +278,11 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
 
   const getUtilizationStatus = (used, limit) => {
     const pct = limit > 0 ? (used / limit) * 100 : 0;
+    const pctEntero = Math.floor(pct);
     if (pct >= 100) return { label: 'Sin crédito', color: '#9C382A', isFull: true };
-    if (pct <= 10) return { label: 'Saludable', color: '#2A4D3B', isFull: false };
-    if (pct <= 20) return { label: 'Moderado', color: '#D48B3F', isFull: false };
-    if (pct <= 30) return { label: 'Alto', color: '#9C382A', isFull: false };
+    if (pctEntero <= 10) return { label: 'Saludable', color: '#2A4D3B', isFull: false };
+    if (pctEntero <= 20) return { label: 'Moderado', color: '#D48B3F', isFull: false };
+    if (pctEntero <= 30) return { label: 'Alto', color: '#9C382A', isFull: false };
     return { label: 'Crítico', color: '#9C382A', isFull: false };
   };
 
@@ -576,7 +577,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
         summary = 'Tiene poco aire disponible frente a su límite.';
         detail = 'Aunque todavía tenga cupo, conviene no cargarla mucho para proteger tu perfil.';
       }
-    } else if (utilization <= 10 && available > 0 && (daysLeft === null || daysLeft > 7)) {
+    } else if (Math.floor(utilization) <= 10 && available > 0 && (daysLeft === null || daysLeft > 7)) {
       score += 15;
     }
 

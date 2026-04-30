@@ -79,7 +79,8 @@ const getProgressStrokeOffset = (percentage, radius = 56) => {
 };
 
 const getCreditTone = (value) => {
-  if (value <= 10) {
+  const valueEntero = Math.floor(value || 0);
+  if (valueEntero <= 10) {
     return {
       stroke: '#2A4D3B',
       glow: 'shadow-[0_18px_40px_rgba(42,77,59,0.18)]',
@@ -87,7 +88,7 @@ const getCreditTone = (value) => {
       label: 'Óptimo'
     };
   }
-  if (value <= 20) {
+  if (valueEntero <= 20) {
     return {
       stroke: '#D48B3F',
       glow: 'shadow-[0_18px_40px_rgba(212,139,63,0.18)]',
@@ -326,6 +327,8 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
   const totalCreditUsed = cards.reduce((sum, c) => sum + c.used, 0);
   const totalCreditLimit = cards.reduce((sum, c) => sum + c.limit, 0);
   const creditUtilization = totalCreditLimit > 0 ? (totalCreditUsed / totalCreditLimit) * 100 : 0;
+  const creditUtilizationEntero = Math.floor(creditUtilization || 0);
+  const getUtilizationEntero = (value) => Math.floor(value || 0);
   const totalMonthlyIncomeCapacity = Math.max(cash.income || 0, 0);
   const cashHealthPercentage = totalMonthlyIncomeCapacity > 0
     ? Math.max(0, Math.min((cashAvailable / totalMonthlyIncomeCapacity) * 100, 100))
@@ -536,14 +539,14 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
     ? ((highestUtilizationCard.used + (highestUtilizationCard.weeklyCardSpend / Math.max(currentWeekDayIndex, 1)) * weekDaysRemaining) / highestUtilizationCard.limit) * 100
     : 0;
 
-  const pulseMood = highestUtilizationCard?.utilization >= 35 || cashAvailable < 0
+  const pulseMood = getUtilizationEntero(highestUtilizationCard?.utilization) >= 31 || cashAvailable < 0
     ? 'serious'
-    : weeklyDelta < 0 || creditUtilization <= 20
+    : weeklyDelta < 0 || creditUtilizationEntero <= 20
       ? 'motivating'
       : 'balanced';
 
   let pulseTodayLine = 'Hoy sigue tu ritmo con control y revisa antes de usar crédito.';
-  if (highestUtilizationCard && highestUtilizationCard.utilization >= 35) {
+  if (highestUtilizationCard && getUtilizationEntero(highestUtilizationCard.utilization) >= 31) {
     pulseTodayLine = `Hoy no deberías usar ${getCardDisplayName(highestUtilizationCard)}.`;
   } else if (nearestPaymentCard && nearestPaymentCard.daysLeft !== null && nearestPaymentCard.daysLeft <= 3 && nearestPaymentCard.used > 0) {
     pulseTodayLine = `Hoy prioriza ${getCardDisplayName(nearestPaymentCard)} antes del próximo pago.`;
@@ -553,13 +556,13 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
     pulseTodayLine = 'Hoy conviene frenar compras y proteger tu cash.';
   }
 
-  const pulseCritical = highestUtilizationCard?.utilization >= 35 || cashAvailable < 0 || (nearestPaymentCard?.daysLeft !== null && nearestPaymentCard?.daysLeft <= 0 && nearestPaymentCard?.used > 0);
-  const pulseAttention = !pulseCritical && (highestUtilizationCard?.utilization >= 20 || cashHealthPercentage < 40 || (nearestPaymentCard?.daysLeft !== null && nearestPaymentCard?.daysLeft <= 5 && nearestPaymentCard?.used > 0));
+  const pulseCritical = getUtilizationEntero(highestUtilizationCard?.utilization) >= 31 || cashAvailable < 0 || (nearestPaymentCard?.daysLeft !== null && nearestPaymentCard?.daysLeft <= 0 && nearestPaymentCard?.used > 0);
+  const pulseAttention = !pulseCritical && (getUtilizationEntero(highestUtilizationCard?.utilization) >= 21 || cashHealthPercentage < 40 || (nearestPaymentCard?.daysLeft !== null && nearestPaymentCard?.daysLeft <= 5 && nearestPaymentCard?.used > 0));
   const pulseStatusLabel = pulseCritical ? 'Actúa hoy' : pulseAttention ? 'Revisa esto' : 'Vas bien';
   const pulseStatusClass = pulseCritical ? 'critical' : pulseAttention ? 'attention' : 'stable';
   const pulseActionTitle = pulseCritical ? 'Lo primero que debes hacer' : pulseAttention ? 'Próximo paso' : 'Mantén este ritmo';
   const pulseActionText = pulseCritical
-    ? (highestUtilizationCard?.utilization >= 35
+    ? (getUtilizationEntero(highestUtilizationCard?.utilization) >= 31
       ? `Baja ${getCardDisplayName(highestUtilizationCard)} por debajo de 30% antes de seguir usando crédito.`
       : 'Pausa compras variables y protege efectivo antes de asumir más pagos.')
     : pulseAttention
@@ -569,7 +572,7 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
       : 'Puedes seguir operando, pero conserva margen antes de usar crédito.';
   const commandMetrics = [
     { label: 'Estado', value: pulseStatusLabel, tone: pulseStatusClass },
-    { label: 'Uso de tarjetas', value: `${creditUtilization.toFixed(0)}%`, tone: creditUtilization <= 10 ? 'stable' : creditUtilization <= 20 ? 'attention' : 'critical' },
+    { label: 'Uso de tarjetas', value: `${creditUtilizationEntero}%`, tone: creditUtilizationEntero <= 10 ? 'stable' : creditUtilizationEntero <= 20 ? 'attention' : 'critical' },
     { label: 'Dinero disponible', value: new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(cashAvailable), tone: cashAvailable > 0 ? 'stable' : 'critical' },
     { label: 'Pago próximo', value: nearestPaymentCard?.daysLeft !== null && nearestPaymentCard ? `${Math.max(nearestPaymentCard.daysLeft, 0)} día${Math.max(nearestPaymentCard.daysLeft, 0) === 1 ? '' : 's'}` : 'Sin alerta', tone: nearestPaymentCard?.daysLeft !== null && nearestPaymentCard?.daysLeft <= 5 ? 'attention' : 'neutral' }
   ];
@@ -588,7 +591,7 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
     id: 'review-balance',
     title: 'Revisa tu saldo de la tarjeta',
     help: hasReviewedBalance
-      ? `Listo. Estás usando ${creditUtilization.toFixed(0)}% de tu límite${creditUtilization <= 10 ? ' — perfecto.' : creditUtilization <= 30 ? ' — vas bien.' : ' — atento.'}`
+      ? `Listo. Estás usando ${creditUtilizationEntero}% de tu límite${creditUtilizationEntero <= 10 ? ' — perfecto.' : creditUtilizationEntero <= 30 ? ' — vas bien.' : ' — atento.'}`
       : 'Conecta o agrega una tarjeta para empezar.',
     done: hasReviewedBalance,
     tone: 'neutral'
@@ -615,15 +618,15 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
   }
 
   // Tarea 3: si la utilización está alta, frenar compras grandes
-  if (highestUtilizationCard && highestUtilizationCard.utilization >= 30) {
+  if (highestUtilizationCard && getUtilizationEntero(highestUtilizationCard.utilization) >= 31) {
     addTask({
       id: 'high-utilization',
       title: `Baja el uso de ${getCardDisplayName(highestUtilizationCard)}`,
-      help: `Estás usando ${highestUtilizationCard.utilization.toFixed(0)}% de tu límite. Si pagas ${formatCurrency(highestUtilizationCard.targetThirtyPercent || highestUtilizationCard.targetTenPercent)}, vuelves a una zona sana.`,
+      help: `Estás usando ${getUtilizationEntero(highestUtilizationCard.utilization)}% de tu límite. Si pagas ${formatCurrency(highestUtilizationCard.targetThirtyPercent || highestUtilizationCard.targetTenPercent)}, vuelves a una zona sana.`,
       done: false,
       tone: 'urgent',
       chips: [
-        { label: `Ahora: ${highestUtilizationCard.utilization.toFixed(0)}%`, tone: 'red' },
+        { label: `Ahora: ${getUtilizationEntero(highestUtilizationCard.utilization)}%`, tone: 'red' },
         { label: `Meta: <30%`, tone: 'green' }
       ]
     });
@@ -664,10 +667,10 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
     help: cards.length > 0 && cards[0].limit
       ? `Si tu límite es ${formatCurrency(cards[0].limit)}, intenta no pasar de ${formatCurrency(cards[0].limit * 0.3)} al mes. Eso ayuda a cuidar tu puntaje de crédito.`
       : 'No uses más del 30% de tu límite total. Eso ayuda a cuidar tu puntaje de crédito.',
-    done: creditUtilization <= 30 && cards.length > 0,
+    done: creditUtilizationEntero <= 30 && cards.length > 0,
     tone: 'normal',
     chips: [
-      { label: `Vas en ${creditUtilization.toFixed(0)}%`, tone: creditUtilization <= 30 ? 'green' : 'red' },
+      { label: `Vas en ${creditUtilizationEntero}%`, tone: creditUtilizationEntero <= 30 ? 'green' : 'red' },
       { label: 'Todo el mes', tone: 'neutral' }
     ]
   });
@@ -688,7 +691,7 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
   // Una "razón" educativa que aparece debajo de las tareas
   let whyTitle = 'Usar menos del 30% te ayuda a verte responsable';
   let whyText = 'Los bancos ven cuánto de tu límite usas. Mientras menos dependas de la tarjeta, más sano se ve tu perfil para futuras oportunidades.';
-  if (highestUtilizationCard && highestUtilizationCard.utilization >= 30) {
+  if (highestUtilizationCard && getUtilizationEntero(highestUtilizationCard.utilization) >= 31) {
     whyTitle = 'Pasar de 30% puede afectar tu puntaje aunque pagues a tiempo';
     whyText = 'El banco mide cuánto debes vs cuánto te prestaron. Aunque pagues completo después, reportar saldo alto puede afectar tu puntaje de crédito.';
   } else if (nearestPaymentCard && nearestPaymentCard.daysLeft !== null && nearestPaymentCard.daysLeft <= 5 && nearestPaymentCard.used > 0) {
@@ -700,7 +703,7 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
   }
 
   let contextualTip = 'No uses más del 30% de tu límite de crédito.';
-  if (highestUtilizationCard && highestUtilizationCard.utilization >= 30) {
+  if (highestUtilizationCard && getUtilizationEntero(highestUtilizationCard.utilization) >= 31) {
     contextualTip = 'Superar 30% puede presionar tu puntaje de crédito, aunque pagues a tiempo.';
   } else if (nearestPaymentCard && nearestPaymentCard.daysLeft !== null && nearestPaymentCard.daysLeft <= 5 && nearestPaymentCard.used > 0) {
     contextualTip = 'Paga antes de la fecha de corte, no solo la fecha límite.';
@@ -718,21 +721,21 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
   let semaforoTitle = 'Vas bien';
   let semaforoMessage = 'Tu dinero y tus tarjetas se ven bajo control. Mantén este ritmo.';
 
-  if (highestUtilizationCard?.utilization >= 35 || cashAvailable < 0 || (nearestPaymentCard?.daysLeft !== null && nearestPaymentCard?.daysLeft <= 0 && nearestPaymentCard?.used > 0)) {
+  if (getUtilizationEntero(highestUtilizationCard?.utilization) >= 31 || cashAvailable < 0 || (nearestPaymentCard?.daysLeft !== null && nearestPaymentCard?.daysLeft <= 0 && nearestPaymentCard?.used > 0)) {
     semaforoLevel = 'red';
     semaforoEmoji = '🔴';
     semaforoTitle = 'Actúa hoy';
-    semaforoMessage = highestUtilizationCard?.utilization >= 35
-      ? `Estás usando ${highestUtilizationCard.utilization.toFixed(0)}% de ${getCardDisplayName(highestUtilizationCard)}. Hoy conviene bajar ese saldo.`
+    semaforoMessage = getUtilizationEntero(highestUtilizationCard?.utilization) >= 31
+      ? `Estás usando ${getUtilizationEntero(highestUtilizationCard.utilization)}% de ${getCardDisplayName(highestUtilizationCard)}. Hoy conviene bajar ese saldo.`
       : cashAvailable < 0
         ? 'Tus gastos superaron lo que tienes. Pausa compras grandes hasta tu próximo ingreso.'
         : `Hoy vence un pago. Atiéndelo antes de que te cobren intereses.`;
-  } else if (highestUtilizationCard?.utilization >= 20 || cashHealthPercentage < 40 || (nearestPaymentCard?.daysLeft !== null && nearestPaymentCard?.daysLeft <= 5 && nearestPaymentCard?.used > 0)) {
+  } else if (getUtilizationEntero(highestUtilizationCard?.utilization) >= 21 || cashHealthPercentage < 40 || (nearestPaymentCard?.daysLeft !== null && nearestPaymentCard?.daysLeft <= 5 && nearestPaymentCard?.used > 0)) {
     semaforoLevel = 'amber';
     semaforoEmoji = '🟡';
     semaforoTitle = 'Revisa esto';
-    semaforoMessage = highestUtilizationCard?.utilization >= 20
-      ? `Tu uso de tarjeta va en ${highestUtilizationCard.utilization.toFixed(0)}%. Intenta mantenerlo debajo de 30%.`
+    semaforoMessage = getUtilizationEntero(highestUtilizationCard?.utilization) >= 21
+      ? `Tu uso de tarjeta va en ${getUtilizationEntero(highestUtilizationCard.utilization)}%. Intenta mantenerlo debajo de 30%.`
       : nearestPaymentCard?.daysLeft !== null && nearestPaymentCard?.daysLeft <= 5
         ? `Tienes un pago en ${Math.max(nearestPaymentCard.daysLeft, 0)} día${Math.max(nearestPaymentCard.daysLeft, 0) === 1 ? '' : 's'}. Aparta el dinero esta semana.`
         : 'Tu efectivo está bajo. Cuida los gastos no esenciales esta semana.';
@@ -783,10 +786,10 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
     : creditUtilization === 0
       ? 'Este es el total que estás usando de tus tarjetas. Ahora mismo no tienes uso registrado.'
       : creditUtilization < 30
-        ? `Este es el total que estás usando de tus tarjetas: ${creditUtilization.toFixed(0)}%. Vas bien.`
+        ? `Este es el total que estás usando de tus tarjetas: ${creditUtilizationEntero}%. Vas bien.`
         : creditUtilization < 50
-          ? `Este es el total que estás usando de tus tarjetas: ${creditUtilization.toFixed(0)}%. Procura bajarlo de 30% para cuidar tu puntaje de crédito.`
-          : `Este es el total que estás usando de tus tarjetas: ${creditUtilization.toFixed(0)}%. Es alto; paga lo más que puedas este mes.`;
+          ? `Este es el total que estás usando de tus tarjetas: ${creditUtilizationEntero}%. Procura bajarlo de 30% para cuidar tu puntaje de crédito.`
+          : `Este es el total que estás usando de tus tarjetas: ${creditUtilizationEntero}%. Es alto; paga lo más que puedas este mes.`;
 
   const tickerMessages = [];
   const addTickerMessage = (text, tone = 'neutral') => {
@@ -794,18 +797,18 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
     tickerMessages.push({ text, tone });
   };
 
-  if (highestUtilizationCard && highestUtilizationCard.utilization >= 35) {
+  if (highestUtilizationCard && getUtilizationEntero(highestUtilizationCard.utilization) >= 31) {
     addTickerMessage(
-      `Actúa hoy · ${getCardDisplayName(highestUtilizationCard)} llegó a ${highestUtilizationCard.utilization.toFixed(0)}% — paga ${formatCurrency(highestUtilizationCard.targetThirtyPercent || highestUtilizationCard.targetTenPercent)} para volver a una zona más sana.`,
+      `Actúa hoy · ${getCardDisplayName(highestUtilizationCard)} llegó a ${getUtilizationEntero(highestUtilizationCard.utilization)}% — paga ${formatCurrency(highestUtilizationCard.targetThirtyPercent || highestUtilizationCard.targetTenPercent)} para volver a una zona más sana.`,
       'danger'
     );
-  } else if (highestUtilizationCard && highestUtilizationCard.utilization >= 20) {
+  } else if (highestUtilizationCard && getUtilizationEntero(highestUtilizationCard.utilization) >= 21) {
     addTickerMessage(
-      `Revisa esto · ${getCardDisplayName(highestUtilizationCard)} va en ${highestUtilizationCard.utilization.toFixed(0)}% — si pagas ${formatCurrency(highestUtilizationCard.targetThirtyPercent)}, vuelves debajo de 30%.`,
+      `Revisa esto · ${getCardDisplayName(highestUtilizationCard)} va en ${getUtilizationEntero(highestUtilizationCard.utilization)}% — si pagas ${formatCurrency(highestUtilizationCard.targetThirtyPercent)}, vuelves debajo de 30%.`,
       'warning'
     );
   } else if (creditUtilization > 0) {
-    addTickerMessage(`Positivo · Tu uso total va en ${creditUtilization.toFixed(0)}%. Bien. Mantenerlo bajo te da más margen.`, 'success');
+    addTickerMessage(`Positivo · Tu uso total va en ${creditUtilizationEntero}%. Bien. Mantenerlo bajo te da más margen.`, 'success');
   }
 
   if (nearestPaymentCard && nearestPaymentCard.daysLeft !== null) {
@@ -834,7 +837,7 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
     addTickerMessage(`Predicción · Si sigues este ritmo, cerrarás la semana en ${formatCurrency(projectedWeekSpend)}.`, 'info');
   }
 
-  if (projectedRiskCardUtilization >= 35 && highestUtilizationCard) {
+  if (getUtilizationEntero(projectedRiskCardUtilization) >= 31 && highestUtilizationCard) {
     addTickerMessage(`Predicción · Si no haces un pago, ${getCardDisplayName(highestUtilizationCard)} podría terminar cerca de ${projectedRiskCardUtilization.toFixed(0)}%.`, 'danger');
   }
 
@@ -906,7 +909,7 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
     {
       label: 'tarjeta con mayor presión',
       value: mostDangerousCard ? getCardDisplayName(mostDangerousCard) : 'Riesgo bajo',
-      tone: mostDangerousCard && mostDangerousCard.utilization >= 30 ? 'danger' : 'warning'
+      tone: mostDangerousCard && getUtilizationEntero(mostDangerousCard.utilization) >= 31 ? 'danger' : 'warning'
     }
   ];
 
@@ -1125,7 +1128,7 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
               </div>
               <div className="money-block-bar-labels">
                 <span>De {formatCurrency(totalCreditLimit)} de límite</span>
-                <span>{creditUtilization.toFixed(0)}%</span>
+                <span>{creditUtilizationEntero}%</span>
               </div>
             </div>
           )}
