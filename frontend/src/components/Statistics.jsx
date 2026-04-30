@@ -144,9 +144,9 @@ export default function Statistics({ data }) {
       <div className="hero-surface p-5 sm:p-6 text-white">
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.18em] text-white/65 font-semibold mb-2">Resumen claro</p>
-            <h1 className="font-heading text-3xl sm:text-4xl font-semibold tracking-[-0.04em]">Entender mis números</h1>
-            <p className="mt-2 text-sm text-white/70 max-w-xl">Esta pantalla traduce tus movimientos en señales simples: cuánto gastas, hacia dónde vas y qué debes vigilar.</p>
+            <p className="text-[11px] uppercase tracking-[0.18em] text-white/65 font-semibold mb-2">Análisis</p>
+            <h1 className="font-heading text-3xl sm:text-4xl font-semibold tracking-[-0.04em]">Estadísticas</h1>
+            <p className="mt-2 text-sm text-white/70 max-w-xl">Visualiza tendencias, compara tus gastos y entiende cómo se comporta tu dinero durante el mes.</p>
           </div>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             <div className="rounded-[20px] border border-white/10 bg-white/10 px-4 py-3 backdrop-blur-sm">
@@ -161,25 +161,12 @@ export default function Statistics({ data }) {
         </div>
       </div>
 
-      <div className="novice-guide-card">
-        <div>
-          <p className="novice-kicker">Qué significa</p>
-          <h2>No es matemática complicada</h2>
-          <p>Estas estadísticas responden tres preguntas: cuánto se fue, si vas gastando rápido y qué parte de tu ingreso ya comprometiste.</p>
-        </div>
-        <div className="novice-steps">
-          <span>1. Mira el gasto del mes</span>
-          <span>2. Compara el promedio diario</span>
-          <span>3. Revisa la proyección</span>
-        </div>
-      </div>
-
       {/* Key Metrics */}
       <div className="grid w-full min-w-0 grid-cols-1 min-[390px]:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="premium-card w-full max-w-full min-w-0 overflow-hidden p-4 sm:p-5">
           <div className="flex items-center gap-2 mb-3">
             <ChartBar weight="duotone" className="w-5 h-5 text-[#2A4D3B]" />
-            <span className="label-uppercase text-[10px]">Gastado este mes</span>
+            <span className="label-uppercase text-[10px]">Este mes</span>
           </div>
           <p className="metric-value text-2xl text-[#1A1C1A]">
             ${monthTotal.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
@@ -190,7 +177,7 @@ export default function Statistics({ data }) {
         <div className="premium-card w-full max-w-full min-w-0 overflow-hidden p-4 sm:p-5">
           <div className="flex items-center gap-2 mb-3">
             <Lightning weight="duotone" className="w-5 h-5 text-[#D48B3F]" />
-            <span className="label-uppercase text-[10px]">Promedio diario</span>
+            <span className="label-uppercase text-[10px]">Promedio/día</span>
           </div>
           <p className="metric-value text-2xl text-[#1A1C1A]">
             ${avgDaily.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
@@ -201,7 +188,7 @@ export default function Statistics({ data }) {
         <div className="premium-card w-full max-w-full min-w-0 overflow-hidden p-4 sm:p-5">
           <div className="flex items-center gap-2 mb-3">
             <TrendUp weight="duotone" className="w-5 h-5 text-[#B65C47]" />
-            <span className="label-uppercase text-[10px]">Si sigues así</span>
+            <span className="label-uppercase text-[10px]">Proyección</span>
           </div>
           <p className="metric-value text-2xl text-[#1A1C1A]">
             ${projectedTotal.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
@@ -212,7 +199,7 @@ export default function Statistics({ data }) {
         <div className="premium-card w-full max-w-full min-w-0 overflow-hidden p-4 sm:p-5">
           <div className="flex items-center gap-2 mb-3">
             <Target weight="duotone" className="w-5 h-5 text-[#2A4D3B]" />
-            <span className="label-uppercase text-[10px]">Usado de mi ingreso</span>
+            <span className="label-uppercase text-[10px]">vs Ingreso (Cash)</span>
           </div>
           <p className={`metric-value text-2xl ${
             realCashOutflow <= cash.income * 0.7 ? 'text-[#2A4D3B]' :
@@ -230,7 +217,7 @@ export default function Statistics({ data }) {
       <div className="grid w-full min-w-0 grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
         {/* Category Breakdown */}
         <div className="premium-card w-full max-w-full min-w-0 overflow-hidden p-4 sm:p-6">
-          <h3 className="font-heading font-medium text-lg text-[#1A1C1A] mb-4">¿En qué gasté más?</h3>
+          <h3 className="font-heading font-medium text-lg text-[#1A1C1A] mb-4">Por Categoría</h3>
           {categoryData.length > 0 ? (
             <div className="flex min-w-0 flex-col sm:flex-row items-center gap-5 sm:gap-6">
               <div className="w-40 h-40 flex-shrink-0">
@@ -276,14 +263,14 @@ export default function Statistics({ data }) {
           ) : (
             <div className="empty-state-premium h-40 flex flex-col items-center justify-center text-center text-[#737573]">
               <p className="font-semibold text-[#1A1C1A]">Aún no hay lectura estadística</p>
-              <p className="mt-1 text-sm">Agrega ingresos, gastos o tarjetas para que la app pueda explicarte tus patrones.</p>
+              <p className="mt-1 text-sm">Registra ingresos, gastos o tarjetas para activar tendencias.</p>
             </div>
           )}
         </div>
 
         {/* Weekly Comparison */}
         <div className="premium-card w-full max-w-full min-w-0 overflow-hidden p-4 sm:p-6">
-          <h3 className="font-heading font-medium text-lg text-[#1A1C1A] mb-4">Semana contra semana</h3>
+          <h3 className="font-heading font-medium text-lg text-[#1A1C1A] mb-4">Comparación Semanal</h3>
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={weeklyData}>
@@ -308,7 +295,7 @@ export default function Statistics({ data }) {
 
       {/* Daily Trend 7 Days */}
       <div className="premium-card w-full max-w-full min-w-0 overflow-hidden p-4 sm:p-6">
-        <h3 className="font-heading font-medium text-lg text-[#1A1C1A] mb-4">Últimos 7 días</h3>
+        <h3 className="font-heading font-medium text-lg text-[#1A1C1A] mb-4">Últimos 7 Días</h3>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={dailyTrend7}>
@@ -327,7 +314,7 @@ export default function Statistics({ data }) {
 
       {/* Daily Trend */}
       <div className="premium-card w-full max-w-full min-w-0 overflow-hidden p-4 sm:p-6">
-        <h3 className="font-heading font-medium text-lg text-[#1A1C1A] mb-4">Movimiento de 30 días</h3>
+        <h3 className="font-heading font-medium text-lg text-[#1A1C1A] mb-4">Tendencia de 30 Días</h3>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={dailyTrend}>
@@ -370,7 +357,7 @@ export default function Statistics({ data }) {
       {/* Payment Methods */}
       {methodData.length > 0 && (
         <div className="premium-card w-full max-w-full min-w-0 overflow-hidden p-4 sm:p-6">
-          <h3 className="font-heading font-medium text-lg text-[#1A1C1A] mb-4">Cómo pagaste</h3>
+          <h3 className="font-heading font-medium text-lg text-[#1A1C1A] mb-4">Método de Pago</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {methodData.map((method) => (
               <div key={method.name} className="flex items-center gap-4 p-4 rounded-xl bg-[#F2F0EB]">
