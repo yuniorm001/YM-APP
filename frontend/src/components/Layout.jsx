@@ -4,7 +4,6 @@ import {
   House,
   Wallet,
   CreditCard,
-  CalendarBlank,
   Gear,
   List,
   X,
@@ -15,7 +14,6 @@ import {
   CaretDown,
   Sparkle,
   GlobeHemisphereWest,
-  Calendar,
   DoorOpen
 } from '@phosphor-icons/react';
 
@@ -23,7 +21,6 @@ const navigationItems = [
   { id: 'home', icon: House, label: 'Inicio', type: 'tab' },
   { id: 'expenses', icon: Wallet, label: 'Dinero', type: 'tab' },
   { id: 'cards', icon: CreditCard, label: 'Tarjetas', type: 'tab' },
-  { id: 'calendar', icon: CalendarBlank, label: 'Calendario', type: 'tab' },
   { id: 'new-expense', icon: PlusCircle, label: '', type: 'action', variant: 'expense' },
   { id: 'new-income', icon: CurrencyDollar, label: '', type: 'action', variant: 'income' },
 ];
@@ -78,12 +75,6 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
   const toggleAppLanguage = () => {
     setAppLanguage((prev) => (prev === 'ES' ? 'EN' : 'ES'));
   };
-
-  const currentDateLabel = new Date().toLocaleDateString('es', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-  });
 
   const powerGlyph = '⏻';
 
@@ -305,50 +296,45 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
                   </span>
                 </motion.button>
               ) : (
-                <div className="flex flex-col gap-2">
-                  <motion.button
-                    whileTap={{ scale: 0.985 }}
-                    type="button"
-                    onClick={() => setActiveTab('settings')}
-                    className={`group relative flex w-full items-center gap-2 overflow-hidden rounded-[14px] border px-2.5 py-2 text-left transition-all duration-300 ${activeTab === 'settings' ? 'border-[#2A4D3B]/25 bg-[linear-gradient(135deg,#2A4D3B,#1E3A2B)] text-white shadow-[0_12px_24px_rgba(42,77,59,0.18)]' : 'border-[#ECE6DC] bg-[linear-gradient(135deg,rgba(255,255,255,0.94),rgba(246,240,230,0.96))] text-[#234333] hover:border-[#2A4D3B]/20'}`}
-                    data-testid="sidebar-settings-button"
-                  >
-                    <span className="relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-[10px] border border-white/70 bg-white/20">
-                      <Gear weight={activeTab === 'settings' ? 'fill' : 'duotone'} className="h-3.5 w-3.5" />
-                    </span>
-                    <div className="relative z-10 min-w-0">
-                      <p className={`text-[9px] font-semibold uppercase tracking-[0.12em] ${activeTab === 'settings' ? 'text-white/65' : 'text-[#7E745E]'}`}>Sistema</p>
-                      <p className={`text-[10px] font-semibold ${activeTab === 'settings' ? 'text-white' : 'text-[#234333]'}`}>Ajustes</p>
-                    </div>
-                  </motion.button>
+                <div className="relative overflow-hidden rounded-[22px] border border-[#E7DED0] bg-[linear-gradient(145deg,rgba(255,255,255,0.98),rgba(244,239,230,0.96))] p-2 shadow-[0_14px_34px_rgba(45,36,22,0.07)]">
+                  <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(212,139,63,0.12),transparent_42%)]" />
+                  <div className="relative z-10 flex flex-col gap-2">
+                    <motion.button
+                      whileTap={{ scale: 0.985 }}
+                      type="button"
+                      onClick={() => setActiveTab('settings')}
+                      className={`group relative flex w-full items-center gap-3 overflow-hidden rounded-[18px] border px-3 py-3 text-left transition-all duration-300 ${activeTab === 'settings' ? 'border-[#D8C19D] bg-[linear-gradient(135deg,rgba(255,255,255,0.99),rgba(249,243,232,0.99))] text-[#1E3328] shadow-[0_12px_26px_rgba(118,91,50,0.12)]' : 'border-white/70 bg-white/55 text-[#334238] hover:border-[#D8C19D]/70 hover:bg-white/80'}`}
+                      data-testid="sidebar-settings-button"
+                    >
+                      {activeTab === 'settings' ? <span className="absolute left-0 top-3 bottom-3 w-1 rounded-r-full bg-[#D48B3F]" /> : null}
+                      <span className={`relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-[14px] border transition-all duration-300 ${activeTab === 'settings' ? 'border-[#D8C19D] bg-[#FFF8EC] text-[#A06125]' : 'border-[#E9E0D2] bg-white text-[#506052] group-hover:text-[#A06125]'}`}>
+                        <Gear weight={activeTab === 'settings' ? 'fill' : 'duotone'} className="h-4 w-4" />
+                      </span>
+                      <div className="relative z-10 min-w-0">
+                        <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#9A8870]">Sistema</p>
+                        <p className="text-[12px] font-semibold text-[#24382E]">Ajustes</p>
+                      </div>
+                      {activeTab === 'settings' ? <span className="ml-auto h-2 w-2 rounded-full bg-[#D48B3F] shadow-[0_0_0_4px_rgba(212,139,63,0.12)]" /> : null}
+                    </motion.button>
 
-                  <div className="flex w-full items-center gap-2 rounded-[14px] border border-white/70 bg-[linear-gradient(135deg,rgba(255,255,255,0.92),rgba(246,240,230,0.94))] px-2.5 py-2 shadow-[0_6px_14px_rgba(0,0,0,0.035)]">
-                    <div className="relative flex h-7 w-7 shrink-0 items-center justify-center rounded-[10px] border border-white/80 bg-white/80">
-                      <Calendar weight="duotone" className="h-3.5 w-3.5 text-[#2A4D3B]" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-[9px] font-semibold uppercase tracking-[0.12em] text-[#7E745E]">Fecha</p>
-                      <p className="truncate text-[10px] font-semibold text-[#234333]">{currentDateLabel}</p>
-                    </div>
+                    <motion.button
+                      whileTap={{ scale: 0.97 }}
+                      type="button"
+                      onClick={onLogout}
+                      className="group relative flex w-full items-center gap-3 overflow-hidden rounded-[18px] border border-[#E7CACA] bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(255,242,242,0.98))] px-3 py-3 text-left text-[#8E2F2F] transition-all duration-300 hover:border-[#D87D7D] hover:bg-[linear-gradient(135deg,rgba(255,255,255,1),rgba(255,236,236,1))] hover:shadow-[0_12px_26px_rgba(142,47,47,0.08)]"
+                      data-testid="sidebar-logout-button"
+                    >
+                      <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.62),transparent_48%)] opacity-85 transition-opacity duration-300 group-hover:opacity-100" />
+                      <span className="pointer-events-none absolute inset-y-0 -left-[42%] w-[38%] bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.58),transparent)] skew-x-[-20deg] opacity-0 transition-all duration-500 group-hover:left-[112%] group-hover:opacity-100" />
+                      <span className="relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-[14px] border border-[#EDC3C3] bg-white/94 shadow-[inset_0_1px_0_rgba(255,255,255,0.92)] transition-all duration-300 group-hover:border-[#D87D7D] group-hover:bg-white">
+                        <DoorOpen weight="fill" className="h-4 w-4 text-[#B23A3A] transition-all duration-300 group-hover:scale-[1.06]" />
+                      </span>
+                      <div className="relative z-10 min-w-0">
+                        <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#A47777]">Sesión</p>
+                        <p className="text-[12px] font-semibold text-[#8E2F2F]">Cerrar sesión</p>
+                      </div>
+                    </motion.button>
                   </div>
-
-                  <motion.button
-                    whileTap={{ scale: 0.97 }}
-                    type="button"
-                    onClick={onLogout}
-                    className="group relative flex w-full items-center gap-2 overflow-hidden rounded-[14px] border border-[#E4CACA] bg-[linear-gradient(135deg,rgba(255,251,251,0.98),rgba(255,241,241,0.99))] px-2.5 py-2 text-left text-[#8E2F2F] transition-all duration-300 hover:border-[#D87D7D] hover:bg-[linear-gradient(135deg,rgba(255,255,255,1),rgba(255,236,236,1))]"
-                    data-testid="sidebar-logout-button"
-                  >
-                    <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.55),transparent_48%)] opacity-80 transition-opacity duration-300 group-hover:opacity-100" />
-                    <span className="pointer-events-none absolute inset-y-0 -left-[42%] w-[38%] bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.56),transparent)] skew-x-[-20deg] opacity-0 transition-all duration-500 group-hover:left-[112%] group-hover:opacity-100" />
-                    <span className="relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-[10px] border border-[#EDC3C3] bg-white/92 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] transition-all duration-300 group-hover:border-[#D87D7D] group-hover:bg-white">
-                      <DoorOpen weight="fill" className="h-3.5 w-3.5 text-[#B23A3A] transition-all duration-300 group-hover:scale-[1.06]" />
-                    </span>
-                    <div className="relative z-10 min-w-0">
-                      <p className="text-[9px] font-semibold uppercase tracking-[0.12em] text-[#9D6A6A]">Sesión</p>
-                      <p className="text-[10px] font-semibold text-[#8E2F2F]">Cerrar sesión</p>
-                    </div>
-                  </motion.button>
                 </div>
               )}
             </motion.div>
@@ -486,17 +472,6 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
 
               <div className="p-3 border-t border-black/5 mt-auto safe-area-bottom bg-[linear-gradient(180deg,rgba(255,255,255,0),rgba(249,246,239,0.8))]">
                 <div className="space-y-2">
-                  <div className="flex items-center gap-2 overflow-hidden rounded-[22px] border border-[#ECE6DC] bg-[linear-gradient(135deg,rgba(255,255,255,0.94),rgba(244,238,228,0.96))] px-3 py-3 shadow-[0_12px_24px_rgba(0,0,0,0.045)]">
-                    <div className="relative flex h-9 w-9 items-center justify-center rounded-[14px] border border-white/80 bg-white shadow-[0_8px_16px_rgba(0,0,0,0.05)]">
-                      <div className="absolute inset-0 rounded-[14px] bg-[radial-gradient(circle_at_top_left,rgba(42,77,59,0.12),transparent_58%)]" />
-                      <Calendar weight="duotone" className="relative z-10 w-4 h-4 text-[#2A4D3B]" />
-                    </div>
-                    <div className="text-left min-w-0">
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#7E745E]">Fecha</p>
-                      <p className="mt-1 truncate text-[12px] font-semibold text-[#234333]">{currentDateLabel}</p>
-                    </div>
-                  </div>
-
                   <motion.button
                     whileTap={{ scale: 0.985 }}
                     type="button"
@@ -529,14 +504,14 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
       >
         <div
           className={`mx-auto max-w-7xl box-border ${
-            isMobile && ['home', 'expenses', 'calendar'].includes(activeTab)
+            isMobile && ['home', 'expenses', 'cards'].includes(activeTab)
               ? 'px-5 py-4'
               : 'p-3'
           } md:p-5 lg:p-7 pb-8 md:pb-6`}
         >
           <div
             className={`app-shell relative box-border rounded-[28px] md:rounded-[34px] ${
-              isMobile && ['home', 'expenses', 'calendar'].includes(activeTab)
+              isMobile && ['home', 'expenses', 'cards'].includes(activeTab)
                 ? 'px-4 py-5'
                 : 'px-3 py-4'
             } md:px-5 md:py-5 lg:px-6 lg:py-6`}
@@ -594,7 +569,7 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
                   </motion.button>
                 </div>
 
-                <div className="grid grid-cols-4 gap-2 px-3 pt-2 pb-3">
+                <div className="grid grid-cols-3 gap-2 px-3 pt-2 pb-3">
                   {mobileTabItems.map((item) => {
                     const isActive = activeTab === item.id;
                     return (
@@ -666,9 +641,9 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
                     }}
                     data-testid="bottom-nav-settings"
                     aria-label="Ajustes"
-                    className={`group relative flex h-full min-h-[92px] w-[58px] items-center justify-center overflow-hidden rounded-[24px] border transition-all duration-300 ${activeTab === 'settings' ? 'border-[#2A4D3B]/25 bg-[linear-gradient(135deg,#2A4D3B,#1E3A2B)] text-white shadow-[0_14px_30px_rgba(42,77,59,0.22)]' : 'border-[#E9E2D6] bg-[linear-gradient(135deg,rgba(255,255,255,0.98),rgba(246,240,230,0.99))] text-[#6F6C66]'}`}
+                    className={`group relative flex h-full min-h-[92px] w-[58px] items-center justify-center overflow-hidden rounded-[24px] border transition-all duration-300 ${activeTab === 'settings' ? 'border-[#D8C19D] bg-[linear-gradient(135deg,rgba(255,255,255,0.99),rgba(249,243,232,0.99))] text-[#A06125] shadow-[0_14px_30px_rgba(118,91,50,0.14)]' : 'border-[#E9E2D6] bg-[linear-gradient(135deg,rgba(255,255,255,0.98),rgba(246,240,230,0.99))] text-[#6F6C66]'}`}
                   >
-                    <span className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full border border-white/60 bg-white/18 transition-all duration-300">
+                    <span className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full border border-[#E4D6C1] bg-white/80 transition-all duration-300">
                       <Gear weight={activeTab === 'settings' ? 'fill' : 'duotone'} className="h-4 w-4" />
                     </span>
                   </motion.button>
