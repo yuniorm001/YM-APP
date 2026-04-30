@@ -797,6 +797,912 @@ input[type="date"].premium-input {
   100% { transform: translateX(-50%); }
 }
 
+/* ==========================================================
+   PULSO SMART — Versión tipo tareas (rediseño simplificado)
+   ========================================================== */
+
+.smart-pulse-hero-tasks {
+  padding: 1.4rem 1.4rem 1.5rem;
+}
+
+.smart-pulse-tasks-wrap {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.smart-pulse-greeting {
+  margin-top: 0.4rem;
+}
+
+.smart-pulse-greeting-title {
+  font-family: var(--font-heading, 'Fraunces', 'Playfair Display', Georgia, serif);
+  font-size: 1.85rem;
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  color: #1B2A22;
+  margin: 0;
+}
+
+.smart-pulse-greeting-sub {
+  margin-top: 0.5rem;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: #5A6B62;
+  max-width: 32rem;
+}
+
+/* Progreso ring + texto */
+.smart-tasks-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.95rem;
+  background: #fff;
+  border-radius: 18px;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(42, 77, 59, 0.08);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02);
+}
+
+.smart-tasks-ring {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.4s ease;
+}
+
+.smart-tasks-ring::after {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  background: #fff;
+  border-radius: 50%;
+}
+
+.smart-tasks-ring span {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-heading, 'Fraunces', Georgia, serif);
+  font-weight: 600;
+  font-size: 0.98rem;
+  color: #2A4D3B;
+}
+
+.smart-tasks-progress-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.smart-tasks-progress-label {
+  font-size: 0.76rem;
+  color: #737573;
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+.smart-tasks-progress-status {
+  font-family: var(--font-heading, 'Fraunces', Georgia, serif);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #1B2A22;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+/* Sección de tareas */
+.smart-tasks-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.2rem;
+}
+
+.smart-tasks-count {
+  background: #E5EDE3;
+  color: #2A4D3B;
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 100px;
+  text-transform: uppercase;
+}
+
+.smart-tasks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.smart-task {
+  position: relative;
+  background: #fff;
+  border: 1px solid rgba(42, 77, 59, 0.08);
+  border-radius: 16px;
+  padding: 0.85rem 0.95rem 0.85rem 0.85rem;
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+  transition: all 0.2s ease;
+}
+
+.smart-task:hover {
+  border-color: rgba(42, 77, 59, 0.18);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(30, 35, 31, 0.04);
+}
+
+.smart-task-done {
+  background: #FAF8F2;
+  border-color: rgba(42, 77, 59, 0.06);
+}
+
+.smart-task-urgent::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 14px;
+  bottom: 14px;
+  width: 3px;
+  background: #B07A1F;
+  border-radius: 0 4px 4px 0;
+}
+
+.smart-task-critical::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 14px;
+  bottom: 14px;
+  width: 3px;
+  background: #A8412E;
+  border-radius: 0 4px 4px 0;
+}
+
+.smart-task-check {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 1px;
+  border: 2px solid #E6E1D6;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: transparent;
+  transition: all 0.2s ease;
+}
+
+.smart-task-done .smart-task-check {
+  background: #2A4D3B;
+  border-color: #2A4D3B;
+  color: #fff;
+}
+
+.smart-task-urgent .smart-task-check {
+  border-color: #B07A1F;
+}
+
+.smart-task-critical .smart-task-check {
+  border-color: #A8412E;
+}
+
+.smart-task-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.smart-task-title {
+  font-family: var(--font-heading, 'Fraunces', Georgia, serif);
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: #1B2A22;
+  margin: 0;
+}
+
+.smart-task-done .smart-task-title {
+  color: #737573;
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+
+.smart-task-help {
+  font-size: 0.8rem;
+  color: #5A6B62;
+  margin: 4px 0 0;
+  line-height: 1.45;
+}
+
+.smart-task-chips {
+  display: flex;
+  gap: 6px;
+  margin-top: 9px;
+  flex-wrap: wrap;
+}
+
+.smart-task-chip {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.68rem;
+  font-weight: 500;
+  padding: 4px 9px;
+  border-radius: 100px;
+  letter-spacing: 0.01em;
+}
+
+.smart-task-chip-green { background: #E5EDE3; color: #2A4D3B; }
+.smart-task-chip-amber { background: #F7E9CE; color: #B07A1F; }
+.smart-task-chip-red   { background: #F5DDD4; color: #A8412E; }
+.smart-task-chip-neutral { background: #F1ECE0; color: #5A6B62; }
+
+/* Tarjeta educativa "¿Por qué?" */
+.smart-tasks-why {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #F7F2E6 0%, #EFE8D5 100%);
+  border-radius: 18px;
+  padding: 0.95rem 1.05rem;
+  margin-top: 0.2rem;
+}
+
+.smart-tasks-why::before {
+  content: '';
+  position: absolute;
+  right: -30px;
+  top: -30px;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: #E5DCC1;
+  opacity: 0.5;
+}
+
+.smart-tasks-why-label {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.66rem;
+  letter-spacing: 0.16em;
+  font-weight: 600;
+  color: #B07A1F;
+  text-transform: uppercase;
+}
+
+.smart-tasks-why-title {
+  position: relative;
+  font-family: var(--font-heading, 'Fraunces', Georgia, serif);
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: #1B2A22;
+  margin: 6px 0 0;
+}
+
+.smart-tasks-why-text {
+  position: relative;
+  font-size: 0.8rem;
+  color: #5A6B62;
+  line-height: 1.5;
+  margin: 5px 0 0;
+}
+
+@media (max-width: 767px) {
+  .smart-pulse-hero-tasks {
+    padding: 1.1rem 1rem 1.2rem;
+  }
+  .smart-pulse-greeting-title {
+    font-size: 1.6rem;
+  }
+  .smart-task-title {
+    font-size: 0.95rem;
+  }
+}
+/* ========== FIN rediseño tareas ========== */
+
+/* ==========================================================
+   ARQUITECTURA SIMPLIFICADA — Semáforo + Mi dinero | Tarjetas
+   + Resumen semanal + acordeón experto
+   ========================================================== */
+
+/* === SEMÁFORO === */
+.semaforo-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.1rem 1.2rem;
+  border-radius: 22px;
+  border: 1px solid;
+  position: relative;
+  overflow: hidden;
+}
+
+.semaforo-card-green {
+  background: linear-gradient(135deg, #EEF7EE 0%, #E5EDE3 100%);
+  border-color: rgba(42, 77, 59, 0.12);
+}
+.semaforo-card-amber {
+  background: linear-gradient(135deg, #FBF3DD 0%, #F7E9CE 100%);
+  border-color: rgba(176, 122, 31, 0.18);
+}
+.semaforo-card-red {
+  background: linear-gradient(135deg, #FBE6DD 0%, #F5DDD4 100%);
+  border-color: rgba(168, 65, 46, 0.18);
+}
+
+.semaforo-emoji {
+  font-size: 2.2rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.semaforo-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.semaforo-label {
+  font-size: 0.66rem !important;
+  letter-spacing: 0.16em !important;
+}
+.semaforo-card-green .semaforo-label { color: #2A4D3B; }
+.semaforo-card-amber .semaforo-label { color: #B07A1F; }
+.semaforo-card-red .semaforo-label { color: #A8412E; }
+
+.semaforo-title {
+  font-family: var(--font-heading, 'Outfit', sans-serif);
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: #1B2A22;
+  margin: 4px 0 4px;
+  line-height: 1.15;
+}
+
+.semaforo-message {
+  font-size: 0.88rem;
+  color: #5A6B62;
+  line-height: 1.4;
+}
+
+/* === MI DINERO | MIS TARJETAS === */
+.my-money-split {
+  /* layout viene de Tailwind grid */
+}
+
+.money-block {
+  position: relative;
+  background: #fff;
+  border: 1px solid #ECE9E2;
+  border-radius: 22px;
+  padding: 1.2rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  overflow: hidden;
+  transition: all 0.25s ease;
+}
+.money-block:hover {
+  border-color: rgba(42, 77, 59, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(30, 35, 31, 0.06);
+}
+
+.money-block-cash::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 4px;
+  background: linear-gradient(90deg, #2A4D3B 0%, #4A7C6F 100%);
+}
+.money-block-credit::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 4px;
+  background: linear-gradient(90deg, #D48B3F 0%, #B65C47 100%);
+}
+
+.money-block-header {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-top: 0.2rem;
+}
+
+.money-block-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.money-block-icon-cash {
+  background: #E5EDE3;
+  color: #2A4D3B;
+}
+.money-block-icon-credit {
+  background: #F7E9CE;
+  color: #B07A1F;
+}
+
+.money-block-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.money-block-kicker {
+  font-size: 0.62rem !important;
+  letter-spacing: 0.18em !important;
+  color: #737573 !important;
+}
+.money-block-title {
+  font-family: var(--font-heading, 'Outfit', sans-serif);
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #1B2A22;
+  letter-spacing: -0.01em;
+}
+
+.money-block-amount {
+  font-family: var(--font-heading, 'Outfit', sans-serif);
+  font-size: 2.1rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  margin-top: 0.4rem;
+}
+.money-block-amount-cash { color: #2A4D3B; }
+.money-block-amount-credit { color: #B07A1F; }
+
+.money-block-helper {
+  font-size: 0.84rem;
+  color: #5A6B62;
+  line-height: 1.45;
+  margin-top: 0.1rem;
+}
+
+.money-block-bar-wrap {
+  margin-top: 0.6rem;
+}
+.money-block-bar {
+  position: relative;
+  height: 8px;
+  background: #F1ECE0;
+  border-radius: 100px;
+  overflow: hidden;
+}
+.money-block-bar-fill {
+  height: 100%;
+  border-radius: 100px;
+  transition: width 0.5s ease;
+}
+.money-block-bar-fill-cash {
+  background: linear-gradient(90deg, #2A4D3B 0%, #4A7C6F 100%);
+}
+.money-block-bar-fill-credit-good {
+  background: linear-gradient(90deg, #2A4D3B 0%, #4A7C6F 100%);
+}
+.money-block-bar-fill-credit-warn {
+  background: linear-gradient(90deg, #D48B3F 0%, #B07A1F 100%);
+}
+.money-block-bar-fill-credit-bad {
+  background: linear-gradient(90deg, #B65C47 0%, #A8412E 100%);
+}
+.money-block-bar-mark {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 2px;
+  background: rgba(27, 42, 34, 0.25);
+  border-radius: 1px;
+  /* el inline-style fija el left */
+}
+/* Pequeña etiqueta visual de la marca 30% */
+.money-block-bar-mark::after {
+  content: '30%';
+  position: absolute;
+  bottom: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.55rem;
+  color: #8A8D88;
+  font-weight: 500;
+}
+
+.money-block-bar-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 0.72rem;
+  color: #737573;
+  font-weight: 500;
+}
+.money-block-bar-labels span:last-child {
+  color: #1B2A22;
+  font-weight: 600;
+}
+
+.money-block-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #2A4D3B;
+  background: transparent;
+  border: 0;
+  padding: 8px 0 0;
+  cursor: pointer;
+  transition: gap 0.2s ease;
+  align-self: flex-start;
+}
+.money-block-link:hover { gap: 10px; }
+
+/* Más espacio inferior en credit por la marca 30% */
+.money-block-credit .money-block-bar-wrap {
+  margin-bottom: 0.7rem;
+}
+
+/* === RESUMEN SEMANAL === */
+.weekly-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.95rem 1.1rem;
+  border-radius: 18px;
+  border: 1px solid;
+}
+.weekly-summary-good {
+  background: #EEF7EE;
+  border-color: rgba(42, 77, 59, 0.12);
+}
+.weekly-summary-warn {
+  background: #FBF3DD;
+  border-color: rgba(176, 122, 31, 0.18);
+}
+.weekly-summary-neutral {
+  background: #FCFBF8;
+  border-color: #ECE9E2;
+}
+
+.weekly-summary-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.weekly-summary-good .weekly-summary-icon { background: #2A4D3B; color: #fff; }
+.weekly-summary-warn .weekly-summary-icon { background: #B07A1F; color: #fff; }
+.weekly-summary-neutral .weekly-summary-icon { background: #5A6B62; color: #fff; }
+
+.weekly-summary-text {
+  flex: 1;
+  min-width: 0;
+}
+.weekly-summary-kicker {
+  font-size: 0.62rem !important;
+  letter-spacing: 0.18em !important;
+  color: #737573 !important;
+}
+.weekly-summary-message {
+  font-family: var(--font-heading, 'Outfit', sans-serif);
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #1B2A22;
+  margin-top: 3px;
+  line-height: 1.35;
+  letter-spacing: -0.005em;
+}
+
+/* === ACORDEÓN EXPERTO === */
+.details-accordion {
+  background: #FCFBF8;
+  border: 1px solid #ECE9E2;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.details-accordion-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.95rem 1.1rem;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s ease;
+}
+.details-accordion-trigger:hover {
+  background: #F4F1EA;
+}
+
+.details-accordion-trigger-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.details-accordion-trigger-title {
+  font-family: var(--font-heading, 'Outfit', sans-serif);
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #1B2A22;
+  letter-spacing: -0.005em;
+}
+
+.details-accordion-caret {
+  width: 18px;
+  height: 18px;
+  color: #5A6B62;
+  transition: transform 0.3s ease;
+}
+.details-accordion-caret-open {
+  transform: rotate(180deg);
+}
+
+.details-accordion-body {
+  overflow: hidden;
+}
+
+.details-accordion-inner {
+  padding: 0 1.1rem 1.2rem;
+  border-top: 1px solid #ECE9E2;
+  padding-top: 1rem;
+}
+
+/* Stat cells dentro del acordeón */
+.details-stat {
+  background: #fff;
+  border: 1px solid #ECE9E2;
+  border-radius: 14px;
+  padding: 0.7rem 0.8rem;
+}
+.details-stat-value {
+  font-family: var(--font-heading, 'Outfit', sans-serif);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1B2A22;
+  margin-top: 4px;
+  letter-spacing: -0.015em;
+}
+.details-stat-sub {
+  font-size: 0.7rem;
+  color: #8A8D88;
+  margin-top: 2px;
+}
+
+/* Proyección */
+.details-projection {
+  background: #fff;
+  border: 1px solid #ECE9E2;
+  border-radius: 14px;
+  padding: 0.85rem 1rem;
+}
+.details-projection-text {
+  font-size: 0.84rem;
+  color: #5A6B62;
+  line-height: 1.5;
+  margin-top: 4px;
+}
+.details-projection-text strong {
+  color: #1B2A22;
+  font-weight: 600;
+}
+
+/* Meta dentro del acordeón */
+.details-goal {
+  background: #fff;
+  border: 1px solid #ECE9E2;
+  border-radius: 14px;
+  padding: 0.95rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+.details-goal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.details-goal-pct {
+  font-family: var(--font-heading, 'Outfit', sans-serif);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 100px;
+}
+.details-goal-pct.tone-good { background: #E5EDE3; color: #2A4D3B; }
+.details-goal-pct.tone-warn { background: #F7E9CE; color: #B07A1F; }
+.details-goal-pct.tone-bad { background: #F5DDD4; color: #A8412E; }
+
+.details-goal-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+.details-goal-label {
+  font-size: 0.7rem;
+  color: #737573;
+}
+.details-goal-amount {
+  font-family: var(--font-heading, 'Outfit', sans-serif);
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1B2A22;
+  margin-top: 2px;
+}
+.details-goal-amount.tone-good { color: #2A4D3B; }
+.details-goal-hint {
+  font-size: 0.78rem;
+  color: #5A6B62;
+  line-height: 1.4;
+  background: #F4F1EA;
+  padding: 8px 10px;
+  border-radius: 10px;
+  margin-top: 2px;
+}
+.details-goal-hint strong {
+  color: #1B2A22;
+  font-weight: 600;
+}
+
+@media (max-width: 767px) {
+  .money-block-amount {
+    font-size: 1.85rem;
+  }
+  .semaforo-emoji {
+    font-size: 1.9rem;
+  }
+  .semaforo-title {
+    font-size: 1.2rem;
+  }
+}
+/* ========== FIN arquitectura simplificada ========== */
+
+/* ==========================================================
+   v3 — SIMPLIFICACIÓN ADICIONAL
+   - Tinte de semáforo en Pulso Smart card
+   - Status strip integrado al header del Pulso
+   - Resumen semanal embebido en Mi dinero
+   ========================================================== */
+
+/* Tintes de semáforo en el card del Pulso Smart */
+.smart-pulse-tinted-green {
+  background:
+    radial-gradient(circle at top left, rgba(42,77,59,0.14), transparent 30%),
+    radial-gradient(circle at top right, rgba(74,124,111,0.10), transparent 26%),
+    linear-gradient(180deg, #FFFEFC 0%, #F4F8F2 100%) !important;
+}
+.smart-pulse-tinted-amber {
+  background:
+    radial-gradient(circle at top left, rgba(176,122,31,0.14), transparent 30%),
+    radial-gradient(circle at top right, rgba(212,139,63,0.12), transparent 26%),
+    linear-gradient(180deg, #FFFEFC 0%, #FBF6EB 100%) !important;
+}
+.smart-pulse-tinted-red {
+  background:
+    radial-gradient(circle at top left, rgba(168,65,46,0.13), transparent 30%),
+    radial-gradient(circle at top right, rgba(182,92,71,0.11), transparent 26%),
+    linear-gradient(180deg, #FFFEFC 0%, #FBF1ED 100%) !important;
+}
+
+/* Status strip — semáforo integrado al Pulso Smart */
+.smart-pulse-status-strip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid;
+  margin-top: 4px;
+}
+.smart-pulse-status-green {
+  background: rgba(255, 255, 255, 0.65);
+  border-color: rgba(42, 77, 59, 0.15);
+}
+.smart-pulse-status-amber {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(176, 122, 31, 0.22);
+}
+.smart-pulse-status-red {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(168, 65, 46, 0.22);
+}
+
+.smart-pulse-status-emoji {
+  font-size: 1.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.smart-pulse-status-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.smart-pulse-status-title {
+  font-family: var(--font-heading, 'Outfit', sans-serif);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #1B2A22;
+  line-height: 1.2;
+}
+
+.smart-pulse-status-message {
+  font-size: 0.78rem;
+  color: #5A6B62;
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+/* Resumen semanal embebido en bloque Mi dinero */
+.money-block-week {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 9px 11px;
+  border-radius: 12px;
+  margin-top: 8px;
+  border: 1px solid;
+}
+.money-block-week-good {
+  background: #EEF5EA;
+  border-color: rgba(42, 77, 59, 0.12);
+  color: #2A4D3B;
+}
+.money-block-week-warn {
+  background: #FBF3DD;
+  border-color: rgba(176, 122, 31, 0.18);
+  color: #B07A1F;
+}
+.money-block-week-neutral {
+  background: #F4F1EA;
+  border-color: rgba(115, 117, 115, 0.18);
+  color: #5A6B62;
+}
+.money-block-week svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.money-block-week-text {
+  font-size: 0.74rem;
+  line-height: 1.4;
+  font-weight: 500;
+  color: #1B2A22;
+}
+
+@media (max-width: 767px) {
+  .smart-pulse-status-emoji {
+    font-size: 1.35rem;
+  }
+  .smart-pulse-status-title {
+    font-size: 0.95rem;
+  }
+}
+/* ========== FIN v3 simplificación ========== */
+
+
 @media (max-width: 767px) {
   .smart-pulse-hero {
     padding: 1rem 0.9rem 0.9rem;

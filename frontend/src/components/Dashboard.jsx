@@ -1,4 +1,5 @@
-import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   CurrencyDollar,
   TrendUp,
@@ -11,7 +12,12 @@ import {
   Heart,
   ShieldCheck,
   Wallet,
-  DoorOpen
+  DoorOpen,
+  Check,
+  Info,
+  CaretDown,
+  CreditCard,
+  Coins
 } from '@phosphor-icons/react';
 
 const containerVariants = {
@@ -264,6 +270,7 @@ function PremiumRadialCard({
 
 export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
   const { cash, expenses, cards, goals, currentDate } = data;
+  const [showDetails, setShowDetails] = useState(false);
   
   const todayExpenses = expenses.filter(e => {
     const expDate = new Date(e.date);
@@ -567,6 +574,131 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
     { label: 'Pago próximo', value: nearestPaymentCard?.daysLeft !== null && nearestPaymentCard ? `${Math.max(nearestPaymentCard.daysLeft, 0)} día${Math.max(nearestPaymentCard.daysLeft, 0) === 1 ? '' : 's'}` : 'Sin alerta', tone: nearestPaymentCard?.daysLeft !== null && nearestPaymentCard?.daysLeft <= 5 ? 'attention' : 'neutral' }
   ];
 
+  // ============================================================
+  // Tareas diarias — versión simplificada para usuarios sin
+  // conocimientos de crédito. Convierte los datos financieros
+  // en pasos accionables que la persona pueda tachar de su lista.
+  // ============================================================
+  const dailyTasks = [];
+  const addTask = (task) => dailyTasks.push(task);
+
+  // Tarea 1: revisar saldo (siempre presente, se marca hecha si ya hay datos cargados)
+  const hasReviewedBalance = cards.length > 0 || cardInsights.length > 0;
+  addTask({
+    id: 'review-balance',
+    title: 'Revisa tu saldo de la tarjeta',
+    help: hasReviewedBalance
+      ? `Listo. Estás usando ${creditUtilization.toFixed(0)}% de tu límite${creditUtilization <= 10 ? ' — perfecto.' : creditUtilization <= 30 ? ' — vas bien.' : ' — atento.'}`
+      : 'Conecta o agrega una tarjeta para empezar.',
+    done: hasReviewedBalance,
+    tone: 'neutral'
+  });
+
+  // Tarea 2: pago próximo
+  if (nearestPaymentCard && nearestPaymentCard.daysLeft !== null && nearestPaymentCard.used > 0 && nearestPaymentCard.daysLeft <= 7) {
+    const dl = Math.max(nearestPaymentCard.daysLeft, 0);
+    addTask({
+      id: 'upcoming-payment',
+      title: dl <= 0
+        ? `Paga hoy ${getCardDisplayName(nearestPaymentCard)}`
+        : `Prepara tu pago de ${getCardDisplayName(nearestPaymentCard)}`,
+      help: dl <= 0
+        ? `Vence hoy. Si no pagas, te cobran intereses y baja tu puntaje.`
+        : `Vence en ${dl} día${dl === 1 ? '' : 's'}. Aparta ${formatCurrency(nearestPaymentCard.used)} antes de esa fecha.`,
+      done: false,
+      tone: dl <= 2 ? 'critical' : 'urgent',
+      chips: [
+        { label: dl <= 0 ? 'Hoy' : `${dl} día${dl === 1 ? '' : 's'}`, tone: dl <= 2 ? 'red' : 'amber' },
+        { label: formatCurrency(nearestPaymentCard.used), tone: 'neutral' }
+      ]
+    });
+  }
+
+  // Tarea 3: si la utilización está alta, frenar compras grandes
+  if (highestUtilizationCard && highestUtilizationCard.utilization >= 30) {
+    addTask({
+      id: 'high-utilization',
+      title: `Baja el uso de ${getCardDisplayName(highestUtilizationCard)}`,
+      help: `Estás usando ${highestUtilizationCard.utilization.toFixed(0)}% de tu límite. Si pagas ${formatCurrency(highestUtilizationCard.targetTwentyEightPercent || highestUtilizationCard.targetTenPercent)}, vuelves a una zona sana.`,
+      done: false,
+      tone: 'urgent',
+      chips: [
+        { label: `Ahora: ${highestUtilizationCard.utilization.toFixed(0)}%`, tone: 'red' },
+        { label: `Meta: <30%`, tone: 'green' }
+      ]
+    });
+  } else if (cashAvailable <= 0) {
+    addTask({
+      id: 'pause-spending',
+      title: 'Frena las compras grandes hoy',
+      help: 'No tienes efectivo guardado. Antes de comprar algo de más de $50, espera a tu próximo ingreso.',
+      done: false,
+      tone: 'urgent',
+      chips: [
+        { label: 'Importante', tone: 'amber' },
+        { label: '2 min', tone: 'neutral' }
+      ]
+    });
+  }
+
+  // Tarea 4: guardar efectivo
+  if (cashAvailable < Math.max(recurringPayAmount * 0.15, 35)) {
+    const savingsTarget = Math.max(20, Math.round(Math.max(recurringPayAmount * 0.05, 20)));
+    addTask({
+      id: 'save-cash',
+      title: 'Guarda algo de efectivo esta semana',
+      help: `Aparta aunque sean ${formatCurrency(savingsTarget)} para emergencias. Te ayudará a no depender solo de la tarjeta.`,
+      done: false,
+      tone: 'normal',
+      chips: [
+        { label: `Meta: ${formatCurrency(savingsTarget)}`, tone: 'green' },
+        { label: 'Esta semana', tone: 'neutral' }
+      ]
+    });
+  }
+
+  // Tarea 5: mantener uso debajo del 30% (educativa, siempre presente)
+  addTask({
+    id: 'utilization-rule',
+    title: 'Mantén tu uso debajo del 30%',
+    help: cards.length > 0 && cards[0].limit
+      ? `Si tu límite es ${formatCurrency(cards[0].limit)}, intenta no pasar de ${formatCurrency(cards[0].limit * 0.3)} al mes. Eso sube tu puntaje.`
+      : 'No uses más del 30% de tu límite total. Eso sube tu puntaje de crédito.',
+    done: creditUtilization <= 30 && cards.length > 0,
+    tone: 'normal',
+    chips: [
+      { label: `Vas en ${creditUtilization.toFixed(0)}%`, tone: creditUtilization <= 30 ? 'green' : 'red' },
+      { label: 'Todo el mes', tone: 'neutral' }
+    ]
+  });
+
+  const tasksDone = dailyTasks.filter((t) => t.done).length;
+  const tasksTotal = dailyTasks.length;
+  const tasksProgressPct = tasksTotal > 0 ? Math.round((tasksDone / tasksTotal) * 100) : 0;
+  const tasksProgressLabel = tasksProgressPct === 100
+    ? '¡Día completado!'
+    : tasksProgressPct >= 75
+      ? 'Vas bien — falta poco'
+      : tasksProgressPct >= 50
+        ? 'A buen ritmo'
+        : tasksProgressPct >= 25
+          ? 'Buen comienzo'
+          : 'Empecemos por la primera';
+
+  // Una "razón" educativa que aparece debajo de las tareas
+  let whyTitle = 'Usar menos del 30% te hace ver responsable';
+  let whyText = 'Los bancos ven cuánto de tu límite usas. Mientras menos uses, mejor te ven — y eso te abre mejores créditos en el futuro.';
+  if (highestUtilizationCard && highestUtilizationCard.utilization >= 30) {
+    whyTitle = 'Pasar de 30% baja tu puntaje, aunque pagues a tiempo';
+    whyText = 'El banco mide cuánto debes vs cuánto te prestaron. Aunque pagues completo, si reportas saldo alto, tu score baja.';
+  } else if (nearestPaymentCard && nearestPaymentCard.daysLeft !== null && nearestPaymentCard.daysLeft <= 5 && nearestPaymentCard.used > 0) {
+    whyTitle = 'Pagar antes de la fecha de corte cuenta más';
+    whyText = 'No es lo mismo pagar antes del corte que antes del límite. El corte es cuando el banco "toma la foto" de tu deuda.';
+  } else if (cashAvailable <= 0) {
+    whyTitle = 'El efectivo es tu colchón antes de usar crédito';
+    whyText = 'Si tienes ahorro, no necesitas la tarjeta para emergencias. Eso te mantiene fuera de intereses.';
+  }
+
   let contextualTip = 'No uses más del 30% de tu límite de crédito.';
   if (highestUtilizationCard && highestUtilizationCard.utilization >= 30) {
     contextualTip = 'Superar 30% puede presionar tu score, aunque pagues a tiempo.';
@@ -577,6 +709,84 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
   } else if (cards.length > 0) {
     contextualTip = 'Cerrar tarjetas puede afectar tu score y tu antigüedad promedio.';
   }
+
+  // ============================================================
+  // SEMÁFORO HUMANO — un solo número resumen para el cliente
+  // ============================================================
+  let semaforoLevel = 'green'; // green | amber | red
+  let semaforoEmoji = '🟢';
+  let semaforoTitle = 'Estás bien';
+  let semaforoMessage = 'Tienes margen y tus tarjetas están sanas. Sigue así.';
+
+  if (highestUtilizationCard?.utilization >= 35 || cashAvailable < 0 || (nearestPaymentCard?.daysLeft !== null && nearestPaymentCard?.daysLeft <= 0 && nearestPaymentCard?.used > 0)) {
+    semaforoLevel = 'red';
+    semaforoEmoji = '🔴';
+    semaforoTitle = 'Atención inmediata';
+    semaforoMessage = highestUtilizationCard?.utilization >= 35
+      ? `Estás usando ${highestUtilizationCard.utilization.toFixed(0)}% de ${getCardDisplayName(highestUtilizationCard)}. Es momento de bajar ese saldo.`
+      : cashAvailable < 0
+        ? 'Tus gastos superaron lo que tienes. Pausa compras grandes hasta tu próximo ingreso.'
+        : `Hoy vence un pago. Atiéndelo antes de que te cobren intereses.`;
+  } else if (highestUtilizationCard?.utilization >= 20 || cashHealthPercentage < 40 || (nearestPaymentCard?.daysLeft !== null && nearestPaymentCard?.daysLeft <= 5 && nearestPaymentCard?.used > 0)) {
+    semaforoLevel = 'amber';
+    semaforoEmoji = '🟡';
+    semaforoTitle = 'Algo que cuidar';
+    semaforoMessage = highestUtilizationCard?.utilization >= 20
+      ? `Tu uso de tarjeta va en ${highestUtilizationCard.utilization.toFixed(0)}%. Procura no pasar de 30%.`
+      : nearestPaymentCard?.daysLeft !== null && nearestPaymentCard?.daysLeft <= 5
+        ? `Tienes un pago en ${Math.max(nearestPaymentCard.daysLeft, 0)} día${Math.max(nearestPaymentCard.daysLeft, 0) === 1 ? '' : 's'}. Aparta el dinero esta semana.`
+        : 'Tu efectivo está bajo. Cuida los gastos no esenciales esta semana.';
+  } else if (cards.length === 0 && cashAvailable === 0) {
+    semaforoLevel = 'amber';
+    semaforoEmoji = '🟡';
+    semaforoTitle = 'Empecemos a configurar';
+    semaforoMessage = 'Agrega tus tarjetas e ingresos para que la app te guíe.';
+  }
+
+  // ============================================================
+  // FRASE SEMANAL — un resumen humano en una línea
+  // ============================================================
+  let weeklySummary = '';
+  let weeklySummaryTone = 'neutral'; // good | neutral | warn
+
+  if (weekTotal === 0) {
+    weeklySummary = 'No has registrado gastos esta semana todavía.';
+    weeklySummaryTone = 'neutral';
+  } else if (previousWeekTotal === 0) {
+    weeklySummary = `Llevas ${formatCurrency(weekTotal)} esta semana en ${weekExpenses.length} gasto${weekExpenses.length === 1 ? '' : 's'}.`;
+    weeklySummaryTone = 'neutral';
+  } else if (weeklyDelta < 0) {
+    weeklySummary = `Has gastado ${formatCurrency(weekTotal)}. Vas mejor que la semana pasada por ${formatCurrency(Math.abs(weeklyDelta))}.`;
+    weeklySummaryTone = 'good';
+  } else if (weeklyDelta > 0) {
+    weeklySummary = `Has gastado ${formatCurrency(weekTotal)} — ${formatCurrency(weeklyDelta)} más que la semana pasada.`;
+    weeklySummaryTone = 'warn';
+  } else {
+    weeklySummary = `Has gastado ${formatCurrency(weekTotal)} esta semana, igual que la anterior.`;
+    weeklySummaryTone = 'neutral';
+  }
+
+  // ============================================================
+  // BLOQUE "MI DINERO" — datos limpios para el cliente
+  // ============================================================
+  const myMoneyHelper = cashAvailable <= 0
+    ? 'Tu efectivo está agotado por ahora. Espera tu próximo ingreso antes de gastos grandes.'
+    : monthRunwayDays > 0 && averageDailySpend > 0
+      ? `Te alcanza para ${Math.round(monthRunwayDays)} día${Math.round(monthRunwayDays) === 1 ? '' : 's'} al ritmo actual.`
+      : 'Sin gastos registrados aún este mes.';
+
+  // ============================================================
+  // BLOQUE "MIS TARJETAS" — datos limpios
+  // ============================================================
+  const myCardsHelper = cards.length === 0
+    ? 'Aún no has agregado tarjetas. Agrégalas para que te guiemos.'
+    : creditUtilization === 0
+      ? 'No has usado tus tarjetas este mes. Mientras menos uses, mejor.'
+      : creditUtilization < 30
+        ? `Estás usando ${creditUtilization.toFixed(0)}%. Vas bien — los bancos te ven responsable.`
+        : creditUtilization < 50
+          ? `Estás usando ${creditUtilization.toFixed(0)}%. Procura bajar de 30% para que tu score suba.`
+          : `Estás usando ${creditUtilization.toFixed(0)}%. Es alto — paga lo más que puedas este mes.`;
 
   const tickerMessages = [];
   const addTickerMessage = (text, tone = 'neutral') => {
@@ -711,46 +921,95 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
       className="space-y-6"
       data-testid="dashboard"
     >
-      <motion.div variants={itemVariants} className="smart-pulse-card premium-card overflow-hidden px-0 py-0" data-testid="smart-credit-ticker">
-        <div className="smart-pulse-hero">
+      <motion.div variants={itemVariants} className={`smart-pulse-card premium-card smart-pulse-tinted-${semaforoLevel} overflow-hidden px-0 py-0`} data-testid="smart-credit-ticker">
+        <div className="smart-pulse-hero smart-pulse-hero-tasks">
           <div className="smart-pulse-orb smart-pulse-orb-left" />
           <div className="smart-pulse-orb smart-pulse-orb-right" />
-          <div className="smart-pulse-grid">
-            <div className="smart-pulse-main min-w-0">
-              <div className="smart-pulse-topline">
-                <div className="smart-pulse-brand">
-                  <div className="smart-pulse-icon-wrap">
-                    <Sparkle weight="fill" className="h-4 w-4" />
-                  </div>
-                  <span className="label-uppercase text-[#2A4D3B]">Pulso smart</span>
+          <div className="smart-pulse-tasks-wrap">
+            {/* Header: marca + estado del semáforo integrado */}
+            <div className="smart-pulse-topline">
+              <div className="smart-pulse-brand">
+                <div className="smart-pulse-icon-wrap">
+                  <Sparkle weight="fill" className="h-4 w-4" />
                 </div>
-                <div className="smart-pulse-badges">
-                  <span className={`smart-pulse-mood ${pulseMood === 'serious' ? 'smart-pulse-mood-serious' : pulseMood === 'motivating' ? 'smart-pulse-mood-motivating' : 'smart-pulse-mood-watch'}`}>
-                    {pulseMood === 'serious' ? 'Directo' : pulseMood === 'motivating' ? 'Motivador' : 'En vigilancia'}
-                  </span>
-                  <span className="smart-pulse-live">En vivo</span>
-                </div>
+                <span className="label-uppercase text-[#2A4D3B]">Pulso smart</span>
               </div>
-              <div className="smart-pulse-copy">
-                <p className="smart-pulse-kicker">Centro de decisión financiera</p>
-                <h2 className="smart-pulse-title">{pulseTodayLine}</h2>
-                <div className={`smart-pulse-action smart-pulse-action-${pulseStatusClass}`}>
-                  <span className="smart-pulse-action-dot" />
-                  <div>
-                    <p className="smart-pulse-action-label">{pulseActionTitle}</p>
-                    <p className="smart-pulse-action-text">{pulseActionText}</p>
-                  </div>
-                </div>
-                <p className="smart-pulse-tip">Consejo contextual: {contextualTip}</p>
+              <div className="smart-pulse-badges">
+                <span className="smart-pulse-live">En vivo</span>
               </div>
             </div>
-            <div className="smart-pulse-stats smart-pulse-command-metrics lg:min-w-[430px]">
-              {commandMetrics.map((item) => (
-                <div key={item.label} className={`smart-pulse-command-metric smart-pulse-command-metric-${item.tone}`}>
-                  <p className="smart-pulse-stat-label">{item.label}</p>
-                  <p className="smart-pulse-command-value">{item.value}</p>
+
+            {/* Estado del semáforo integrado al header */}
+            <div className={`smart-pulse-status-strip smart-pulse-status-${semaforoLevel}`}>
+              <span className="smart-pulse-status-emoji">{semaforoEmoji}</span>
+              <div className="smart-pulse-status-text">
+                <p className="smart-pulse-status-title">{semaforoTitle}</p>
+                <p className="smart-pulse-status-message">{semaforoMessage}</p>
+              </div>
+            </div>
+
+            <div className="smart-pulse-greeting">
+              <h2 className="smart-pulse-greeting-title">
+                Tu plan de hoy
+              </h2>
+            </div>
+
+            {/* Progreso */}
+            <div className="smart-tasks-progress">
+              <div
+                className="smart-tasks-ring"
+                style={{
+                  background: `conic-gradient(#2A4D3B ${tasksProgressPct}%, #E5EDE3 0)`
+                }}
+              >
+                <span>{tasksDone}/{tasksTotal}</span>
+              </div>
+              <div className="smart-tasks-progress-text">
+                <p className="smart-tasks-progress-label">Tu progreso de hoy</p>
+                <p className="smart-tasks-progress-status">{tasksProgressLabel}</p>
+              </div>
+            </div>
+
+            {/* Lista de tareas */}
+            <div className="smart-tasks-section-header">
+              <span className="label-uppercase">Tareas de hoy</span>
+              <span className="smart-tasks-count">{tasksTotal - tasksDone} pendiente{(tasksTotal - tasksDone) === 1 ? '' : 's'}</span>
+            </div>
+
+            <div className="smart-tasks-list">
+              {dailyTasks.map((task) => (
+                <div
+                  key={task.id}
+                  className={`smart-task ${task.done ? 'smart-task-done' : ''} ${task.tone === 'urgent' ? 'smart-task-urgent' : ''} ${task.tone === 'critical' ? 'smart-task-critical' : ''}`}
+                >
+                  <div className="smart-task-check">
+                    {task.done && <Check weight="bold" className="h-3.5 w-3.5" />}
+                  </div>
+                  <div className="smart-task-body">
+                    <p className="smart-task-title">{task.title}</p>
+                    <p className="smart-task-help">{task.help}</p>
+                    {task.chips && task.chips.length > 0 && (
+                      <div className="smart-task-chips">
+                        {task.chips.map((chip, i) => (
+                          <span key={i} className={`smart-task-chip smart-task-chip-${chip.tone}`}>
+                            {chip.label}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               ))}
+            </div>
+
+            {/* Tarjeta educativa "¿Por qué?" */}
+            <div className="smart-tasks-why">
+              <div className="smart-tasks-why-label">
+                <Info weight="fill" className="h-3 w-3" />
+                ¿POR QUÉ?
+              </div>
+              <p className="smart-tasks-why-title">{whyTitle}</p>
+              <p className="smart-tasks-why-text">{whyText}</p>
             </div>
           </div>
         </div>
@@ -774,289 +1033,216 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
         </div>
       </motion.div>
 
-      <motion.div variants={itemVariants} className="dashboard-section-header">
-        <div>
-          <p className="label-uppercase">Vista ejecutiva</p>
-          <h2 className="font-heading text-2xl font-semibold text-[#161816]">Tu mapa financiero de hoy</h2>
-        </div>
-        <p className="dashboard-section-note">Crédito, cash y presión de pagos organizados por prioridad.</p>
-      </motion.div>
+      {/* ============================================================
+          ARQUITECTURA SIMPLIFICADA v3:
+          - Semáforo integrado dentro del Pulso Smart (no card aparte)
+          - Mi dinero | Mis tarjetas (incluye resumen semanal dentro)
+          - Acordeón "Ver más detalles"
+          ============================================================ */}
 
-      {/* Quick Stats */}
-      <motion.div variants={itemVariants} className="dashboard-hierarchy-grid grid grid-cols-2 lg:grid-cols-5 gap-4">
-        {/* NUEVO: Estado del Cliente */}
-        <div className="premium-card dashboard-priority-card p-5 col-span-2 lg:col-span-1" data-testid="stat-client-status">
-          <div className="flex items-center justify-between mb-3">
-            <span className="label-uppercase">Estado</span>
-            <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: `${clientStatus.bgColor}15` }}>
-              <ShieldCheck weight="duotone" className="w-4 h-4" style={{ color: clientStatus.color }} />
+      {/* SPLIT: MI DINERO | MIS TARJETAS — la división mental clave */}
+      <motion.div
+        variants={itemVariants}
+        className="my-money-split grid grid-cols-1 md:grid-cols-2 gap-4"
+        data-testid="money-split"
+      >
+        {/* MI DINERO (cash) */}
+        <div className="money-block money-block-cash" data-testid="block-cash">
+          <div className="money-block-header">
+            <div className="money-block-icon money-block-icon-cash">
+              <Coins weight="fill" className="w-5 h-5" />
+            </div>
+            <div className="money-block-titles">
+              <p className="label-uppercase money-block-kicker">Mi dinero</p>
+              <h3 className="money-block-title">Lo que tengo</h3>
             </div>
           </div>
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-2xl">{clientStatus.icon}</span>
-            <p className="metric-value text-xl sm:text-2xl" style={{ color: clientStatus.color }}>
-              {clientStatus.estado}
-            </p>
-          </div>
-          <p className="text-xs text-[#737573] mt-1 leading-relaxed">{clientStatus.mensaje}</p>
-          {gastoCredito > 0 && (
-            <div className="mt-3 pt-3 border-t border-[#E6E6E3]">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-[#737573]">Cobertura</span>
-                <span className="font-semibold" style={{ color: clientStatus.color }}>
-                  {(cobertura * 100).toFixed(0)}%
-                </span>
-              </div>
-              <div className="progress-bar h-1.5 mt-2">
+
+          <p className="money-block-amount money-block-amount-cash">
+            {new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(Math.max(cashAvailable, 0))}
+          </p>
+          <p className="money-block-helper">{myMoneyHelper}</p>
+
+          {totalMonthlyIncomeCapacity > 0 && (
+            <div className="money-block-bar-wrap">
+              <div className="money-block-bar">
                 <div
-                  className="progress-fill rounded-full transition-all"
-                  style={{ 
-                    width: `${Math.min(cobertura * 100, 100)}%`,
-                    backgroundColor: clientStatus.color
-                  }}
+                  className="money-block-bar-fill money-block-bar-fill-cash"
+                  style={{ width: `${Math.min(cashHealthPercentage, 100)}%` }}
                 />
               </div>
+              <div className="money-block-bar-labels">
+                <span>De {formatCurrency(totalMonthlyIncomeCapacity)} este mes</span>
+                <span>{cashHealthPercentage.toFixed(0)}%</span>
+              </div>
+            </div>
+          )}
+
+          {/* Resumen semanal integrado al bloque Mi dinero */}
+          {weekTotal > 0 && (
+            <div className={`money-block-week money-block-week-${weeklySummaryTone}`}>
+              {weeklySummaryTone === 'good' ? (
+                <TrendDown weight="fill" className="w-3.5 h-3.5" />
+              ) : weeklySummaryTone === 'warn' ? (
+                <TrendUp weight="fill" className="w-3.5 h-3.5" />
+              ) : (
+                <Calendar weight="fill" className="w-3.5 h-3.5" />
+              )}
+              <p className="money-block-week-text">{weeklySummary}</p>
             </div>
           )}
         </div>
 
-        <div className="premium-card dashboard-stat-card p-5" data-testid="stat-today">
-          <div className="flex items-center justify-between mb-3">
-            <span className="label-uppercase">Hoy</span>
-            <div className="w-8 h-8 rounded-full bg-[#2A4D3B]/10 flex items-center justify-center">
-              <Lightning weight="duotone" className="w-4 h-4 text-[#2A4D3B]" />
+        {/* MIS TARJETAS (crédito) */}
+        <div className="money-block money-block-credit" data-testid="block-credit">
+          <div className="money-block-header">
+            <div className="money-block-icon money-block-icon-credit">
+              <CreditCard weight="fill" className="w-5 h-5" />
+            </div>
+            <div className="money-block-titles">
+              <p className="label-uppercase money-block-kicker">Mis tarjetas</p>
+              <h3 className="money-block-title">Lo que debo</h3>
             </div>
           </div>
-          <p className="metric-value text-2xl sm:text-3xl text-[#1A1C1A]">${todayTotal.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</p>
-          <p className="text-xs text-[#737573] mt-1">{todayExpenses.length} gastos</p>
-        </div>
 
-        <div className="premium-card dashboard-stat-card p-5" data-testid="stat-week">
-          <div className="flex items-center justify-between mb-3">
-            <span className="label-uppercase">Semana</span>
-            <div className="w-8 h-8 rounded-full bg-[#B65C47]/10 flex items-center justify-center">
-              <TrendUp weight="duotone" className="w-4 h-4 text-[#B65C47]" />
-            </div>
-          </div>
-          <p className="metric-value text-2xl sm:text-3xl text-[#1A1C1A]">${weekTotal.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</p>
-          <p className="text-xs text-[#737573] mt-1">{weekExpenses.length} gastos</p>
-        </div>
-
-        <div className="premium-card dashboard-stat-card p-5" data-testid="stat-month">
-          <div className="flex items-center justify-between mb-3">
-            <span className="label-uppercase">Mes</span>
-            <div className="w-8 h-8 rounded-full bg-[#D48B3F]/10 flex items-center justify-center">
-              <Calendar weight="duotone" className="w-4 h-4 text-[#D48B3F]" />
-            </div>
-          </div>
-          <p className="metric-value text-2xl sm:text-3xl text-[#1A1C1A]">${monthTotal.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</p>
-          <p className="text-xs text-[#737573] mt-1">{monthExpenses.length} gastos</p>
-        </div>
-
-        <div className="premium-card dashboard-stat-card dashboard-cash-card p-5" data-testid="stat-balance">
-          <div className="flex items-center justify-between mb-3">
-            <span className="label-uppercase">Cash Disponible</span>
-            <div className="w-8 h-8 rounded-full bg-[#2A4D3B]/10 flex items-center justify-center">
-              <CurrencyDollar weight="duotone" className="w-4 h-4 text-[#2A4D3B]" />
-            </div>
-          </div>
-          <p className={`metric-value text-2xl sm:text-3xl ${cashAvailable >= 0 ? 'text-[#2A4D3B]' : 'text-[#9C382A]'}`}>
-            ${cashAvailable.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+          <p className="money-block-amount money-block-amount-credit">
+            {new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(totalCreditUsed)}
           </p>
-          <p className="text-xs text-[#737573] mt-1">
-            {primaryIncomeEntry ? `${recurringIncomeLabel} · ${new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'USD' }).format(recurringPayAmount)} por cobro` : `de ${cash.income.toLocaleString('es-MX')} (solo cash)`}
-            {monthCardPaymentsTotal > 0 ? ` · pagos a tarjetas: $${monthCardPaymentsTotal.toLocaleString('es-MX', { minimumFractionDigits: 2 })}` : ''}
-          </p>
+          <p className="money-block-helper">{myCardsHelper}</p>
+
+          {totalCreditLimit > 0 && (
+            <div className="money-block-bar-wrap">
+              <div className="money-block-bar">
+                <div
+                  className={`money-block-bar-fill ${creditUtilization < 30 ? 'money-block-bar-fill-credit-good' : creditUtilization < 50 ? 'money-block-bar-fill-credit-warn' : 'money-block-bar-fill-credit-bad'}`}
+                  style={{ width: `${Math.min(creditUtilization, 100)}%` }}
+                />
+                {/* Marca el "30%" como referencia visual */}
+                <div className="money-block-bar-mark" style={{ left: '30%' }} />
+              </div>
+              <div className="money-block-bar-labels">
+                <span>De {formatCurrency(totalCreditLimit)} de límite</span>
+                <span>{creditUtilization.toFixed(0)}%</span>
+              </div>
+            </div>
+          )}
+
+          {cards.length > 0 && (
+            <button
+              type="button"
+              onClick={() => onNavigate('cards')}
+              className="money-block-link"
+            >
+              Ver mis {cards.length} tarjeta{cards.length === 1 ? '' : 's'}
+              <ArrowRight weight="bold" className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
       </motion.div>
 
-      {/* Main Grid */}
-      <div className="dashboard-main-grid grid grid-cols-1 gap-6 items-stretch">
-        <div className="dashboard-insights-stack flex h-full flex-col gap-6">
-        {/* Goal Progress */}
-        <motion.div variants={itemVariants} className="premium-card p-6" data-testid="goal-card">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#2A4D3B] flex items-center justify-center">
-                <Target weight="duotone" className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h3 className="font-heading font-medium text-lg text-[#1A1C1A]">Control inteligente {isWeeklyGoal ? 'Semanal' : 'Mensual'}</h3>
-                <p className="text-sm text-[#737573]">Solo gastos en cash (no incluye tarjetas)</p>
-              </div>
-            </div>
-            <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-              !canUseSmartGoal ? 'bg-[#B65C47]/10 text-[#B65C47]' :
-              goalProgress < 70 ? 'bg-[#2A4D3B]/10 text-[#2A4D3B]' :
-              goalProgress < 90 ? 'bg-[#D48B3F]/10 text-[#D48B3F]' :
-              'bg-[#B65C47]/10 text-[#B65C47]'
-            }`}>
-              {!canUseSmartGoal ? 'Pausada' : `${goalProgress.toFixed(0)}%`}
+      {/* ACORDEÓN: VER MÁS DETALLES — todo lo técnico va aquí */}
+      <motion.div variants={itemVariants} className="details-accordion" data-testid="details-accordion">
+        <button
+          type="button"
+          onClick={() => setShowDetails((prev) => !prev)}
+          className="details-accordion-trigger"
+          aria-expanded={showDetails}
+        >
+          <div className="details-accordion-trigger-text">
+            <span className="label-uppercase">Modo experto</span>
+            <span className="details-accordion-trigger-title">
+              {showDetails ? 'Ocultar detalles' : 'Ver más detalles'}
             </span>
           </div>
+          <CaretDown
+            weight="bold"
+            className={`details-accordion-caret ${showDetails ? 'details-accordion-caret-open' : ''}`}
+          />
+        </button>
 
-          <div className="space-y-4">
-            <div className="progress-bar h-3">
-              <div
-                className={`progress-fill ${
-                  !canUseSmartGoal ? 'bg-[#B65C47]' :
-                  goalProgress < 70 ? 'bg-[#2A4D3B]' :
-                  goalProgress < 90 ? 'bg-[#D48B3F]' :
-                  'bg-[#B65C47]'
-                }`}
-                style={{ width: `${!canUseSmartGoal ? 100 : goalProgress}%` }}
-              />
-            </div>
+        <AnimatePresence initial={false}>
+          {showDetails && (
+            <motion.div
+              key="details"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              className="details-accordion-body"
+            >
+              <div className="details-accordion-inner space-y-4">
 
-            <div className="flex items-center justify-between text-sm">
-              <div>
-                <p className="text-[#737573]">Gastado (cash)</p>
-                <p className="metric-value text-lg text-[#1A1C1A]">${goalSpent.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</p>
-              </div>
-              <div className="text-right">
-                <p className="text-[#737573]">Disponible</p>
-                <p className={`metric-value text-lg ${canUseSmartGoal ? 'text-[#2A4D3B]' : 'text-[#B65C47]'}`}>${remainingGoal.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</p>
-              </div>
-            </div>
+                {/* Desglose de gastos: Hoy / Semana / Mes */}
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="details-stat">
+                    <span className="label-uppercase">Hoy</span>
+                    <p className="details-stat-value">{formatCurrency(todayTotal)}</p>
+                    <p className="details-stat-sub">{todayExpenses.length} gasto{todayExpenses.length === 1 ? '' : 's'}</p>
+                  </div>
+                  <div className="details-stat">
+                    <span className="label-uppercase">Semana</span>
+                    <p className="details-stat-value">{formatCurrency(weekTotal)}</p>
+                    <p className="details-stat-sub">{weekExpenses.length} gasto{weekExpenses.length === 1 ? '' : 's'}</p>
+                  </div>
+                  <div className="details-stat">
+                    <span className="label-uppercase">Mes</span>
+                    <p className="details-stat-value">{formatCurrency(monthTotal)}</p>
+                    <p className="details-stat-sub">{monthExpenses.length} gasto{monthExpenses.length === 1 ? '' : 's'}</p>
+                  </div>
+                </div>
 
-            {!canUseSmartGoal ? (
-              <div className="flex items-center gap-2 p-3 rounded-xl bg-[#FFF7F4] border border-[#F1D7CF]">
-                <Sparkle weight="duotone" className="w-5 h-5 text-[#B65C47]" />
-                <p className="text-sm text-[#9C382A]">
-                  El Control inteligente está pausado porque no tienes cash disponible en este momento.
-                </p>
-              </div>
-            ) : goalProgress < 100 && (
-              <div className="flex items-center gap-2 p-3 rounded-xl bg-[#F2F0EB]">
-                <Sparkle weight="duotone" className="w-5 h-5 text-[#2A4D3B]" />
-                <p className="text-sm text-[#737573]">
-                  {isWeeklyGoal ? (
-                    <>Puedes gastar <span className="font-medium text-[#1A1C1A]">${suggestedDailyBudget.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</span> por día restante de esta semana</>
-                  ) : (
-                    <>Puedes gastar <span className="font-medium text-[#1A1C1A]">${suggestedDailyBudget.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</span> por día o <span className="font-medium text-[#1A1C1A]">${suggestedWeeklyBudget.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</span> por semana restante del mes</>
+                {/* Proyección y runway en lenguaje humano */}
+                <div className="details-projection">
+                  <p className="label-uppercase">A este ritmo</p>
+                  <p className="details-projection-text">
+                    Vas a gastar <strong>{formatCurrency(projectedMonthSpend)}</strong> al cierre del mes
+                    {' '}(promedio {formatCurrency(averageDailySpend)} al día).
+                  </p>
+                  {monthRunwayDays > 0 && cashAvailable > 0 && (
+                    <p className="details-projection-text">
+                      Tu efectivo te alcanza para <strong>{Math.round(monthRunwayDays)} día{Math.round(monthRunwayDays) === 1 ? '' : 's'}</strong> al ritmo actual.
+                    </p>
                   )}
-                </p>
-              </div>
-            )}
-          </div>
-        </motion.div>
+                </div>
 
-        <motion.div variants={itemVariants} className="premium-card p-6 relative overflow-hidden min-h-[520px] lg:min-h-0 flex h-full flex-1 flex-col" data-testid="financial-pulse-widget">
-          <div className="absolute right-0 top-0 h-36 w-36 rounded-full blur-3xl opacity-60" style={{ background: 'radial-gradient(circle, rgba(42,77,59,0.18) 0%, transparent 68%)' }} />
-          <div className="flex items-start justify-between gap-4 mb-6 relative flex-shrink-0">
-            <div className="flex items-start gap-3 min-w-0">
-              <div className="w-12 h-12 rounded-[18px] bg-gradient-to-br from-[#2A4D3B] to-[#1E3A2B] flex items-center justify-center shadow-[0_16px_34px_rgba(42,77,59,0.18)] flex-shrink-0">
-                <Lightning weight="duotone" className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <p className="label-uppercase mb-2">Pulso financiero</p>
-                <h3 className="font-heading text-xl font-semibold text-[#161816]">Ritmo de este mes</h3>
-                <p className="text-sm text-[#737573] mt-1">Una lectura rápida de ingresos, gasto y proyección.</p>
-              </div>
-            </div>
-            <div className="hidden sm:flex items-center gap-2 rounded-full border border-[#E7E1D7] bg-[#FCFBF8] px-3 py-2 text-xs font-semibold text-[#2A4D3B]">
-              <Heart weight="duotone" className="w-4 h-4" />
-              {savingsRate.toFixed(0)}% libre
-            </div>
-          </div>
-
-          <div className="relative flex-1 grid grid-cols-1 xl:grid-cols-[1.2fr_0.8fr] gap-6 items-stretch content-stretch">
-            <div className="space-y-4 flex flex-col justify-between">
-              {financialPulseData.map((item) => (
-                <div key={item.label} className="rounded-[24px] border border-[#ECE9E2] bg-[#FCFBF8] p-4 flex-1 flex flex-col justify-center">
-                  <div className="flex items-center justify-between gap-3 mb-3">
-                    <div>
-                      <p className="text-sm font-medium text-[#1A1C1A]">{item.label}</p>
-                      <p className="text-xs text-[#8A8D88]">{item.helper}</p>
+                {/* Control inteligente (meta) — solo si hay datos */}
+                {canUseSmartGoal && goalProgress < 100 && (
+                  <div className="details-goal">
+                    <div className="details-goal-header">
+                      <span className="label-uppercase">Meta {isWeeklyGoal ? 'semanal' : 'mensual'} (solo cash)</span>
+                      <span className={`details-goal-pct ${goalProgress < 70 ? 'tone-good' : goalProgress < 90 ? 'tone-warn' : 'tone-bad'}`}>
+                        {goalProgress.toFixed(0)}%
+                      </span>
                     </div>
-                    <p className="metric-value text-base text-[#161816]">{new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'USD' }).format(item.value)}</p>
+                    <div className="progress-bar h-2">
+                      <div
+                        className={`progress-fill ${goalProgress < 70 ? 'bg-[#2A4D3B]' : goalProgress < 90 ? 'bg-[#D48B3F]' : 'bg-[#B65C47]'}`}
+                        style={{ width: `${goalProgress}%` }}
+                      />
+                    </div>
+                    <div className="details-goal-row">
+                      <div>
+                        <p className="details-goal-label">Gastado</p>
+                        <p className="details-goal-amount">{formatCurrency(goalSpent)}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="details-goal-label">Disponible</p>
+                        <p className="details-goal-amount tone-good">{formatCurrency(remainingGoal)}</p>
+                      </div>
+                    </div>
+                    {suggestedDailyBudget > 0 && (
+                      <p className="details-goal-hint">
+                        Puedes gastar <strong>{formatCurrency(suggestedDailyBudget)}</strong> al día sin pasarte de la meta.
+                      </p>
+                    )}
                   </div>
-                  <div className="h-2.5 rounded-full bg-[#ECE9E2] overflow-hidden">
-                    <div className="h-full rounded-full transition-all duration-500" style={{ width: `${item.width}%`, background: `linear-gradient(90deg, ${item.color} 0%, ${item.color}CC 100%)` }} />
-                  </div>
-                </div>
-              ))}
-            </div>
+                )}
 
-            <div className="grid grid-cols-1 gap-4 h-full auto-rows-fr">
-              <div className="rounded-[28px] border border-[#ECE9E2] bg-[#FCFBF8] p-5 flex flex-col justify-center min-h-[220px] min-w-0">
-                <p className="text-xs uppercase tracking-[0.18em] text-[#8A8D88] mb-2">Proyección del mes</p>
-                <p className="metric-value min-w-0 max-w-full break-words leading-[1.05] text-[clamp(2rem,5vw,2.6rem)] text-[#161816]">{new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'USD' }).format(projectedMonthSpend)}</p>
-                <p className="text-sm text-[#737573] mt-2">Basado en un promedio diario de {new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'USD' }).format(averageDailySpend)}.</p>
               </div>
-
-              <div className="rounded-[24px] border border-[#ECE9E2] bg-white p-4 flex flex-1 flex-col justify-center min-h-[160px] min-w-0 overflow-hidden">
-                <p className="text-xs uppercase tracking-[0.16em] text-[#8A8D88] mb-2">Balance neto</p>
-                <p className={`metric-value min-w-0 max-w-full break-words leading-[1.05] text-[clamp(1.55rem,3.8vw,2rem)] ${cashAvailable >= 0 ? 'text-[#2A4D3B]' : 'text-[#9C382A]'}`}>{new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'USD' }).format(cashAvailable)}</p>
-                <p className="text-sm text-[#737573] mt-1">después de gastos y pagos</p>
-              </div>
-
-              <div className="rounded-[24px] border border-[#ECE9E2] bg-white p-4 flex flex-1 flex-col justify-center min-h-[160px] min-w-0 overflow-hidden">
-                <p className="text-xs uppercase tracking-[0.16em] text-[#8A8D88] mb-2">Runway cash</p>
-                <p className="metric-value min-w-0 max-w-full break-words leading-[1.05] text-[clamp(1.65rem,4vw,2.05rem)] text-[#2A4D3B]">{monthRunwayDays.toFixed(1)}</p>
-                <p className="text-sm text-[#737573] mt-1">días al ritmo actual</p>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-        </div>
-
-        <div className="dashboard-radial-pair grid h-full gap-6 auto-rows-fr">
-          <PremiumRadialCard
-            title="Crédito"
-            subtitle={`${cards.length} tarjeta${cards.length !== 1 ? 's' : ''}`}
-            icon={<CurrencyDollar weight="duotone" className="w-5 h-5" />}
-            percentage={creditUtilization}
-            valueLabel={`${creditUtilization.toFixed(0)}%`}
-            hint={`${new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(totalCreditUsed)} usado`}
-            accent={creditTone.stroke}
-            tone={creditTone}
-            testId="credit-card"
-            footer={(
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div className="rounded-2xl bg-white px-3 py-2 border border-[#ECE9E2]">
-                  <p className="text-[#8A8D88] text-xs uppercase tracking-[0.16em] mb-1">Límite total</p>
-                  <p className="font-semibold text-[#1A1C1A]">{new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(totalCreditLimit)}</p>
-                </div>
-                <div className="rounded-2xl bg-white px-3 py-2 border border-[#ECE9E2]">
-                  <p className="text-[#8A8D88] text-xs uppercase tracking-[0.16em] mb-1">Espacio libre</p>
-                  <p className="font-semibold text-[#1A1C1A]">{new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(Math.max(totalCreditLimit - totalCreditUsed, 0))}</p>
-                </div>
-              </div>
-            )}
-            onClick={() => onNavigate('cards')}
-            buttonLabel="Ver tarjetas"
-          />
-
-          <PremiumRadialCard
-            title="Cash Disponible"
-            subtitle={primaryIncomeEntry ? `${recurringIncomeLabel} · flujo activo` : 'Sin flujo registrado'}
-            icon={<WalletIcon />}
-            percentage={cashHealthPercentage}
-            valueLabel={`${cashHealthPercentage.toFixed(0)}%`}
-            hint={new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'USD' }).format(cashAvailable)}
-            accent={cashTone.stroke}
-            tone={cashTone}
-            testId="cash-radial-card"
-            footer={(
-              <div className="space-y-3 text-sm">
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-[#737573]">Ingreso mensual</span>
-                  <span className="font-semibold text-[#1A1C1A]">{new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'USD' }).format(totalMonthlyIncomeCapacity)}</span>
-                </div>
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-[#737573]">Gastos cash del mes</span>
-                  <span className="font-semibold text-[#1A1C1A]">{new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'USD' }).format(monthCashTotal)}</span>
-                </div>
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-[#737573]">Pagos a tarjetas</span>
-                  <span className="font-semibold text-[#1A1C1A]">{new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'USD' }).format(monthCardPaymentsTotal)}</span>
-                </div>
-              </div>
-            )}
-          />
-        </div>
-      </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
 
 
     </motion.div>
