@@ -278,23 +278,42 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
               className={`rounded-[22px] border border-[#ECE6DC] bg-gradient-to-br from-[#FCFBF8] to-[#F3EEE6] ${isDesktopSidebarCollapsed ? 'px-3 py-3' : 'px-3 py-3'} shadow-[0_10px_22px_rgba(0,0,0,0.025)]`}
             >
               {isDesktopSidebarCollapsed ? (
-                <motion.button
-                  whileHover={{}}
-                  whileTap={{ scale: 0.96 }}
-                  type="button"
-                  onClick={onLogout}
-                  className="group relative mx-auto flex h-12 w-12 items-center justify-center overflow-hidden rounded-[20px] border border-[#E9B5B5] bg-[linear-gradient(135deg,#FFF6F6_0%,#FFE9E9_36%,#FFDCDC_100%)] text-[#C62828] transition-all duration-300 hover:border-[#D96B6B] hover:saturate-[1.08]"
-                  data-testid="sidebar-power-logout-button"
-                  aria-label="Cerrar sesión"
-                  title="Cerrar sesión"
-                >
-                  <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.58),transparent_48%)] opacity-90 transition-opacity duration-300 group-hover:opacity-100" />
-                  <span className="pointer-events-none absolute inset-0 rounded-[20px] ring-1 ring-white/20 transition-all duration-300 group-hover:ring-white/40" />
-                  <span className="pointer-events-none absolute inset-y-0 -left-[45%] w-[46%] bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.62),transparent)] skew-x-[-22deg] opacity-0 transition-all duration-500 group-hover:left-[118%] group-hover:opacity-100" />
-                  <span className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full border border-[#E9B5B5] bg-white/78 shadow-[inset_0_1px_0_rgba(255,255,255,0.88)] transition-all duration-300 group-hover:border-[#D96B6B] group-hover:bg-white/88">
-                    <span className="text-[21px] font-semibold leading-none tracking-[-0.02em] transition-all duration-300 group-hover:scale-[1.04]">{powerGlyph}</span>
-                  </span>
-                </motion.button>
+                <div className="flex flex-col items-center gap-3">
+                  <motion.button
+                    whileHover={{ y: -1 }}
+                    whileTap={{ scale: 0.96 }}
+                    type="button"
+                    onClick={() => setActiveTab('settings')}
+                    className={`group relative mx-auto flex h-12 w-12 items-center justify-center overflow-hidden rounded-[20px] border transition-all duration-300 ${activeTab === 'settings' ? 'border-[#D8C19D] bg-[linear-gradient(135deg,#FFFDF8_0%,#F6EDDD_100%)] text-[#A06125] shadow-[0_14px_28px_rgba(118,91,50,0.12)]' : 'border-[#E9E2D6] bg-[linear-gradient(135deg,#FFFFFF_0%,#F6F0E6_100%)] text-[#667067] hover:border-[#D8C19D] hover:text-[#A06125]'}`}
+                    data-testid="sidebar-collapsed-settings-button"
+                    aria-label="Ajustes"
+                    title="Ajustes"
+                  >
+                    <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(212,139,63,0.16),transparent_48%)] opacity-80 transition-opacity duration-300 group-hover:opacity-100" />
+                    <span className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full border border-[#E5D8C4] bg-white/78 shadow-[inset_0_1px_0_rgba(255,255,255,0.88)]">
+                      <Gear weight={activeTab === 'settings' ? 'fill' : 'duotone'} className="h-4 w-4" />
+                    </span>
+                    {activeTab === 'settings' ? <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-[#D48B3F] shadow-[0_0_0_4px_rgba(212,139,63,0.13)]" /> : null}
+                  </motion.button>
+
+                  <motion.button
+                    whileHover={{}}
+                    whileTap={{ scale: 0.96 }}
+                    type="button"
+                    onClick={onLogout}
+                    className="group relative mx-auto flex h-12 w-12 items-center justify-center overflow-hidden rounded-[20px] border border-[#E9B5B5] bg-[linear-gradient(135deg,#FFF6F6_0%,#FFE9E9_36%,#FFDCDC_100%)] text-[#C62828] transition-all duration-300 hover:border-[#D96B6B] hover:saturate-[1.08]"
+                    data-testid="sidebar-power-logout-button"
+                    aria-label="Cerrar sesión"
+                    title="Cerrar sesión"
+                  >
+                    <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.58),transparent_48%)] opacity-90 transition-opacity duration-300 group-hover:opacity-100" />
+                    <span className="pointer-events-none absolute inset-0 rounded-[20px] ring-1 ring-white/20 transition-all duration-300 group-hover:ring-white/40" />
+                    <span className="pointer-events-none absolute inset-y-0 -left-[45%] w-[46%] bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.62),transparent)] skew-x-[-22deg] opacity-0 transition-all duration-500 group-hover:left-[118%] group-hover:opacity-100" />
+                    <span className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full border border-[#E9B5B5] bg-white/78 shadow-[inset_0_1px_0_rgba(255,255,255,0.88)] transition-all duration-300 group-hover:border-[#D96B6B] group-hover:bg-white/88">
+                      <span className="text-[21px] font-semibold leading-none tracking-[-0.02em] transition-all duration-300 group-hover:scale-[1.04]">{powerGlyph}</span>
+                    </span>
+                  </motion.button>
+                </div>
               ) : (
                 <div className="relative overflow-hidden rounded-[22px] border border-[#E7DED0] bg-[linear-gradient(145deg,rgba(255,255,255,0.98),rgba(244,239,230,0.96))] p-2 shadow-[0_14px_34px_rgba(45,36,22,0.07)]">
                   <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(212,139,63,0.12),transparent_42%)]" />

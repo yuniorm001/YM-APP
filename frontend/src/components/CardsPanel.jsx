@@ -719,8 +719,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                 className="absolute inset-0 rounded-full transition-all duration-500"
                 style={getUtilizationBarStyle(totalUtilization)}
               />
-              {/* Marcadores de 10%, 20% y 30% */}
-              <div className="absolute top-0 left-[10%] w-0.5 h-full bg-[#2A4D3B]/40" />
+              {/* Marcadores de 20% y 30% */}
               <div className="absolute top-0 left-[20%] w-0.5 h-full bg-[#D48B3F]/40" />
               <div className="absolute top-0 left-[30%] w-0.5 h-full bg-[#9C382A]/40" />
             </div>
@@ -729,15 +728,15 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
               <div className="flex items-center gap-3">
                 <span className="flex items-center gap-1">
                   <span className="w-2 h-2 rounded-full bg-[#2A4D3B]"></span>
-                  10%
+                  0–19.99%
                 </span>
                 <span className="flex items-center gap-1">
                   <span className="w-2 h-2 rounded-full bg-[#D48B3F]"></span>
-                  20%
+                  20–29.99%
                 </span>
                 <span className="flex items-center gap-1">
                   <span className="w-2 h-2 rounded-full bg-[#9C382A]"></span>
-                  30%
+                  30%+
                 </span>
               </div>
               <span>100%</span>
@@ -1045,7 +1044,6 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                         className="absolute inset-0 rounded-full transition-all duration-500 z-[1]"
                         style={getUtilizationBarStyle(utilization)}
                       />
-                      <div className="absolute top-0 left-[10%] w-0.5 h-full bg-[#2A4D3B]/45 z-[2]" />
                       <div className="absolute top-0 left-[20%] w-0.5 h-full bg-[#D48B3F]/45 z-[2]" />
                       <div className="absolute top-0 left-[30%] w-0.5 h-full bg-[#9C382A]/45 z-[2]" />
                     </div>
@@ -1055,15 +1053,15 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                       <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-end">
                         <span className="inline-flex items-center gap-1.5">
                           <span className="w-2 h-2 rounded-full bg-[#2A4D3B]"></span>
-                          10%
+                          Saludable
                         </span>
                         <span className="inline-flex items-center gap-1.5">
                           <span className="w-2 h-2 rounded-full bg-[#D48B3F]"></span>
-                          20%
+                          Moderado
                         </span>
                         <span className="inline-flex items-center gap-1.5">
                           <span className="w-2 h-2 rounded-full bg-[#9C382A]"></span>
-                          30%
+                          Alto
                         </span>
                       </div>
                     </div>
