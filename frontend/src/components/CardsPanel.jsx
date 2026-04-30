@@ -652,9 +652,9 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
       <div className="hero-surface p-5 sm:p-6 text-white">
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.18em] text-white/65 font-semibold mb-2">Portafolio</p>
-            <h1 className="font-heading text-3xl sm:text-4xl font-semibold tracking-[-0.04em]">Mis Tarjetas</h1>
-            <p className="mt-2 text-sm text-white/70 max-w-xl">Controla utilización, límites, pagos y presión de crédito desde un solo lugar.</p>
+            <p className="text-[11px] uppercase tracking-[0.18em] text-white/65 font-semibold mb-2">Control de crédito</p>
+            <h1 className="font-heading text-3xl sm:text-4xl font-semibold tracking-[-0.04em]">Mis tarjetas</h1>
+            <p className="mt-2 text-sm text-white/70 max-w-xl">Mira cuánto estás usando, cuánto te queda disponible y qué tarjeta conviene cuidar primero.</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-stretch sm:min-w-[468px]">
             <div className="rounded-[20px] border border-white/10 bg-white/10 px-5 py-4 backdrop-blur-sm min-h-[72px] sm:min-w-[226px] flex flex-col justify-center">
@@ -667,9 +667,22 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
               data-testid="add-card-btn"
             >
               <Plus weight="bold" className="w-5 h-5" />
-              <span>Nueva Tarjeta</span>
+              <span>Agregar tarjeta</span>
             </button>
           </div>
+        </div>
+      </div>
+
+      <div className="novice-guide-card">
+        <div>
+          <p className="novice-kicker">Lectura simple</p>
+          <h2>La meta es mantener las tarjetas bajas</h2>
+          <p>Para alguien nuevo en crédito: 10% o menos es saludable, 20% pide atención y 30% o más ya requiere actuar.</p>
+        </div>
+        <div className="novice-steps">
+          <span>1. Revisa el % usado</span>
+          <span>2. Mira la fecha de pago</span>
+          <span>3. Baja primero la más alta</span>
         </div>
       </div>
 
@@ -679,7 +692,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
               <Wallet weight="fill" className="w-4 h-4 text-[#2A4D3B]" />
-              <p className="label-uppercase">Utilización Total del Crédito</p>
+              <p className="label-uppercase">Uso total de tarjetas</p>
             </div>
             <div className="flex items-end gap-3 flex-wrap">
               <span className="metric-value text-4xl sm:text-5xl text-[#1A1C1A]">
@@ -709,7 +722,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                 </div>
                 <div>
                   <p className="font-semibold text-[#9C382A]">Sin crédito disponible</p>
-                  <p className="text-sm text-[#9C382A]/80">Has alcanzado el límite total de tus tarjetas.</p>
+                  <p className="text-sm text-[#9C382A]/80">Ya estás usando todo el crédito disponible. Evita seguir cargando compras hasta bajar saldos.</p>
                 </div>
               </motion.div>
             )}
@@ -755,13 +768,13 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
             <div className="min-w-0">
               <div className="flex items-center gap-2 mb-1">
                 <Clock weight="fill" className="w-4 h-4 text-[#2A4D3B]" />
-                <p className="label-uppercase">Guía inteligente de uso</p>
+                <p className="label-uppercase">Qué tarjeta usar</p>
               </div>
               <h2 className="font-heading text-xl sm:text-2xl font-semibold text-[#1A1C1A] tracking-tight">
-                Decisión inteligente de uso
+                Recomendación de hoy
               </h2>
               <p className="text-sm text-[#737573] mt-1">
-                Identifica qué tarjeta conviene usar hoy según fecha de pago, utilización y cupo disponible.
+                La app te ayuda a escoger la tarjeta menos riesgosa según saldo, fecha de pago y crédito disponible.
               </p>
             </div>
 
@@ -816,8 +829,8 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
             </div>
           ) : (
             <div className="rounded-[24px] border border-[#E6E6E3] bg-white p-4">
-              <p className="text-sm font-semibold text-[#1A1C1A]">Aún no hay una tarjeta recomendada</p>
-              <p className="text-sm text-[#737573] mt-1">Registra tarjetas con cupo disponible y fecha de pago para activar esta guía.</p>
+              <p className="text-sm font-semibold text-[#1A1C1A]">Aún no hay recomendación</p>
+              <p className="text-sm text-[#737573] mt-1">Agrega una tarjeta con límite, saldo y fecha de pago para que la app pueda orientarte.</p>
             </div>
           )}
 
@@ -1162,8 +1175,8 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
             <div className="empty-state-icon w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-[#F2F0EB] to-[#E6E6E3] flex items-center justify-center">
               <CreditCardIcon weight="duotone" className="w-10 h-10 text-[#737573]" />
             </div>
-            <h3 className="font-heading font-semibold text-xl text-[#1A1C1A] mb-2">Activa tu portafolio de crédito</h3>
-            <p className="text-[#737573] mb-6">Agrega tu primera tarjeta para calcular utilización, fechas de pago y recomendaciones inteligentes.</p>
+            <h3 className="font-heading font-semibold text-xl text-[#1A1C1A] mb-2">Agrega tu primera tarjeta</h3>
+            <p className="text-[#737573] mb-6">Con una tarjeta registrada podrás ver tu uso, tu crédito disponible y qué pago conviene priorizar.</p>
             <button
               onClick={() => setShowForm(true)}
               className="btn-app-primary inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#2A4D3B] to-[#1E3A2B] text-white font-semibold shadow-lg"
@@ -1203,8 +1216,8 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                       <Clock weight="fill" className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#2A4D3B]">Guía inteligente de uso</p>
-                      <h3 className="font-heading text-2xl font-semibold text-[#1A1C1A] mt-1">Decisión inteligente de uso</h3>
+                      <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#2A4D3B]">Qué tarjeta usar</p>
+                      <h3 className="font-heading text-2xl font-semibold text-[#1A1C1A] mt-1">Recomendación de hoy</h3>
                       <p className="text-sm text-[#737573] mt-1">Mira el detalle completo en un popup sin recargar la vista principal.</p>
                     </div>
                   </div>
@@ -1425,8 +1438,8 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                     <div className="w-14 h-14 mx-auto rounded-2xl bg-[#F2F0EB] flex items-center justify-center">
                       <CreditCardIcon weight="duotone" className="w-7 h-7 text-[#737573]" />
                     </div>
-                    <p className="text-[#1A1C1A] font-semibold mt-4">Agrega tarjetas para ver recomendaciones</p>
-                    <p className="text-sm text-[#737573] mt-1">Esta sección te ayudará a usar mejor cada tarjeta según su fecha de pago y cupo disponible.</p>
+                    <p className="text-[#1A1C1A] font-semibold mt-4">Agrega tarjetas para recibir una guía</p>
+                    <p className="text-sm text-[#737573] mt-1">Aquí verás cuál tarjeta conviene usar o pagar primero, explicado de forma simple.</p>
                   </div>
                 )}
                 </div>
@@ -1507,7 +1520,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>
                         <p className="text-[10px] uppercase tracking-[0.14em] text-[#737573]">Selecciona la meta</p>
-                        <p className="text-sm font-semibold text-[#1A1C1A] mt-1">Elige cómo quieres que cierre esta tarjeta antes del pago</p>
+                        <p className="text-sm font-semibold text-[#1A1C1A] mt-1">Elige cómo quieres dejar esta tarjeta antes de pagar</p>
                       </div>
                       <div className="grid grid-cols-4 gap-2 w-full sm:w-auto">
                         {PAYMENT_GOAL_OPTIONS.map((option) => {
@@ -1565,7 +1578,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                   ) : (
                     <div className="rounded-2xl border border-[#E6DED2] bg-[#FCFBF8] p-4">
                       <p className="text-sm font-semibold text-[#1A1C1A]">Aún no hay una ruta disponible.</p>
-                      <p className="text-sm text-[#5E605D] mt-1">Esta tarjeta necesita saldo usado y fecha de pago para calcular el objetivo.</p>
+                      <p className="text-sm text-[#5E605D] mt-1">Agrega saldo usado y fecha de pago para calcular una meta clara.</p>
                     </div>
                   )}
                   </div>
@@ -1749,7 +1762,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                               {editingCard ? 'Editar tarjeta' : 'Nueva Tarjeta'}
                             </h2>
                             <p className="text-xs text-[#737573] font-medium leading-relaxed">
-                              {editingCard ? 'Actualiza los datos de tu tarjeta de crédito' : 'Registra los datos de tu tarjeta de crédito'}
+                              {editingCard ? 'Actualiza los datos de esta tarjeta' : 'Agrega los datos básicos de tu tarjeta'}
                             </p>
                           </div>
                         </div>
@@ -1785,7 +1798,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                         )}
 
                         <div>
-                          <label className="text-sm font-semibold text-[#1A1C1A] block mb-2">Nombre de la tarjeta</label>
+                          <label className="text-sm font-semibold text-[#1A1C1A] block mb-2">Nombre fácil de reconocer</label>
                           <input
                             type="text"
                             value={formData.name}
@@ -1801,7 +1814,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                         </div>
 
                         <div>
-                          <label className="text-sm font-semibold text-[#1A1C1A] block mb-2">Tipo de tarjeta</label>
+                          <label className="text-sm font-semibold text-[#1A1C1A] block mb-2">Marca de la tarjeta</label>
                           <select
                             value={formData.type}
                             onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value }))}
@@ -1835,7 +1848,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
 
                         <div className="grid w-full min-w-0 grid-cols-1 sm:grid-cols-2 gap-4">
                           <div>
-                            <label className="text-sm font-semibold text-[#1A1C1A] block mb-2">Límite de crédito</label>
+                            <label className="text-sm font-semibold text-[#1A1C1A] block mb-2">Límite de la tarjeta</label>
                             <input
                               type="text"
                               inputMode="decimal"

@@ -74,20 +74,33 @@ export default function ExpensesList({ expenses, onEdit, onDelete }) {
       <div className="hero-surface p-5 sm:p-6 text-white">
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.18em] text-white/65 font-semibold mb-2">Historial</p>
-            <h1 className="font-heading text-3xl sm:text-4xl font-semibold tracking-[-0.04em]">Mis Gastos</h1>
-            <p className="mt-2 text-sm text-white/70">Visualiza, filtra y analiza tus gastos en tiempo real.</p>
+            <p className="text-[11px] uppercase tracking-[0.18em] text-white/65 font-semibold mb-2">Control simple</p>
+            <h1 className="font-heading text-3xl sm:text-4xl font-semibold tracking-[-0.04em]">Mis gastos</h1>
+            <p className="mt-2 text-sm text-white/70">Aquí ves en qué se fue tu dinero. Busca, filtra y corrige cualquier gasto sin complicarte.</p>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:min-w-[260px]">
             <div className="rounded-[20px] border border-white/10 bg-white/10 px-4 py-3 backdrop-blur-sm">
-              <p className="text-[11px] uppercase tracking-[0.14em] text-white/60 font-semibold">Registros</p>
+              <p className="text-[11px] uppercase tracking-[0.14em] text-white/60 font-semibold">Gastos guardados</p>
               <p className="metric-value mt-2 text-2xl">{filteredExpenses.length}</p>
             </div>
             <div className="rounded-[20px] border border-white/10 bg-white/10 px-4 py-3 backdrop-blur-sm">
-              <p className="text-[11px] uppercase tracking-[0.14em] text-white/60 font-semibold">Total</p>
+              <p className="text-[11px] uppercase tracking-[0.14em] text-white/60 font-semibold">Total usado</p>
               <p className="metric-value mt-2 text-2xl">${formatCurrency(totalFiltered)}</p>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className="novice-guide-card">
+        <div>
+          <p className="novice-kicker">Cómo usar esta pantalla</p>
+          <h2>Primero mira los gastos grandes</h2>
+          <p>Un cliente nuevo solo necesita revisar tres cosas: cuánto gastó, en qué categoría se fue y si fue cash o tarjeta.</p>
+        </div>
+        <div className="novice-steps">
+          <span>1. Busca un gasto</span>
+          <span>2. Filtra por tipo</span>
+          <span>3. Corrige o elimina si está mal</span>
         </div>
       </div>
 
@@ -96,7 +109,7 @@ export default function ExpensesList({ expenses, onEdit, onDelete }) {
           <div className="flex-1">
             <input
               type="text"
-              placeholder="Buscar gastos..."
+              placeholder="Busca por nombre: comida, gasolina, renta..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="premium-input px-5"
@@ -114,7 +127,7 @@ export default function ExpensesList({ expenses, onEdit, onDelete }) {
             data-testid="toggle-filters"
           >
             <FadersHorizontal weight="duotone" className="w-5 h-5" />
-            <span className="font-medium">Filtros</span>
+            <span className="font-medium">Organizar</span>
             <CaretDown weight="bold" className={`w-4 h-4 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
           </button>
         </div>
@@ -124,7 +137,7 @@ export default function ExpensesList({ expenses, onEdit, onDelete }) {
             <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
               <div className="pt-4 border-t border-[#E6E6E3] mt-4 space-y-4">
                 <div>
-                  <p className="text-sm font-medium text-[#737573] mb-2">Categoría</p>
+                  <p className="text-sm font-medium text-[#737573] mb-2">Tipo de gasto</p>
                   <div className="flex flex-wrap gap-2">
                     <button onClick={() => setFilter('all')} className={`category-pill ${filter === 'all' ? 'bg-[#2A4D3B] text-white' : 'bg-[#F2F0EB] text-[#737573] hover:bg-[#E6E6E3]'}`} data-testid="filter-all">Todas</button>
                     {CATEGORIES.map((cat) => (
@@ -142,13 +155,13 @@ export default function ExpensesList({ expenses, onEdit, onDelete }) {
                 </div>
 
                 <div>
-                  <p className="text-sm font-medium text-[#737573] mb-2">Ordenar por</p>
+                  <p className="text-sm font-medium text-[#737573] mb-2">Ver primero</p>
                   <div className="flex flex-wrap gap-2">
                     {[
-                      { id: 'recent', label: 'Más recientes' },
-                      { id: 'oldest', label: 'Más antiguos' },
-                      { id: 'highest', label: 'Mayor monto' },
-                      { id: 'lowest', label: 'Menor monto' },
+                      { id: 'recent', label: 'Lo último' },
+                      { id: 'oldest', label: 'Lo primero' },
+                      { id: 'highest', label: 'Gastos grandes' },
+                      { id: 'lowest', label: 'Gastos pequeños' },
                       { id: 'name', label: 'Nombre A-Z' }
                     ].map((option) => (
                       <button key={option.id} onClick={() => setSortBy(option.id)} className={`category-pill ${sortBy === option.id ? 'bg-[#1A1C1A] text-white' : 'bg-[#F2F0EB] text-[#737573] hover:bg-[#E6E6E3]'}`} data-testid={`sort-${option.id}`}>
@@ -250,8 +263,8 @@ export default function ExpensesList({ expenses, onEdit, onDelete }) {
               <div className="empty-state-icon w-16 h-16 rounded-2xl bg-[#F2F0EB] flex items-center justify-center mx-auto mb-4">
                 <Wallet weight="duotone" className="w-8 h-8 text-[#737573]" />
               </div>
-              <h3 className="font-heading text-xl font-medium text-[#1A1C1A] mb-2">Activa tu historial de gastos</h3>
-              <p className="text-[#737573] max-w-md mx-auto">Cuando registres tus movimientos aparecerán aquí con su historial de edición para que tu control financiero sea más transparente.</p>
+              <h3 className="font-heading text-xl font-medium text-[#1A1C1A] mb-2">Empieza registrando tu primer gasto</h3>
+              <p className="text-[#737573] max-w-md mx-auto">Cuando agregues gastos, aquí verás una lista fácil de revisar: qué compraste, cuánto fue y si salió de dinero disponible o de tarjeta.</p>
             </motion.div>
           )}
         </AnimatePresence>

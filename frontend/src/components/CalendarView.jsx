@@ -90,26 +90,39 @@ export default function CalendarView({ expenses, currentDate }) {
       <div className="hero-surface p-5 sm:p-6 text-white">
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.18em] text-white/65 font-semibold mb-2">Planeación</p>
-            <h1 className="font-heading text-3xl sm:text-4xl font-semibold tracking-[-0.04em]">Calendario</h1>
-            <p className="mt-2 text-sm text-white/70 max-w-xl">Revisa tus movimientos por fecha, detecta picos de gasto y organiza mejor tu flujo mensual.</p>
+            <p className="text-[11px] uppercase tracking-[0.18em] text-white/65 font-semibold mb-2">Vista por fecha</p>
+            <h1 className="font-heading text-3xl sm:text-4xl font-semibold tracking-[-0.04em]">Mi calendario de gastos</h1>
+            <p className="mt-2 text-sm text-white/70 max-w-xl">Aquí ves qué días gastaste más para evitar sorpresas antes del próximo pago.</p>
           </div>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             <div className="rounded-[20px] border border-white/10 bg-white/10 px-4 py-3 backdrop-blur-sm">
-              <p className="text-[11px] uppercase tracking-[0.14em] text-white/60 font-semibold">Mes activo</p>
+              <p className="text-[11px] uppercase tracking-[0.14em] text-white/60 font-semibold">Mes actual</p>
               <p className="metric-value mt-2 text-2xl">{viewDate.toLocaleDateString('es', { month: 'short' }).replace('.', '')}</p>
             </div>
             <div className="rounded-[20px] border border-white/10 bg-white/10 px-4 py-3 backdrop-blur-sm">
-              <p className="text-[11px] uppercase tracking-[0.14em] text-white/60 font-semibold">Gastos</p>
+              <p className="text-[11px] uppercase tracking-[0.14em] text-white/60 font-semibold">Gastos guardados</p>
               <p className="metric-value mt-2 text-2xl">{monthExpenses.length}</p>
             </div>
           </div>
         </div>
       </div>
 
+      <div className="novice-guide-card">
+        <div>
+          <p className="novice-kicker">Lectura rápida</p>
+          <h2>Los días con compras te muestran el patrón</h2>
+          <p>Usa el calendario para ver si tus gastos se concentran en ciertos días y preparar mejor tu dinero disponible.</p>
+        </div>
+        <div className="novice-steps">
+          <span>1. Mira los días marcados</span>
+          <span>2. Revisa cuánto fue</span>
+          <span>3. Evita repetir picos</span>
+        </div>
+      </div>
+
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <p className="label-uppercase mb-1">Mes visible</p>
+          <p className="label-uppercase mb-1">Mes que estás viendo</p>
           <h2 className="font-heading text-2xl sm:text-3xl font-light text-[#1A1C1A] tracking-tight">
             {viewDate.toLocaleDateString('es', { month: 'long', year: 'numeric' })}
           </h2>
@@ -244,7 +257,7 @@ export default function CalendarView({ expenses, currentDate }) {
 
       {/* Week Summary */}
       <div className="premium-card p-6">
-        <h3 className="font-heading font-medium text-lg text-[#1A1C1A] mb-4">Resumen Semanal</h3>
+        <h3 className="font-heading font-medium text-lg text-[#1A1C1A] mb-4">Esta semana</h3>
         <div className="grid grid-cols-7 gap-2">
           {dayNames.map((day, i) => {
             const weekStart = new Date(currentDate);

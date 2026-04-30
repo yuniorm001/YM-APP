@@ -839,20 +839,33 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
       <div className="hero-surface p-5 sm:p-6 text-white">
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.18em] text-white/65 font-semibold mb-2">Preferencias</p>
-            <h1 className="font-heading text-3xl sm:text-4xl font-semibold tracking-[-0.04em]">Configuración</h1>
-            <p className="mt-2 text-sm text-white/70 max-w-xl">Administra ingresos, ajustes y control de tu cash mensual.</p>
+            <p className="text-[11px] uppercase tracking-[0.18em] text-white/65 font-semibold mb-2">Ajustes básicos</p>
+            <h1 className="font-heading text-3xl sm:text-4xl font-semibold tracking-[-0.04em]">Ajustes de mi dinero</h1>
+            <p className="mt-2 text-sm text-white/70 max-w-xl">Configura tu ingreso, metas y reportes sin tocar nada complicado.</p>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:min-w-[280px]">
             <div className="rounded-[20px] border border-white/10 bg-white/10 px-4 py-3 backdrop-blur-sm">
-              <p className="text-[11px] uppercase tracking-[0.14em] text-white/60 font-semibold">Mensual</p>
+              <p className="text-[11px] uppercase tracking-[0.14em] text-white/60 font-semibold">Ingreso mensual</p>
               <p className="metric-value mt-2 text-2xl">${formatMoney(monthlyCashIncome)}</p>
             </div>
             <div className="rounded-[20px] border border-white/10 bg-white/10 px-4 py-3 backdrop-blur-sm">
-              <p className="text-[11px] uppercase tracking-[0.14em] text-white/60 font-semibold">Disponible</p>
+              <p className="text-[11px] uppercase tracking-[0.14em] text-white/60 font-semibold">Dinero disponible</p>
               <p className="metric-value mt-2 text-2xl">${formatMoney(cashAvailable)}</p>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className="novice-guide-card">
+        <div>
+          <p className="novice-kicker">Antes de tocar ajustes</p>
+          <h2>Aquí solo defines la base</h2>
+          <p>El cliente solo debe entender esto: cuánto entra, cuánto queda disponible y qué meta quiere seguir durante el mes.</p>
+        </div>
+        <div className="novice-steps">
+          <span>1. Confirma tu ingreso</span>
+          <span>2. Revisa tu dinero disponible</span>
+          <span>3. Descarga o reinicia cuando toque</span>
         </div>
       </div>
 
@@ -869,8 +882,8 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                     <span className="admin-console-kicker">Control de seguridad</span>
                     <span className="admin-console-live"><span></span> Admin activo</span>
                   </div>
-                  <h3 className="font-heading text-2xl font-semibold tracking-[-0.035em] text-[#101510] sm:text-3xl">Panel admin de accesos</h3>
-                  <p className="mt-2 max-w-2xl text-sm leading-6 text-[#5F665F]">Gestiona correos autorizados, roles, estado de acceso y vencimientos desde una vista clara y profesional.</p>
+                  <h3 className="font-heading text-2xl font-semibold tracking-[-0.035em] text-[#101510] sm:text-3xl">Panel de accesos autorizados</h3>
+                  <p className="mt-2 max-w-2xl text-sm leading-6 text-[#5F665F]">Agrega, revisa o pausa los correos que pueden entrar a la app.</p>
                 </div>
               </div>
               <button
@@ -1111,7 +1124,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
             </div>
             <div className="min-w-0">
               <p className="settings-kicker">Control de entradas</p>
-              <h3>Historial de ingresos del mes</h3>
+              <h3>Ingresos registrados este mes</h3>
               <p>Lectura ejecutiva de lo que entra, lo cobrado y el cash disponible para decidir mejor.</p>
             </div>
           </div>
@@ -1183,7 +1196,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
             </div>
             <div className="min-w-0">
               <p className="settings-kicker">Límite inteligente</p>
-              <h3>Meta Inteligente</h3>
+              <h3>Meta de dinero</h3>
               <p>Convierte tu cash disponible en un límite claro para no gastar por impulso.</p>
             </div>
           </div>
@@ -1258,11 +1271,11 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
               </div>
               {!canUseSmartGoal ? (
                 <div className="settings-alert-soft settings-alert-soft--danger">
-                  Necesitas tener cash disponible para activar la Meta Inteligente.
+                  Necesitas tener cash disponible para activar la Meta de dinero.
                 </div>
               ) : !hasEnoughCashForGoal ? (
                 <div className="settings-alert-soft settings-alert-soft--danger">
-                  No tienes cash suficiente para guardar esta Meta Inteligente. Tu cash disponible actual es de ${formatMoney(cashAvailable)}.
+                  No tienes cash suficiente para guardar esta Meta de dinero. Tu cash disponible actual es de ${formatMoney(cashAvailable)}.
                 </div>
               ) : null}
 
@@ -1301,8 +1314,8 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
               <CalendarBlank weight="fill" className="w-6 h-6" />
             </div>
             <div>
-              <p className="settings-kicker">Calendario activo</p>
-              <h3>Período Actual</h3>
+              <p className="settings-kicker">Mes de trabajo</p>
+              <h3>Mes actual</h3>
               <p>Ubica la lectura financiera dentro del mes, semana y día en curso.</p>
             </div>
           </div>
@@ -1330,7 +1343,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
             </div>
             <div>
               <p className="settings-kicker">Herramientas</p>
-              <h3>Acciones</h3>
+              <h3>Descargar o reiniciar</h3>
               <p>Exporta información o reinicia datos cuando necesites limpiar el perfil.</p>
             </div>
           </div>
@@ -1344,7 +1357,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
               <div className="settings-action-icon"><Export weight="fill" className="w-6 h-6" /></div>
               <div>
                 <p>Exportar datos en PDF</p>
-                <span>Ingresos, gastos, tarjetas y resumen financiero.</span>
+                <span>Descarga un resumen con ingresos, gastos y tarjetas.</span>
               </div>
             </button>
 
@@ -1356,7 +1369,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
               <div className="settings-action-icon"><Trash weight="fill" className="w-6 h-6" /></div>
               <div>
                 <p>Reiniciar datos</p>
-                <span>Elimina gastos, tarjetas, ingresos del mes y devuelve la meta a $0.</span>
+                <span>Borra los datos del período y vuelve a empezar limpio.</span>
               </div>
             </button>
           </div>
@@ -1390,7 +1403,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                           </div>
                           <div>
                             <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#2A4D3B]">Ingresos del mes</p>
-                            <h3 className="font-heading text-2xl font-semibold text-[#1A1C1A] mt-1">Detalle de ingresos registrados</h3>
+                            <h3 className="font-heading text-2xl font-semibold text-[#1A1C1A] mt-1">Detalle de ingresos</h3>
                             <p className="text-sm text-[#737573] mt-1">Consulta todos los ingresos guardados del período actual en una vista completa, sin perder el resumen principal de la app.</p>
                           </div>
                         </div>
@@ -1499,7 +1512,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                         </div>
                         <div>
                           <p className="admin-section-label">Control completo</p>
-                          <h3>Todos los accesos autorizados</h3>
+                          <h3>Todos los correos autorizados</h3>
                           <span>{allowedEmails.length} correos registrados en el panel.</span>
                         </div>
                       </div>
@@ -1618,7 +1631,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                           </div>
                           <div>
                             <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#B65C47]">Configuración</p>
-                            <h3 className="font-heading text-2xl font-semibold text-[#1A1C1A] mt-1">Reiniciar datos del período</h3>
+                            <h3 className="font-heading text-2xl font-semibold text-[#1A1C1A] mt-1">Reiniciar datos</h3>
                             <p className="text-sm text-[#737573] mt-1">Confirma la limpieza del período actual sin dejar espacio visible detrás del popup.</p>
                           </div>
                         </div>
@@ -1640,7 +1653,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                           <div className="w-20 h-20 mx-auto mb-5 rounded-[1.6rem] bg-[#B65C47]/10 flex items-center justify-center">
                             <ArrowCounterClockwise weight="fill" className="w-10 h-10 text-[#B65C47]" />
                           </div>
-                          <h3 className="font-heading font-semibold text-2xl sm:text-3xl text-[#1A1C1A] mb-3">¿Seguro que quieres reiniciar los datos?</h3>
+                          <h3 className="font-heading font-semibold text-2xl sm:text-3xl text-[#1A1C1A] mb-3">¿Seguro que quieres borrar los datos?</h3>
                           <p className="text-[#737573] text-sm sm:text-base mb-5 sm:mb-6">
                             Antes de continuar, ten en cuenta que esta acción eliminará la información guardada del período actual.
                           </p>
