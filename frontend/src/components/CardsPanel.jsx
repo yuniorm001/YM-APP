@@ -279,16 +279,14 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
   const getUtilizationStatus = (used, limit) => {
     const pct = limit > 0 ? (used / limit) * 100 : 0;
     const pctEntero = Math.floor(pct);
-    if (pct >= 100) return { label: 'Sin crédito', color: '#9C382A', isFull: true };
-    if (pctEntero <= 10) return { label: 'Saludable', color: '#2A4D3B', isFull: false };
-    if (pctEntero <= 20) return { label: 'Moderado', color: '#D48B3F', isFull: false };
-    if (pctEntero <= 30) return { label: 'Alto', color: '#9C382A', isFull: false };
-    return { label: 'Crítico', color: '#9C382A', isFull: false };
+    if (pctEntero <= 19) return { label: 'Saludable', color: '#2A4D3B', isFull: false };
+    if (pctEntero <= 29) return { label: 'Moderado', color: '#D48B3F', isFull: false };
+    return { label: 'Alto', color: '#9C382A', isFull: pct >= 100 };
   };
 
 
   const getUtilizationBarStyle = (utilization) => ({
-    background: 'linear-gradient(to right, #2A4D3B 0%, #2A4D3B 10%, #D48B3F 10%, #D48B3F 20%, #9C382A 20%, #9C382A 100%)',
+    background: 'linear-gradient(to right, #2A4D3B 0%, #2A4D3B 20%, #D48B3F 20%, #D48B3F 30%, #9C382A 30%, #9C382A 100%)',
     clipPath: `inset(0 ${100 - Math.min(utilization, 100)}% 0 0 round 999px)`,
     WebkitClipPath: `inset(0 ${100 - Math.min(utilization, 100)}% 0 0 round 999px)`
   });
@@ -577,7 +575,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
         summary = 'Tiene poco aire disponible frente a su límite.';
         detail = 'Aunque todavía tenga cupo, conviene no cargarla mucho para proteger tu perfil.';
       }
-    } else if (Math.floor(utilization) <= 10 && available > 0 && (daysLeft === null || daysLeft > 7)) {
+    } else if (Math.floor(utilization) <= 19 && available > 0 && (daysLeft === null || daysLeft > 7)) {
       score += 15;
     }
 
@@ -677,7 +675,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
         <div>
           <p className="novice-kicker">Lectura simple</p>
           <h2>La meta es mantener las tarjetas bajas</h2>
-          <p>Para alguien nuevo en crédito: 10% o menos es saludable, 20% pide atención y 30% o más ya requiere actuar.</p>
+          <p>Para alguien nuevo en crédito: menos de 20% es saludable, 20% a 29% pide atención y 30% o más es alto.</p>
         </div>
         <div className="novice-steps">
           <span>1. Revisa el % usado</span>
