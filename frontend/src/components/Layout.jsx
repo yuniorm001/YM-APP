@@ -293,7 +293,6 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
                     <span className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full border border-[#E5D8C4] bg-white/78 shadow-[inset_0_1px_0_rgba(255,255,255,0.88)]">
                       <Gear weight={activeTab === 'settings' ? 'fill' : 'duotone'} className="h-4 w-4" />
                     </span>
-                    {activeTab === 'settings' ? <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-[#D48B3F] shadow-[0_0_0_4px_rgba(212,139,63,0.13)]" /> : null}
                   </motion.button>
 
                   <motion.button
