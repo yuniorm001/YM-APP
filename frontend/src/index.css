@@ -738,10 +738,6 @@ input[type="date"].premium-input {
   will-change: transform;
 }
 
-.smart-ticker-track:hover .smart-ticker-marquee {
-  animation-play-state: paused;
-}
-
 .smart-ticker-chip {
   display: inline-flex;
   align-items: center;
@@ -833,6 +829,14 @@ input[type="date"].premium-input {
   line-height: 1.5;
   color: #5A6B62;
   max-width: 32rem;
+}
+
+.smart-pulse-greeting-copy {
+  margin-top: 0.45rem;
+  max-width: 34rem;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: #5A6B62;
 }
 
 /* Progreso ring + texto */

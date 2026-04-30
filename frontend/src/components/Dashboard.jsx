@@ -92,7 +92,7 @@ const getCreditTone = (value) => {
       stroke: '#D48B3F',
       glow: 'shadow-[0_18px_40px_rgba(212,139,63,0.18)]',
       pill: 'bg-[#FFF4E7] text-[#A5661F] border-[#F0D2A8]',
-      label: 'Atención'
+      label: 'Revisa esto'
     };
   }
   return {
@@ -117,7 +117,7 @@ const getCashTone = (value) => {
       stroke: '#4A7C6F',
       glow: 'shadow-[0_18px_40px_rgba(74,124,111,0.16)]',
       pill: 'bg-[#EEF8F5] text-[#2F6154] border-[#CFE2DB]',
-      label: 'Estable'
+      label: 'Vas bien'
     };
   }
   if (value > 0) {
@@ -367,11 +367,11 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
       };
     } else {
       return {
-        estado: 'Crítico',
+        estado: 'Actúa hoy',
         color: '#9C382A',
         bgColor: '#9C382A',
         icon: '🔴',
-        mensaje: 'Tu crédito excede significativamente tu efectivo'
+        mensaje: 'Estás usando más tarjeta de lo que tu dinero disponible puede cubrir'
       };
     }
   };
@@ -555,9 +555,9 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
 
   const pulseCritical = highestUtilizationCard?.utilization >= 35 || cashAvailable < 0 || (nearestPaymentCard?.daysLeft !== null && nearestPaymentCard?.daysLeft <= 0 && nearestPaymentCard?.used > 0);
   const pulseAttention = !pulseCritical && (highestUtilizationCard?.utilization >= 20 || cashHealthPercentage < 40 || (nearestPaymentCard?.daysLeft !== null && nearestPaymentCard?.daysLeft <= 5 && nearestPaymentCard?.used > 0));
-  const pulseStatusLabel = pulseCritical ? 'Crítico' : pulseAttention ? 'Atención' : 'Estable';
+  const pulseStatusLabel = pulseCritical ? 'Actúa hoy' : pulseAttention ? 'Revisa esto' : 'Vas bien';
   const pulseStatusClass = pulseCritical ? 'critical' : pulseAttention ? 'attention' : 'stable';
-  const pulseActionTitle = pulseCritical ? 'Acción prioritaria' : pulseAttention ? 'Próximo movimiento' : 'Mantén el control';
+  const pulseActionTitle = pulseCritical ? 'Lo primero que debes hacer' : pulseAttention ? 'Próximo paso' : 'Mantén este ritmo';
   const pulseActionText = pulseCritical
     ? (highestUtilizationCard?.utilization >= 35
       ? `Baja ${getCardDisplayName(highestUtilizationCard)} por debajo de 30% antes de seguir usando crédito.`
@@ -565,12 +565,12 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
     : pulseAttention
       ? (nearestPaymentCard?.daysLeft !== null && nearestPaymentCard?.daysLeft <= 5 && nearestPaymentCard?.used > 0
         ? `Prepara el pago de ${getCardDisplayName(nearestPaymentCard)} en los próximos ${Math.max(nearestPaymentCard.daysLeft, 0)} días.`
-        : 'Mantén la utilización debajo de 15% y revisa el cash antes de comprar.')
+        : 'Mantén el uso de tarjetas debajo de 15% y revisa tu dinero disponible antes de comprar.')
       : 'Puedes seguir operando, pero conserva margen antes de usar crédito.';
   const commandMetrics = [
     { label: 'Estado', value: pulseStatusLabel, tone: pulseStatusClass },
-    { label: 'Utilización', value: `${creditUtilization.toFixed(0)}%`, tone: creditUtilization <= 10 ? 'stable' : creditUtilization <= 15 ? 'attention' : 'critical' },
-    { label: 'Cash', value: new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(cashAvailable), tone: cashAvailable > 0 ? 'stable' : 'critical' },
+    { label: 'Uso de tarjetas', value: `${creditUtilization.toFixed(0)}%`, tone: creditUtilization <= 10 ? 'stable' : creditUtilization <= 15 ? 'attention' : 'critical' },
+    { label: 'Dinero disponible', value: new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(cashAvailable), tone: cashAvailable > 0 ? 'stable' : 'critical' },
     { label: 'Pago próximo', value: nearestPaymentCard?.daysLeft !== null && nearestPaymentCard ? `${Math.max(nearestPaymentCard.daysLeft, 0)} día${Math.max(nearestPaymentCard.daysLeft, 0) === 1 ? '' : 's'}` : 'Sin alerta', tone: nearestPaymentCard?.daysLeft !== null && nearestPaymentCard?.daysLeft <= 5 ? 'attention' : 'neutral' }
   ];
 
@@ -603,7 +603,7 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
         ? `Paga hoy ${getCardDisplayName(nearestPaymentCard)}`
         : `Prepara tu pago de ${getCardDisplayName(nearestPaymentCard)}`,
       help: dl <= 0
-        ? `Vence hoy. Si no pagas, te cobran intereses y baja tu puntaje.`
+        ? `Vence hoy. Si no pagas, puedes pagar intereses y afectar tu puntaje de crédito.`
         : `Vence en ${dl} día${dl === 1 ? '' : 's'}. Aparta ${formatCurrency(nearestPaymentCard.used)} antes de esa fecha.`,
       done: false,
       tone: dl <= 2 ? 'critical' : 'urgent',
@@ -660,10 +660,10 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
   // Tarea 5: mantener uso debajo del 30% (educativa, siempre presente)
   addTask({
     id: 'utilization-rule',
-    title: 'Mantén tu uso debajo del 30%',
+    title: 'No uses más del 30% de tus tarjetas',
     help: cards.length > 0 && cards[0].limit
-      ? `Si tu límite es ${formatCurrency(cards[0].limit)}, intenta no pasar de ${formatCurrency(cards[0].limit * 0.3)} al mes. Eso sube tu puntaje.`
-      : 'No uses más del 30% de tu límite total. Eso sube tu puntaje de crédito.',
+      ? `Si tu límite es ${formatCurrency(cards[0].limit)}, intenta no pasar de ${formatCurrency(cards[0].limit * 0.3)} al mes. Eso ayuda a cuidar tu puntaje de crédito.`
+      : 'No uses más del 30% de tu límite total. Eso ayuda a cuidar tu puntaje de crédito.',
     done: creditUtilization <= 30 && cards.length > 0,
     tone: 'normal',
     chips: [
@@ -686,11 +686,11 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
           : 'Empecemos por la primera';
 
   // Una "razón" educativa que aparece debajo de las tareas
-  let whyTitle = 'Usar menos del 30% te hace ver responsable';
-  let whyText = 'Los bancos ven cuánto de tu límite usas. Mientras menos uses, mejor te ven — y eso te abre mejores créditos en el futuro.';
+  let whyTitle = 'Usar menos del 30% te ayuda a verte responsable';
+  let whyText = 'Los bancos ven cuánto de tu límite usas. Mientras menos dependas de la tarjeta, más sano se ve tu perfil para futuras oportunidades.';
   if (highestUtilizationCard && highestUtilizationCard.utilization >= 30) {
-    whyTitle = 'Pasar de 30% baja tu puntaje, aunque pagues a tiempo';
-    whyText = 'El banco mide cuánto debes vs cuánto te prestaron. Aunque pagues completo, si reportas saldo alto, tu score baja.';
+    whyTitle = 'Pasar de 30% puede afectar tu puntaje aunque pagues a tiempo';
+    whyText = 'El banco mide cuánto debes vs cuánto te prestaron. Aunque pagues completo después, reportar saldo alto puede afectar tu puntaje de crédito.';
   } else if (nearestPaymentCard && nearestPaymentCard.daysLeft !== null && nearestPaymentCard.daysLeft <= 5 && nearestPaymentCard.used > 0) {
     whyTitle = 'Pagar antes de la fecha de corte cuenta más';
     whyText = 'No es lo mismo pagar antes del corte que antes del límite. El corte es cuando el banco "toma la foto" de tu deuda.';
@@ -701,13 +701,13 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
 
   let contextualTip = 'No uses más del 30% de tu límite de crédito.';
   if (highestUtilizationCard && highestUtilizationCard.utilization >= 30) {
-    contextualTip = 'Superar 30% puede presionar tu score, aunque pagues a tiempo.';
+    contextualTip = 'Superar 30% puede presionar tu puntaje de crédito, aunque pagues a tiempo.';
   } else if (nearestPaymentCard && nearestPaymentCard.daysLeft !== null && nearestPaymentCard.daysLeft <= 5 && nearestPaymentCard.used > 0) {
     contextualTip = 'Paga antes de la fecha de corte, no solo la fecha límite.';
   } else if (cardInsights.some((card) => card.used > 0)) {
     contextualTip = 'Pagar el mínimo prolonga la deuda y aumenta intereses.';
   } else if (cards.length > 0) {
-    contextualTip = 'Cerrar tarjetas puede afectar tu score y tu antigüedad promedio.';
+    contextualTip = 'Cerrar tarjetas puede afectar tu puntaje de crédito y tu antigüedad promedio.';
   }
 
   // ============================================================
@@ -715,32 +715,32 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
   // ============================================================
   let semaforoLevel = 'green'; // green | amber | red
   let semaforoEmoji = '🟢';
-  let semaforoTitle = 'Estás bien';
-  let semaforoMessage = 'Tienes margen y tus tarjetas están sanas. Sigue así.';
+  let semaforoTitle = 'Vas bien';
+  let semaforoMessage = 'Tu dinero y tus tarjetas se ven bajo control. Mantén este ritmo.';
 
   if (highestUtilizationCard?.utilization >= 35 || cashAvailable < 0 || (nearestPaymentCard?.daysLeft !== null && nearestPaymentCard?.daysLeft <= 0 && nearestPaymentCard?.used > 0)) {
     semaforoLevel = 'red';
     semaforoEmoji = '🔴';
-    semaforoTitle = 'Atención inmediata';
+    semaforoTitle = 'Actúa hoy';
     semaforoMessage = highestUtilizationCard?.utilization >= 35
-      ? `Estás usando ${highestUtilizationCard.utilization.toFixed(0)}% de ${getCardDisplayName(highestUtilizationCard)}. Es momento de bajar ese saldo.`
+      ? `Estás usando ${highestUtilizationCard.utilization.toFixed(0)}% de ${getCardDisplayName(highestUtilizationCard)}. Hoy conviene bajar ese saldo.`
       : cashAvailable < 0
         ? 'Tus gastos superaron lo que tienes. Pausa compras grandes hasta tu próximo ingreso.'
         : `Hoy vence un pago. Atiéndelo antes de que te cobren intereses.`;
   } else if (highestUtilizationCard?.utilization >= 20 || cashHealthPercentage < 40 || (nearestPaymentCard?.daysLeft !== null && nearestPaymentCard?.daysLeft <= 5 && nearestPaymentCard?.used > 0)) {
     semaforoLevel = 'amber';
     semaforoEmoji = '🟡';
-    semaforoTitle = 'Algo que cuidar';
+    semaforoTitle = 'Revisa esto';
     semaforoMessage = highestUtilizationCard?.utilization >= 20
-      ? `Tu uso de tarjeta va en ${highestUtilizationCard.utilization.toFixed(0)}%. Procura no pasar de 30%.`
+      ? `Tu uso de tarjeta va en ${highestUtilizationCard.utilization.toFixed(0)}%. Intenta mantenerlo debajo de 30%.`
       : nearestPaymentCard?.daysLeft !== null && nearestPaymentCard?.daysLeft <= 5
         ? `Tienes un pago en ${Math.max(nearestPaymentCard.daysLeft, 0)} día${Math.max(nearestPaymentCard.daysLeft, 0) === 1 ? '' : 's'}. Aparta el dinero esta semana.`
         : 'Tu efectivo está bajo. Cuida los gastos no esenciales esta semana.';
   } else if (cards.length === 0 && cashAvailable === 0) {
     semaforoLevel = 'amber';
     semaforoEmoji = '🟡';
-    semaforoTitle = 'Empecemos a configurar';
-    semaforoMessage = 'Agrega tus tarjetas e ingresos para que la app te guíe.';
+    semaforoTitle = 'Configura tu guía';
+    semaforoMessage = 'Agrega tus tarjetas e ingresos para que la app te diga qué hacer primero.';
   }
 
   // ============================================================
@@ -770,23 +770,23 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
   // BLOQUE "MI DINERO" — datos limpios para el cliente
   // ============================================================
   const myMoneyHelper = cashAvailable <= 0
-    ? 'Tu efectivo está agotado por ahora. Espera tu próximo ingreso antes de gastos grandes.'
+    ? 'Este es el dinero que te queda disponible después de tus gastos y pagos. Ahora está en cero o negativo.'
     : monthRunwayDays > 0 && averageDailySpend > 0
-      ? `Te alcanza para ${Math.round(monthRunwayDays)} día${Math.round(monthRunwayDays) === 1 ? '' : 's'} al ritmo actual.`
-      : 'Sin gastos registrados aún este mes.';
+      ? `Este es el dinero que te queda disponible después de tus gastos y pagos. Al ritmo actual, te alcanza para ${Math.round(monthRunwayDays)} día${Math.round(monthRunwayDays) === 1 ? '' : 's'}.`
+      : 'Este es el dinero que te queda disponible después de tus gastos y pagos.';
 
   // ============================================================
   // BLOQUE "MIS TARJETAS" — datos limpios
   // ============================================================
   const myCardsHelper = cards.length === 0
-    ? 'Aún no has agregado tarjetas. Agrégalas para que te guiemos.'
+    ? 'Aún no has agregado tarjetas. Agrégalas para ver cuánto estás usando.'
     : creditUtilization === 0
-      ? 'No has usado tus tarjetas este mes. Mientras menos uses, mejor.'
+      ? 'Este es el total que estás usando de tus tarjetas. Ahora mismo no tienes uso registrado.'
       : creditUtilization < 30
-        ? `Estás usando ${creditUtilization.toFixed(0)}%. Vas bien — los bancos te ven responsable.`
+        ? `Este es el total que estás usando de tus tarjetas: ${creditUtilization.toFixed(0)}%. Vas bien.`
         : creditUtilization < 50
-          ? `Estás usando ${creditUtilization.toFixed(0)}%. Procura bajar de 30% para que tu score suba.`
-          : `Estás usando ${creditUtilization.toFixed(0)}%. Es alto — paga lo más que puedas este mes.`;
+          ? `Este es el total que estás usando de tus tarjetas: ${creditUtilization.toFixed(0)}%. Procura bajarlo de 30% para cuidar tu puntaje de crédito.`
+          : `Este es el total que estás usando de tus tarjetas: ${creditUtilization.toFixed(0)}%. Es alto; paga lo más que puedas este mes.`;
 
   const tickerMessages = [];
   const addTickerMessage = (text, tone = 'neutral') => {
@@ -796,12 +796,12 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
 
   if (highestUtilizationCard && highestUtilizationCard.utilization >= 35) {
     addTickerMessage(
-      `Crítico · ${getCardDisplayName(highestUtilizationCard)} llegó a ${highestUtilizationCard.utilization.toFixed(0)}% — paga ${formatCurrency(highestUtilizationCard.targetTwentyEightPercent || highestUtilizationCard.targetTenPercent)} para volver a una zona más sana.`,
+      `Actúa hoy · ${getCardDisplayName(highestUtilizationCard)} llegó a ${highestUtilizationCard.utilization.toFixed(0)}% — paga ${formatCurrency(highestUtilizationCard.targetTwentyEightPercent || highestUtilizationCard.targetTenPercent)} para volver a una zona más sana.`,
       'danger'
     );
   } else if (highestUtilizationCard && highestUtilizationCard.utilization >= 20) {
     addTickerMessage(
-      `Atención · ${getCardDisplayName(highestUtilizationCard)} va en ${highestUtilizationCard.utilization.toFixed(0)}% — si pagas ${formatCurrency(highestUtilizationCard.targetTwentyEightPercent)}, vuelves debajo de 30%.`,
+      `Revisa esto · ${getCardDisplayName(highestUtilizationCard)} va en ${highestUtilizationCard.utilization.toFixed(0)}% — si pagas ${formatCurrency(highestUtilizationCard.targetTwentyEightPercent)}, vuelves debajo de 30%.`,
       'warning'
     );
   } else if (creditUtilization > 0) {
@@ -810,17 +810,17 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
 
   if (nearestPaymentCard && nearestPaymentCard.daysLeft !== null) {
     if (nearestPaymentCard.daysLeft <= 0 && nearestPaymentCard.used > 0) {
-      addTickerMessage(`Crítico · Hoy vence ${getCardDisplayName(nearestPaymentCard)} y aún tienes ${formatCurrency(nearestPaymentCard.used)} pendientes.`, 'danger');
+      addTickerMessage(`Actúa hoy · Hoy vence ${getCardDisplayName(nearestPaymentCard)} y aún tienes ${formatCurrency(nearestPaymentCard.used)} pendientes.`, 'danger');
     } else if (nearestPaymentCard.daysLeft <= 3 && nearestPaymentCard.used > 0) {
-      addTickerMessage(`Atención · Tu pago vence en ${nearestPaymentCard.daysLeft} día${nearestPaymentCard.daysLeft === 1 ? '' : 's'} — evita reportar saldo alto en ${getCardDisplayName(nearestPaymentCard)}.`, 'warning');
+      addTickerMessage(`Revisa esto · Tu pago vence en ${nearestPaymentCard.daysLeft} día${nearestPaymentCard.daysLeft === 1 ? '' : 's'} — evita reportar saldo alto en ${getCardDisplayName(nearestPaymentCard)}.`, 'warning');
     } else if (nearestPaymentCard.daysLeft <= 7) {
-      addTickerMessage(`Atención · Tienes pago pronto en ${getCardDisplayName(nearestPaymentCard)}. Organízalo esta semana.`, 'info');
+      addTickerMessage(`Revisa esto · Tienes pago pronto en ${getCardDisplayName(nearestPaymentCard)}. Organízalo esta semana.`, 'info');
     }
   }
 
   if (previousWeekTotal > 0 && weeklyDelta > 0) {
     const compensationTarget = Math.max(Math.round(weeklyDelta * 0.5), 20);
-    addTickerMessage(`Atención · Gastaste ${formatCurrency(weeklyDelta)} más que la semana pasada — reduce ${formatCurrency(compensationTarget)} esta semana para compensar.`, 'warning');
+    addTickerMessage(`Revisa esto · Gastaste ${formatCurrency(weeklyDelta)} más que la semana pasada — reduce ${formatCurrency(compensationTarget)} esta semana para compensar.`, 'warning');
   } else if (previousWeekTotal > 0 && weeklyDelta < 0) {
     addTickerMessage(`Positivo · Vas mejor que la semana pasada. Llevas ${formatCurrency(Math.abs(weeklyDelta))} menos en gastos.`, 'success');
   }
@@ -885,7 +885,7 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
     },
     {
       label: 'vs mes pasado',
-      value: previousMonthCashTotal > 0 ? `${monthlyCashDelta >= 0 ? '+' : '-'}${formatCurrency(Math.abs(monthlyCashDelta))} cash` : formatCurrency(monthCashTotal),
+      value: previousMonthCashTotal > 0 ? `${monthlyCashDelta >= 0 ? '+' : '-'}${formatCurrency(Math.abs(monthlyCashDelta))} dinero` : formatCurrency(monthCashTotal),
       tone: monthlyCashDelta > 0 ? 'warning' : monthlyCashDelta < 0 ? 'success' : 'info'
     },
     {
@@ -932,7 +932,7 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
                 <div className="smart-pulse-icon-wrap">
                   <Sparkle weight="fill" className="h-4 w-4" />
                 </div>
-                <span className="label-uppercase text-[#2A4D3B]">Pulso smart</span>
+                <span className="label-uppercase text-[#2A4D3B]">Tu guía de hoy</span>
               </div>
               <div className="smart-pulse-badges">
                 <span className="smart-pulse-live">En vivo</span>
@@ -952,6 +952,9 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
               <h2 className="smart-pulse-greeting-title">
                 Tu plan de hoy
               </h2>
+              <p className="smart-pulse-greeting-copy">
+                La app te dice qué revisar primero para cuidar tu dinero y tus tarjetas.
+              </p>
             </div>
 
             {/* Progreso */}
@@ -1014,7 +1017,7 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
           </div>
         </div>
         <div className="smart-ticker-shell">
-          <div className="smart-ticker-label">Ticker inteligente</div>
+          <div className="smart-ticker-label">Consejos rápidos</div>
           <div className="smart-ticker-track">
             <div className="smart-ticker-fade smart-ticker-fade-left" />
             <div className="smart-ticker-fade smart-ticker-fade-right" />
@@ -1149,9 +1152,9 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
           aria-expanded={showDetails}
         >
           <div className="details-accordion-trigger-text">
-            <span className="label-uppercase">Modo experto</span>
+            <span className="label-uppercase">Entender mis números</span>
             <span className="details-accordion-trigger-title">
-              {showDetails ? 'Ocultar detalles' : 'Ver más detalles'}
+              {showDetails ? 'Ocultar detalles' : 'Ver detalles de mis números'}
             </span>
           </div>
           <CaretDown
