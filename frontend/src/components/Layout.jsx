@@ -99,17 +99,17 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
     const isAction = item.type === 'action';
 
     if (isActive) {
-      return 'bg-gradient-to-r from-[#2A4D3B] to-[#1E3A2B] text-white shadow-[0_16px_40px_rgba(42,77,59,0.24)] ring-1 ring-white/10';
+      return 'bg-[#22352B] text-white shadow-[0_14px_30px_rgba(0,0,0,0.18)] ring-1 ring-white/10 border border-white/10';
     }
 
     if (isAction) {
       if (item.variant === 'income') {
-        return 'bg-gradient-to-r from-[#2A7B5F] via-[#246A52] to-[#1F5E47] text-white shadow-[0_18px_38px_rgba(42,123,95,0.22)] ring-1 ring-white/10 hover:shadow-[0_22px_44px_rgba(42,123,95,0.28)]';
+        return 'bg-[#1F6B4F] text-white shadow-[0_16px_32px_rgba(31,107,79,0.22)] ring-1 ring-white/10 hover:bg-[#237A5A]';
       }
-      return 'bg-gradient-to-r from-[#D48B3F] via-[#C9734A] to-[#B65C47] text-white shadow-[0_18px_38px_rgba(180,95,71,0.24)] ring-1 ring-white/10 hover:shadow-[0_22px_44px_rgba(180,95,71,0.3)]';
+      return 'bg-[#B96543] text-white shadow-[0_16px_32px_rgba(185,101,67,0.22)] ring-1 ring-white/10 hover:bg-[#C9784E]';
     }
 
-    return 'text-[#737573] hover:bg-[#F2F0EB] hover:text-[#1A1C1A] hover:shadow-[0_8px_20px_rgba(0,0,0,0.04)]';
+    return 'text-[#AAB3AA] hover:bg-white/8 hover:text-white hover:shadow-none border border-transparent hover:border-white/8';
   };
 
   const getMobileItemClasses = (item) => {
@@ -137,10 +137,10 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
           initial={{ x: -280, opacity: 0.98 }}
           animate={{ x: 0, opacity: 1, width: isDesktopSidebarCollapsed ? 96 : 280 }}
           transition={{ type: 'spring', damping: 22, stiffness: 220 }}
-          className="fixed left-0 top-0 h-full bg-[linear-gradient(180deg,rgba(255,255,255,0.94),rgba(251,248,242,0.92))] backdrop-blur-xl border-r border-white/50 z-40 flex flex-col shadow-[8px_0_32px_rgba(0,0,0,0.04)]"
+          className="fixed left-0 top-0 h-full bg-[#111713] border-r border-white/10 z-40 flex flex-col shadow-[12px_0_34px_rgba(0,0,0,0.18)]"
           data-testid="desktop-sidebar"
         >
-          <div className="p-4 border-b border-black/5">
+          <div className="p-4 border-b border-white/10">
             <div className={`flex items-center ${isDesktopSidebarCollapsed ? 'justify-center' : 'justify-between'} gap-3`}>
               <div className={`flex items-center ${isDesktopSidebarCollapsed ? 'justify-center' : 'justify-center'} w-full`}>
                 {isDesktopSidebarCollapsed ? (
@@ -273,7 +273,7 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
             </motion.div>
           </nav>
 
-          <div className="p-3 border-t border-black/5">
+          <div className="p-3 border-t border-white/10">
             <motion.div
               className={`rounded-[22px] border border-[#ECE6DC] bg-gradient-to-br from-[#FCFBF8] to-[#F3EEE6] ${isDesktopSidebarCollapsed ? 'px-3 py-3' : 'px-3 py-3'} shadow-[0_10px_22px_rgba(0,0,0,0.025)]`}
             >
