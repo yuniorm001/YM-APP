@@ -4,7 +4,6 @@ import {
   House,
   Wallet,
   CreditCard,
-  ChartBar,
   CalendarBlank,
   Gear,
   List,
@@ -22,11 +21,9 @@ import {
 
 const navigationItems = [
   { id: 'home', icon: House, label: 'Inicio', type: 'tab' },
-  { id: 'expenses', icon: Wallet, label: 'Gastos', type: 'tab' },
+  { id: 'expenses', icon: Wallet, label: 'Dinero', type: 'tab' },
   { id: 'cards', icon: CreditCard, label: 'Tarjetas', type: 'tab' },
-  { id: 'stats', icon: ChartBar, label: 'Estadísticas', type: 'tab' },
   { id: 'calendar', icon: CalendarBlank, label: 'Calendario', type: 'tab' },
-  { id: 'settings', icon: Gear, label: 'Configuración', type: 'tab' },
   { id: 'new-expense', icon: PlusCircle, label: '', type: 'action', variant: 'expense' },
   { id: 'new-income', icon: CurrencyDollar, label: '', type: 'action', variant: 'income' },
 ];
@@ -203,6 +200,7 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
 
           <nav className={`flex-1 overflow-y-auto ${isDesktopSidebarCollapsed ? 'px-3 py-6' : 'px-4 py-8'} flex flex-col justify-center`}>
             <div className="space-y-2">
+
               {navigationItems.filter((item) => item.type === 'tab').map((item, index) => {
                 const isActive = activeTab === item.id;
                 return (
@@ -308,6 +306,22 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
                 </motion.button>
               ) : (
                 <div className="flex flex-col gap-2">
+                  <motion.button
+                    whileTap={{ scale: 0.985 }}
+                    type="button"
+                    onClick={() => setActiveTab('settings')}
+                    className={`group relative flex w-full items-center gap-2 overflow-hidden rounded-[14px] border px-2.5 py-2 text-left transition-all duration-300 ${activeTab === 'settings' ? 'border-[#2A4D3B]/25 bg-[linear-gradient(135deg,#2A4D3B,#1E3A2B)] text-white shadow-[0_12px_24px_rgba(42,77,59,0.18)]' : 'border-[#ECE6DC] bg-[linear-gradient(135deg,rgba(255,255,255,0.94),rgba(246,240,230,0.96))] text-[#234333] hover:border-[#2A4D3B]/20'}`}
+                    data-testid="sidebar-settings-button"
+                  >
+                    <span className="relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-[10px] border border-white/70 bg-white/20">
+                      <Gear weight={activeTab === 'settings' ? 'fill' : 'duotone'} className="h-3.5 w-3.5" />
+                    </span>
+                    <div className="relative z-10 min-w-0">
+                      <p className={`text-[9px] font-semibold uppercase tracking-[0.12em] ${activeTab === 'settings' ? 'text-white/65' : 'text-[#7E745E]'}`}>Sistema</p>
+                      <p className={`text-[10px] font-semibold ${activeTab === 'settings' ? 'text-white' : 'text-[#234333]'}`}>Ajustes</p>
+                    </div>
+                  </motion.button>
+
                   <div className="flex w-full items-center gap-2 rounded-[14px] border border-white/70 bg-[linear-gradient(135deg,rgba(255,255,255,0.92),rgba(246,240,230,0.94))] px-2.5 py-2 shadow-[0_6px_14px_rgba(0,0,0,0.035)]">
                     <div className="relative flex h-7 w-7 shrink-0 items-center justify-center rounded-[10px] border border-white/80 bg-white/80">
                       <Calendar weight="duotone" className="h-3.5 w-3.5 text-[#2A4D3B]" />
@@ -580,7 +594,7 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
                   </motion.button>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2 px-3 pt-2 pb-3">
+                <div className="grid grid-cols-4 gap-2 px-3 pt-2 pb-3">
                   {mobileTabItems.map((item) => {
                     const isActive = activeTab === item.id;
                     return (
@@ -611,7 +625,7 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
                   <div className="h-px bg-gradient-to-r from-transparent via-[#DDD4C7] to-transparent" />
                 </div>
 
-                <div className="grid grid-cols-[1fr_1fr_auto] items-stretch gap-2 px-3 pb-3 pt-1">
+                <div className="grid grid-cols-[1fr_1fr_auto_auto] items-stretch gap-2 px-3 pb-3 pt-1">
                   {mobileActionItems.map((item) => {
                     const isIncome = item.variant === 'income';
                     const actionLabel = isIncome ? 'Nuevo ingreso' : 'Nuevo gasto';
@@ -643,6 +657,21 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
                       </motion.button>
                     );
                   })}
+
+                  <motion.button
+                    whileTap={{ scale: 0.96 }}
+                    onClick={() => {
+                      setActiveTab('settings');
+                      setIsMobileBottomNavCollapsed(true);
+                    }}
+                    data-testid="bottom-nav-settings"
+                    aria-label="Ajustes"
+                    className={`group relative flex h-full min-h-[92px] w-[58px] items-center justify-center overflow-hidden rounded-[24px] border transition-all duration-300 ${activeTab === 'settings' ? 'border-[#2A4D3B]/25 bg-[linear-gradient(135deg,#2A4D3B,#1E3A2B)] text-white shadow-[0_14px_30px_rgba(42,77,59,0.22)]' : 'border-[#E9E2D6] bg-[linear-gradient(135deg,rgba(255,255,255,0.98),rgba(246,240,230,0.99))] text-[#6F6C66]'}`}
+                  >
+                    <span className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full border border-white/60 bg-white/18 transition-all duration-300">
+                      <Gear weight={activeTab === 'settings' ? 'fill' : 'duotone'} className="h-4 w-4" />
+                    </span>
+                  </motion.button>
 
                   <motion.button
                     whileTap={{ scale: 0.96 }}

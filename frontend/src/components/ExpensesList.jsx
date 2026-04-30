@@ -74,9 +74,9 @@ export default function ExpensesList({ expenses, onEdit, onDelete }) {
       <div className="hero-surface p-5 sm:p-6 text-white">
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.18em] text-white/65 font-semibold mb-2">Historial</p>
-            <h1 className="font-heading text-3xl sm:text-4xl font-semibold tracking-[-0.04em]">Mis Gastos</h1>
-            <p className="mt-2 text-sm text-white/70">Visualiza, filtra y analiza tus gastos en tiempo real.</p>
+            <p className="text-[11px] uppercase tracking-[0.18em] text-white/65 font-semibold mb-2">Control de efectivo</p>
+            <h1 className="font-heading text-3xl sm:text-4xl font-semibold tracking-[-0.04em]">Mi Dinero</h1>
+            <p className="mt-2 text-sm text-white/70">Administra ingresos, gastos y efectivo disponible para decidir cuánto puedes pagar a tus tarjetas.</p>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:min-w-[260px]">
             <div className="rounded-[20px] border border-white/10 bg-white/10 px-4 py-3 backdrop-blur-sm">
