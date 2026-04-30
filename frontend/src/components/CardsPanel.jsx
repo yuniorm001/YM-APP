@@ -31,8 +31,8 @@ const CARD_TYPES = [
 const PAYMENT_GOAL_OPTIONS = [
   { value: 0, label: '$0' },
   { value: 10, label: '10%' },
-  { value: 15, label: '15%' },
-  { value: 20, label: '20%' }
+  { value: 20, label: '20%' },
+  { value: 30, label: '30%' }
 ];
 
 // Función para capitalizar primera letra
@@ -280,13 +280,14 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
     const pct = limit > 0 ? (used / limit) * 100 : 0;
     if (pct >= 100) return { label: 'Sin crédito', color: '#9C382A', isFull: true };
     if (pct <= 10) return { label: 'Saludable', color: '#2A4D3B', isFull: false };
-    if (pct <= 15) return { label: 'Moderado', color: '#D48B3F', isFull: false };
+    if (pct <= 20) return { label: 'Moderado', color: '#D48B3F', isFull: false };
+    if (pct <= 30) return { label: 'Alto', color: '#9C382A', isFull: false };
     return { label: 'Crítico', color: '#9C382A', isFull: false };
   };
 
 
   const getUtilizationBarStyle = (utilization) => ({
-    background: 'linear-gradient(to right, #2A4D3B 0%, #2A4D3B 10%, #D48B3F 10%, #D48B3F 15%, #9C382A 15%, #9C382A 100%)',
+    background: 'linear-gradient(to right, #2A4D3B 0%, #2A4D3B 10%, #D48B3F 10%, #D48B3F 20%, #9C382A 20%, #9C382A 100%)',
     clipPath: `inset(0 ${100 - Math.min(utilization, 100)}% 0 0 round 999px)`,
     WebkitClipPath: `inset(0 ${100 - Math.min(utilization, 100)}% 0 0 round 999px)`
   });
@@ -719,10 +720,10 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                 className="absolute inset-0 rounded-full transition-all duration-500"
                 style={getUtilizationBarStyle(totalUtilization)}
               />
-              {/* Marcadores de 10%, 15% y 20% */}
+              {/* Marcadores de 10%, 20% y 30% */}
               <div className="absolute top-0 left-[10%] w-0.5 h-full bg-[#2A4D3B]/40" />
-              <div className="absolute top-0 left-[15%] w-0.5 h-full bg-[#D48B3F]/40" />
-              <div className="absolute top-0 left-[20%] w-0.5 h-full bg-[#9C382A]/40" />
+              <div className="absolute top-0 left-[20%] w-0.5 h-full bg-[#D48B3F]/40" />
+              <div className="absolute top-0 left-[30%] w-0.5 h-full bg-[#9C382A]/40" />
             </div>
             <div className="flex justify-between mt-2 text-xs text-[#737573] font-medium">
               <span>0%</span>
@@ -733,11 +734,11 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                 </span>
                 <span className="flex items-center gap-1">
                   <span className="w-2 h-2 rounded-full bg-[#D48B3F]"></span>
-                  15%
+                  20%
                 </span>
                 <span className="flex items-center gap-1">
                   <span className="w-2 h-2 rounded-full bg-[#9C382A]"></span>
-                  20%
+                  30%
                 </span>
               </div>
               <span>100%</span>
@@ -1046,8 +1047,8 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                         style={getUtilizationBarStyle(utilization)}
                       />
                       <div className="absolute top-0 left-[10%] w-0.5 h-full bg-[#2A4D3B]/45 z-[2]" />
-                      <div className="absolute top-0 left-[15%] w-0.5 h-full bg-[#D48B3F]/45 z-[2]" />
-                      <div className="absolute top-0 left-[20%] w-0.5 h-full bg-[#9C382A]/45 z-[2]" />
+                      <div className="absolute top-0 left-[20%] w-0.5 h-full bg-[#D48B3F]/45 z-[2]" />
+                      <div className="absolute top-0 left-[30%] w-0.5 h-full bg-[#9C382A]/45 z-[2]" />
                     </div>
 
                     <div className="flex items-center justify-between gap-3 mt-2 text-[10px] sm:text-[11px] font-semibold text-[#737573]">
@@ -1059,11 +1060,11 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                         </span>
                         <span className="inline-flex items-center gap-1.5">
                           <span className="w-2 h-2 rounded-full bg-[#D48B3F]"></span>
-                          15%
+                          20%
                         </span>
                         <span className="inline-flex items-center gap-1.5">
                           <span className="w-2 h-2 rounded-full bg-[#9C382A]"></span>
-                          20%
+                          30%
                         </span>
                       </div>
                     </div>
