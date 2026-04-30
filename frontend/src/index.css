@@ -4614,3 +4614,428 @@ textarea.premium-input:focus {
 [data-testid="sidebar-collapsed-settings-button"] + [data-testid="sidebar-power-logout-button"] {
   box-shadow: 0 12px 24px rgba(142, 47, 47, 0.08), inset 0 1px 0 rgba(255,255,255,0.82);
 }
+
+/* =========================================================
+   LizoNexus Enterprise UI — app redesign (login untouched)
+   Objetivo: look financiero premium, más cuadrado, sobrio y profesional.
+   Se aplica solo al layout autenticado usando data-testid="app-layout".
+   ========================================================= */
+[data-testid="app-layout"] {
+  --ln-bg: #f4f2ee;
+  --ln-surface: #ffffff;
+  --ln-surface-2: #f8f7f4;
+  --ln-surface-3: #efede8;
+  --ln-text: #151713;
+  --ln-muted: #6c706a;
+  --ln-soft: #92968f;
+  --ln-line: rgba(18, 22, 18, 0.10);
+  --ln-line-strong: rgba(18, 22, 18, 0.16);
+  --ln-green: #183f31;
+  --ln-green-2: #23543f;
+  --ln-mint: #6fc6b2;
+  --ln-copper: #bf7448;
+  --ln-copper-2: #d79a62;
+  --ln-red: #a33b30;
+  --ln-radius: 14px;
+  --ln-radius-sm: 10px;
+  --ln-shadow: 0 14px 36px rgba(15, 18, 15, 0.075);
+  --ln-shadow-soft: 0 8px 22px rgba(15, 18, 15, 0.055);
+  background:
+    linear-gradient(180deg, #f7f6f2 0%, #efede8 100%) !important;
+  color: var(--ln-text) !important;
+}
+
+body:has([data-testid="app-layout"]) {
+  background:
+    radial-gradient(circle at 82% -8%, rgba(111,198,178,0.12), transparent 24%),
+    radial-gradient(circle at 14% 4%, rgba(191,116,72,0.10), transparent 24%),
+    linear-gradient(180deg, #f7f6f2 0%, #efede8 100%) !important;
+}
+
+/* Shell: remove juguete/glass, make dashboard feel like a real finance terminal */
+[data-testid="app-layout"] .app-shell {
+  border-radius: 18px !important;
+  border: 1px solid rgba(18, 22, 18, 0.08) !important;
+  background: linear-gradient(180deg, rgba(255,255,255,0.90), rgba(248,247,244,0.94)) !important;
+  box-shadow: 0 20px 60px rgba(16, 20, 16, 0.08) !important;
+}
+[data-testid="app-layout"] .app-shell::before {
+  background:
+    linear-gradient(90deg, rgba(24,63,49,0.035) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(24,63,49,0.035) 1px, transparent 1px) !important;
+  background-size: 28px 28px !important;
+  opacity: .55 !important;
+}
+
+/* Desktop sidebar: dark, editorial, square navigation */
+[data-testid="desktop-sidebar"] {
+  background: linear-gradient(180deg, #151713 0%, #1d211c 46%, #111310 100%) !important;
+  border-right: 1px solid rgba(255,255,255,0.08) !important;
+  box-shadow: 18px 0 44px rgba(10, 12, 10, 0.18) !important;
+}
+[data-testid="desktop-sidebar"] * {
+  border-radius: 12px !important;
+}
+[data-testid="desktop-sidebar"] nav {
+  justify-content: flex-start !important;
+  padding-top: 22px !important;
+}
+[data-testid="desktop-sidebar"] .border-b,
+[data-testid="desktop-sidebar"] .border-t {
+  border-color: rgba(255,255,255,0.08) !important;
+}
+[data-testid="desktop-sidebar"] button:not([data-testid*="new"]),
+[data-testid="desktop-sidebar"] [data-testid^="nav-"] {
+  box-shadow: none !important;
+}
+[data-testid="desktop-sidebar"] [data-testid^="nav-"] {
+  background: transparent !important;
+  color: rgba(255,255,255,0.66) !important;
+  border: 1px solid transparent !important;
+  min-height: 48px !important;
+}
+[data-testid="desktop-sidebar"] [data-testid^="nav-"]:hover {
+  background: rgba(255,255,255,0.055) !important;
+  color: #fff !important;
+  border-color: rgba(255,255,255,0.08) !important;
+  transform: translateX(2px) !important;
+}
+[data-testid="desktop-sidebar"] [data-testid="nav-home"],
+[data-testid="desktop-sidebar"] [data-testid="nav-expenses"],
+[data-testid="desktop-sidebar"] [data-testid="nav-cards"] {
+  font-size: 14px !important;
+}
+[data-testid="desktop-sidebar"] [data-testid^="nav-"] svg {
+  color: currentColor !important;
+}
+[data-testid="desktop-sidebar"] [data-testid^="nav-"] .ml-auto,
+[data-testid="desktop-sidebar"] [data-testid^="nav-"] .absolute.inset-y-2.left-2,
+[data-testid="desktop-sidebar"] [data-testid="sidebar-settings-button"] .absolute.left-0,
+[data-testid="desktop-sidebar"] [data-testid="sidebar-settings-button"] .ml-auto,
+[data-testid="desktop-sidebar"] [data-testid="sidebar-collapsed-settings-button"] .absolute {
+  display: none !important;
+}
+[data-testid="desktop-sidebar"] [data-testid^="nav-"][class*="text-white"],
+[data-testid="desktop-sidebar"] [data-testid="sidebar-settings-button"][class*="text-[#1E3328]"] {
+  background: rgba(255,255,255,0.10) !important;
+  border-color: rgba(255,255,255,0.14) !important;
+  color: #fff !important;
+  box-shadow: inset 3px 0 0 var(--ln-copper), 0 10px 24px rgba(0,0,0,0.10) !important;
+}
+[data-testid="desktop-sidebar"] [data-testid^="nav-new"] {
+  border-radius: 14px !important;
+  background: linear-gradient(135deg, rgba(191,116,72,0.95), rgba(133,73,49,0.95)) !important;
+  box-shadow: 0 14px 28px rgba(0,0,0,0.20) !important;
+}
+[data-testid="desktop-sidebar"] [data-testid="nav-new-income"] {
+  background: linear-gradient(135deg, rgba(35,84,63,0.96), rgba(18,56,42,0.96)) !important;
+}
+[data-testid="desktop-sidebar"] .ai-agent-logo {
+  transform: scale(.92) !important;
+  filter: none !important;
+}
+[data-testid="desktop-sidebar"] .ai-agent-logo,
+[data-testid="desktop-sidebar"] .ai-agent-core {
+  border-radius: 16px !important;
+}
+[data-testid="desktop-sidebar"] .ai-agent-logo::before,
+[data-testid="desktop-sidebar"] .ai-agent-logo::after {
+  border-radius: 18px !important;
+}
+[data-testid="collapse-desktop-sidebar"],
+[data-testid="expand-desktop-sidebar"] {
+  background: rgba(255,255,255,0.06) !important;
+  border-color: rgba(255,255,255,0.10) !important;
+  color: rgba(255,255,255,.82) !important;
+}
+[data-testid="desktop-sidebar"] .rounded-full {
+  border-radius: 10px !important;
+}
+[data-testid="desktop-sidebar"] .text-\[\#9A907F\],
+[data-testid="desktop-sidebar"] .text-\[\#9A8870\] {
+  color: rgba(255,255,255,0.48) !important;
+}
+[data-testid="desktop-sidebar"] .bg-\[\#F7F3EB\],
+[data-testid="desktop-sidebar"] .bg-white,
+[data-testid="desktop-sidebar"] .bg-white\/55,
+[data-testid="desktop-sidebar"] .bg-white\/78,
+[data-testid="desktop-sidebar"] .bg-white\/94 {
+  background: rgba(255,255,255,0.08) !important;
+}
+[data-testid="desktop-sidebar"] [data-testid="sidebar-settings-button"],
+[data-testid="desktop-sidebar"] [data-testid="sidebar-collapsed-settings-button"] {
+  background: rgba(255,255,255,0.06) !important;
+  border: 1px solid rgba(255,255,255,0.10) !important;
+  color: rgba(255,255,255,0.78) !important;
+}
+[data-testid="desktop-sidebar"] [data-testid="sidebar-settings-button"]:hover,
+[data-testid="desktop-sidebar"] [data-testid="sidebar-collapsed-settings-button"]:hover {
+  background: rgba(255,255,255,0.10) !important;
+  color: #fff !important;
+}
+[data-testid="desktop-sidebar"] [data-testid="sidebar-logout-button"],
+[data-testid="desktop-sidebar"] [data-testid="sidebar-power-logout-button"] {
+  background: rgba(163,59,48,0.10) !important;
+  border-color: rgba(255,255,255,0.10) !important;
+  color: #ffb7ae !important;
+}
+
+/* Main cards and sections: square financial dashboard style */
+[data-testid="app-layout"] .premium-card,
+[data-testid="app-layout"] .fintech-details-card,
+[data-testid="app-layout"] .admin-console-card,
+[data-testid="app-layout"] .settings-command-card,
+[data-testid="app-layout"] .settings-inner-panel,
+[data-testid="app-layout"] .settings-income-hero,
+[data-testid="app-layout"] .settings-goal-panel,
+[data-testid="app-layout"] .settings-export-card,
+[data-testid="app-layout"] .settings-reset-card,
+[data-testid="app-layout"] .settings-income-summary,
+[data-testid="app-layout"] .settings-empty-pro,
+[data-testid="app-layout"] .empty-state-premium {
+  border-radius: var(--ln-radius) !important;
+  background: linear-gradient(180deg, #ffffff 0%, #faf9f6 100%) !important;
+  border: 1px solid var(--ln-line) !important;
+  box-shadow: var(--ln-shadow-soft) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+[data-testid="app-layout"] .premium-card::before,
+[data-testid="app-layout"] .premium-card::after,
+[data-testid="app-layout"] .settings-command-card::before,
+[data-testid="app-layout"] .settings-command-card::after {
+  opacity: .28 !important;
+  border-radius: inherit !important;
+}
+[data-testid="app-layout"] .premium-card:hover,
+[data-testid="app-layout"] .fintech-details-card:hover {
+  transform: translateY(-1px) !important;
+  border-color: rgba(24,63,49,0.18) !important;
+  box-shadow: 0 16px 34px rgba(15,18,15,0.09) !important;
+}
+[data-testid="app-layout"] .hero-surface {
+  border-radius: 16px !important;
+  background: linear-gradient(135deg, #151713 0%, #20382e 58%, #10120f 100%) !important;
+  border: 1px solid rgba(255,255,255,0.10) !important;
+  box-shadow: 0 18px 38px rgba(15, 18, 15, 0.18) !important;
+}
+[data-testid="app-layout"] .hero-surface::before {
+  background:
+    linear-gradient(90deg, rgba(255,255,255,0.055) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255,255,255,0.045) 1px, transparent 1px),
+    radial-gradient(circle at 88% 12%, rgba(111,198,178,.20), transparent 18%) !important;
+  background-size: 26px 26px, 26px 26px, auto !important;
+}
+
+/* Dashboard hero / Pulso Smart now feels like a command center */
+[data-testid="app-layout"] .smart-pulse-card {
+  border-radius: 16px !important;
+  border: 1px solid rgba(18,22,18,0.12) !important;
+  background: #151713 !important;
+  box-shadow: 0 20px 48px rgba(15,18,15,0.20) !important;
+}
+[data-testid="app-layout"] .smart-pulse-hero {
+  border-radius: 16px !important;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255,255,255,0.035) 1px, transparent 1px),
+    linear-gradient(135deg, #151713 0%, #1c2e25 58%, #10120f 100%) !important;
+  background-size: 28px 28px, 28px 28px, auto !important;
+}
+[data-testid="app-layout"] .smart-pulse-icon-wrap,
+[data-testid="app-layout"] .smart-pulse-live,
+[data-testid="app-layout"] .smart-pulse-status-strip,
+[data-testid="app-layout"] .smart-pulse-stat,
+[data-testid="app-layout"] .smart-pulse-mood,
+[data-testid="app-layout"] .smart-pulse-badge,
+[data-testid="app-layout"] .smart-pulse-tip {
+  border-radius: 10px !important;
+}
+[data-testid="app-layout"] .smart-pulse-live {
+  background: rgba(111,198,178,0.14) !important;
+  border-color: rgba(111,198,178,0.35) !important;
+  color: #c8fff4 !important;
+}
+[data-testid="app-layout"] .smart-pulse-greeting-title,
+[data-testid="app-layout"] .smart-pulse-title {
+  letter-spacing: -0.04em !important;
+}
+[data-testid="app-layout"] .smart-pulse-status-strip {
+  background: rgba(255,255,255,0.08) !important;
+  border: 1px solid rgba(255,255,255,0.10) !important;
+  box-shadow: inset 3px 0 0 var(--ln-copper) !important;
+}
+[data-testid="app-layout"] .smart-pulse-status-green { box-shadow: inset 3px 0 0 #6fc6b2 !important; }
+[data-testid="app-layout"] .smart-pulse-status-amber { box-shadow: inset 3px 0 0 #d79a62 !important; }
+[data-testid="app-layout"] .smart-pulse-status-red { box-shadow: inset 3px 0 0 #d66b5d !important; }
+
+/* Buttons: less toy, more business */
+[data-testid="app-layout"] .btn-primary,
+[data-testid="app-layout"] .btn-secondary,
+[data-testid="app-layout"] .btn-modal-primary,
+[data-testid="app-layout"] .btn-modal-secondary,
+[data-testid="app-layout"] .btn-modal-danger,
+[data-testid="app-layout"] button:not([data-testid="toggle-bottom-nav"]):not([data-testid="close-sidebar"]):not([data-testid="collapse-desktop-sidebar"]):not([data-testid="expand-desktop-sidebar"]) {
+  border-radius: 12px !important;
+}
+[data-testid="app-layout"] .btn-primary,
+[data-testid="app-layout"] .btn-modal-primary {
+  background: linear-gradient(135deg, #183f31, #10291f) !important;
+  box-shadow: 0 12px 26px rgba(24,63,49,0.18) !important;
+}
+[data-testid="app-layout"] .btn-secondary,
+[data-testid="app-layout"] .btn-modal-secondary {
+  background: linear-gradient(180deg, #ffffff, #f1efea) !important;
+  color: #1c241d !important;
+  border: 1px solid var(--ln-line) !important;
+  box-shadow: 0 8px 16px rgba(15,18,15,0.045) !important;
+}
+[data-testid="app-layout"] .btn-modal-danger {
+  background: linear-gradient(135deg, #9e3d32, #72291f) !important;
+}
+
+/* Inputs / selectors */
+[data-testid="app-layout"] input,
+[data-testid="app-layout"] select,
+[data-testid="app-layout"] textarea {
+  border-radius: 10px !important;
+  border: 1px solid var(--ln-line) !important;
+  background: #ffffff !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.88), 0 1px 0 rgba(15,18,15,0.02) !important;
+}
+[data-testid="app-layout"] input:focus,
+[data-testid="app-layout"] select:focus,
+[data-testid="app-layout"] textarea:focus {
+  border-color: rgba(24,63,49,0.42) !important;
+  box-shadow: 0 0 0 4px rgba(24,63,49,0.09) !important;
+  outline: none !important;
+}
+
+/* Text hierarchy */
+[data-testid="app-layout"] h1,
+[data-testid="app-layout"] h2,
+[data-testid="app-layout"] h3 {
+  color: #151713 !important;
+  letter-spacing: -0.035em !important;
+}
+[data-testid="app-layout"] .hero-surface h1,
+[data-testid="app-layout"] .hero-surface h2,
+[data-testid="app-layout"] .hero-surface h3,
+[data-testid="app-layout"] .smart-pulse-card h1,
+[data-testid="app-layout"] .smart-pulse-card h2,
+[data-testid="app-layout"] .smart-pulse-card h3,
+[data-testid="app-layout"] .smart-pulse-card p,
+[data-testid="app-layout"] .smart-pulse-card span {
+  color: inherit;
+}
+[data-testid="app-layout"] .text-\[\#737573\],
+[data-testid="app-layout"] .text-\[\#5E605D\],
+[data-testid="app-layout"] .text-\[\#6F6C66\] {
+  color: var(--ln-muted) !important;
+}
+
+/* Credit cards: make them look like real dark financial instruments */
+[data-testid="app-layout"] .credit-card-black,
+[data-testid="app-layout"] .credit-card-green,
+[data-testid="app-layout"] .credit-card-sand,
+[data-testid="app-layout"] .credit-card-gold {
+  border-radius: 16px !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+  box-shadow: 0 18px 36px rgba(12,14,12,0.18) !important;
+}
+[data-testid="app-layout"] .credit-card-black,
+[data-testid="app-layout"] .credit-card-green {
+  background:
+    linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255,255,255,0.035) 1px, transparent 1px),
+    linear-gradient(135deg, #111310, #203b30) !important;
+  background-size: 26px 26px, 26px 26px, auto !important;
+}
+[data-testid="app-layout"] .credit-card-gold {
+  background: linear-gradient(135deg, #b96f45, #7d4430) !important;
+}
+[data-testid="app-layout"] .credit-card-sand {
+  background: linear-gradient(135deg, #ffffff, #e8e3d8) !important;
+  border-color: rgba(18,22,18,0.10) !important;
+}
+
+/* Settings / admin board: compact pro console */
+[data-testid="settings-view"] .admin-console-card,
+[data-testid="settings-view"] .settings-command-card {
+  border-radius: 14px !important;
+  box-shadow: 0 12px 26px rgba(15,18,15,0.07) !important;
+}
+[data-testid="settings-view"] .settings-section-icon,
+[data-testid="settings-view"] .settings-mini-orb,
+[data-testid="settings-view"] .settings-empty-icon {
+  border-radius: 10px !important;
+}
+[data-testid="settings-view"] .settings-action-primary,
+[data-testid="settings-view"] .settings-action-secondary,
+[data-testid="settings-view"] .settings-danger-button {
+  border-radius: 10px !important;
+}
+
+/* Mobile: keep premium but practical */
+@media (max-width: 767px) {
+  [data-testid="app-layout"] .app-shell {
+    border-radius: 16px !important;
+  }
+  [data-testid="app-layout"] .premium-card,
+  [data-testid="app-layout"] .hero-surface,
+  [data-testid="app-layout"] .smart-pulse-card,
+  [data-testid="app-layout"] .smart-pulse-hero {
+    border-radius: 14px !important;
+  }
+  [data-testid="bottom-nav"] > div,
+  [data-testid="bottom-nav"] button,
+  [data-testid="mobile-sidebar"] {
+    border-radius: 14px !important;
+  }
+  [data-testid="bottom-nav"] .rounded-full,
+  [data-testid="mobile-sidebar"] .rounded-full {
+    border-radius: 10px !important;
+  }
+  [data-testid="mobile-sidebar"] {
+    background: linear-gradient(180deg, #151713 0%, #1d211c 100%) !important;
+    color: #fff !important;
+  }
+  [data-testid="mobile-sidebar"] [data-testid^="nav-"] {
+    background: rgba(255,255,255,0.06) !important;
+    color: rgba(255,255,255,0.80) !important;
+    border: 1px solid rgba(255,255,255,0.08) !important;
+  }
+  [data-testid="mobile-sidebar"] [data-testid^="nav-"][class*="text-white"] {
+    background: rgba(255,255,255,0.11) !important;
+    color: #fff !important;
+    box-shadow: inset 3px 0 0 var(--ln-copper) !important;
+  }
+}
+
+/* Remove excessive pill/circle feel in authenticated app */
+[data-testid="app-layout"] .rounded-\[28px\],
+[data-testid="app-layout"] .rounded-\[30px\],
+[data-testid="app-layout"] .rounded-\[32px\],
+[data-testid="app-layout"] .rounded-\[34px\],
+[data-testid="app-layout"] .rounded-\[40px\],
+[data-testid="app-layout"] .rounded-3xl,
+[data-testid="app-layout"] .rounded-2xl,
+[data-testid="app-layout"] .rounded-full {
+  border-radius: 14px !important;
+}
+[data-testid="app-layout"] .rounded-xl {
+  border-radius: 12px !important;
+}
+[data-testid="app-layout"] .rounded-lg {
+  border-radius: 10px !important;
+}
+
+/* Keep small status dots as dots where they make sense */
+[data-testid="app-layout"] .smart-pulse-live::before,
+[data-testid="app-layout"] .h-1,
+[data-testid="app-layout"] .h-1\.5,
+[data-testid="app-layout"] .w-1,
+[data-testid="app-layout"] .w-1\.5,
+[data-testid="app-layout"] .h-2.w-2 {
+  border-radius: 999px !important;
+}
