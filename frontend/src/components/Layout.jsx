@@ -323,6 +323,42 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
               </div>
             </motion.div>
 
+            {/* COLLAPSED RAIL FILLERS — keeps the compact menu from feeling empty */}
+            {isDesktopSidebarCollapsed && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.28, duration: 0.34 }}
+                className="mt-7 flex flex-1 flex-col items-center justify-between pb-2"
+                aria-hidden="true"
+              >
+                <div className="flex flex-col items-center gap-3">
+                  <div className="h-px w-12 bg-gradient-to-r from-transparent via-[#D9CFBE] to-transparent" />
+                  <div className="relative flex h-14 w-14 items-center justify-center rounded-[22px] border border-[#E7DED0] bg-[linear-gradient(145deg,#FFFDF9,#F4EEE5)] shadow-[0_12px_28px_rgba(45,36,22,0.06)]">
+                    <span className="absolute inset-0 rounded-[22px] bg-[radial-gradient(circle_at_top_left,rgba(212,139,63,0.14),transparent_54%)]" />
+                    <span className="relative flex h-8 w-8 items-center justify-center rounded-full border border-[#DCCFBC] bg-white/80">
+                      <Sparkle weight="fill" className="h-3.5 w-3.5 text-[#D48B3F]" />
+                    </span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1.5 py-1">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#2A4D3B]/45" />
+                    <span className="h-10 w-px bg-gradient-to-b from-[#D9CFBE] via-[#E9E2D6] to-transparent" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#D48B3F]/55" />
+                  </div>
+                </div>
+
+                <div className="flex flex-col items-center gap-3">
+                  <div className="relative flex h-[72px] w-14 flex-col items-center justify-center gap-1.5 rounded-[24px] border border-[#E7DED0] bg-[linear-gradient(180deg,#FCFAF6,#F3EEE6)] shadow-[0_14px_30px_rgba(45,36,22,0.055)]">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#2A7B5F]" />
+                    <span className="h-1.5 w-7 rounded-full bg-[#DCCFBC]" />
+                    <span className="h-1.5 w-4 rounded-full bg-[#E8DED0]" />
+                    <span className="mt-1 h-1 w-8 rounded-full bg-[#2A4D3B]/10" />
+                  </div>
+                  <div className="h-px w-12 bg-gradient-to-r from-transparent via-[#D9CFBE] to-transparent" />
+                </div>
+              </motion.div>
+            )}
+
             {/* PREMIUM TIP CARD — fills empty space, only when expanded */}
             {!isDesktopSidebarCollapsed && (
               <motion.div
@@ -761,20 +797,19 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
                   })()}
                 </div>
 
-                {/* Mobile logout — centered under the orange FAB */}
+                {/* Mobile logout — red power icon, lower and centered under the orange FAB */}
                 <motion.button
-                  whileTap={{ scale: 0.93 }}
+                  whileTap={{ scale: 0.92 }}
                   onClick={() => {
                     setIsFabOpen(false);
                     onLogout();
                   }}
-                  className="absolute left-1/2 top-[43px] z-30 flex h-[25px] -translate-x-1/2 items-center justify-center gap-1.5 rounded-full border border-white/12 bg-white/[0.08] px-3 text-white/75 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-md transition-all duration-200 hover:bg-white/[0.12] hover:text-white"
+                  className="absolute left-1/2 top-[58px] z-30 flex h-9 w-9 -translate-x-1/2 items-center justify-center rounded-full border border-[#F1B8B8]/70 bg-[linear-gradient(135deg,rgba(255,248,248,0.96),rgba(255,230,230,0.96))] text-[#C62828] shadow-[0_10px_22px_rgba(198,40,40,0.16),inset_0_1px_0_rgba(255,255,255,0.80)] backdrop-blur-md transition-all duration-200 hover:border-[#E37C7C] hover:bg-[#FFF1F1] hover:text-[#B71C1C]"
                   aria-label="Cerrar sesión"
                   data-testid="bottom-nav-logout"
                   title="Cerrar sesión"
                 >
-                  <DoorOpen weight="bold" className="h-3.5 w-3.5" />
-                  <span className="text-[9.5px] font-bold uppercase tracking-[0.12em] leading-none">Salir</span>
+                  <span className="text-[23px] font-semibold leading-none tracking-[-0.02em]">{powerGlyph}</span>
                 </motion.button>
               </div>
             </motion.div>
