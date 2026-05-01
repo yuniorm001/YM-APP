@@ -136,10 +136,15 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
             <div className={`flex items-center ${isDesktopSidebarCollapsed ? 'justify-center' : 'justify-between'} gap-3`}>
               <div className="flex items-center justify-center w-full">
                 {isDesktopSidebarCollapsed ? (
-                  <div className="flex h-12 w-12 flex-col items-center justify-center gap-1.5 rounded-[20px] border border-white/60 bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(245,240,232,0.94))] shadow-[0_12px_28px_rgba(0,0,0,0.05)]">
-                    <div className="h-1.5 w-1.5 rounded-full bg-[#2A4D3B]" />
-                    <div className="h-1.5 w-5 rounded-full bg-[#DCCFBC]" />
-                    <div className="h-1.5 w-3 rounded-full bg-[#E8DED0]" />
+                  <div className="relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-[20px] border border-[#E7DED0] bg-[linear-gradient(145deg,#FFFDF8_0%,#F4EEE6_100%)] shadow-[0_12px_28px_rgba(42,77,59,0.10)]" aria-label="Pulso Smart mini">
+                    <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(42,123,95,0.18),transparent_48%),radial-gradient(circle_at_bottom_right,rgba(212,139,63,0.14),transparent_48%)]" />
+                    <span className="absolute left-2 top-2 h-1.5 w-1.5 rounded-full bg-[#2A7B5F] shadow-[0_0_0_4px_rgba(42,123,95,0.10)]" />
+                    <span className="relative z-10 flex h-8 w-8 items-center justify-center rounded-[14px] border border-[#DCCFBC] bg-white/82 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
+                      <CurrencyDollar weight="bold" className="h-3.5 w-3.5 text-[#2A7B5F]" />
+                    </span>
+                    <span className="absolute bottom-2 right-2 h-3.5 w-5 rounded-[5px] border border-[#DCCFBC] bg-[#F7F1E8]/90">
+                      <span className="absolute left-1 right-1 top-1 h-px rounded-full bg-[#2A4D3B]/35" />
+                    </span>
                   </div>
                 ) : (
                   <div className="relative flex h-[74px] w-full max-w-[198px] items-center justify-center overflow-visible rounded-[18px] bg-transparent">
@@ -348,11 +353,13 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
                 </div>
 
                 <div className="flex flex-col items-center gap-3">
-                  <div className="relative flex h-[72px] w-14 flex-col items-center justify-center gap-1.5 rounded-[24px] border border-[#E7DED0] bg-[linear-gradient(180deg,#FCFAF6,#F3EEE6)] shadow-[0_14px_30px_rgba(45,36,22,0.055)]">
-                    <span className="h-1.5 w-1.5 rounded-full bg-[#2A7B5F]" />
-                    <span className="h-1.5 w-7 rounded-full bg-[#DCCFBC]" />
-                    <span className="h-1.5 w-4 rounded-full bg-[#E8DED0]" />
-                    <span className="mt-1 h-1 w-8 rounded-full bg-[#2A4D3B]/10" />
+                  <div className="relative flex h-[72px] w-14 items-center justify-center overflow-hidden rounded-[24px] border border-[#E7DED0] bg-[linear-gradient(180deg,#FCFAF6,#F3EEE6)] shadow-[0_14px_30px_rgba(45,36,22,0.055)]">
+                    <span className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(212,139,63,0.14),transparent_52%)]" />
+                    <span className="absolute left-3 right-3 top-4 h-1.5 rounded-full bg-[#DCCFBC]" />
+                    <span className="absolute left-3 right-5 top-8 h-1.5 rounded-full bg-[#2A4D3B]/28" />
+                    <span className="absolute bottom-4 flex h-8 w-8 items-center justify-center rounded-full border border-[#DCCFBC] bg-white/82">
+                      <CreditCard weight="duotone" className="h-4 w-4 text-[#2A4D3B]" />
+                    </span>
                   </div>
                   <div className="h-px w-12 bg-gradient-to-r from-transparent via-[#D9CFBE] to-transparent" />
                 </div>
@@ -777,7 +784,7 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
                         whileTap={{ scale: 0.92 }}
                         onClick={() => handleMobileTabClick(item.id)}
                         data-testid={`bottom-nav-${item.id}`}
-                        className="relative flex flex-col items-center justify-center h-full focus:outline-none"
+                        className="relative flex -translate-x-3 flex-col items-center justify-center h-full focus:outline-none"
                         aria-label={item.label}
                       >
                         <motion.span
@@ -797,20 +804,22 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
                   })()}
                 </div>
 
-                {/* Mobile logout — red power icon, lower and centered under the orange FAB */}
+                {/* Mobile logout — placed after Ajustes on the right side of the pill */}
                 <motion.button
                   whileTap={{ scale: 0.92 }}
                   onClick={() => {
                     setIsFabOpen(false);
                     onLogout();
                   }}
-                  className="absolute left-1/2 top-[58px] z-30 flex h-9 w-9 -translate-x-1/2 items-center justify-center rounded-full border border-[#F1B8B8]/70 bg-[linear-gradient(135deg,rgba(255,248,248,0.96),rgba(255,230,230,0.96))] text-[#C62828] shadow-[0_10px_22px_rgba(198,40,40,0.16),inset_0_1px_0_rgba(255,255,255,0.80)] backdrop-blur-md transition-all duration-200 hover:border-[#E37C7C] hover:bg-[#FFF1F1] hover:text-[#B71C1C]"
+                  className="absolute right-2 top-1/2 z-30 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-[#F1B8B8]/70 bg-[linear-gradient(135deg,rgba(255,248,248,0.98),rgba(255,226,226,0.96))] text-[#C62828] shadow-[0_10px_22px_rgba(198,40,40,0.18),inset_0_1px_0_rgba(255,255,255,0.82)] backdrop-blur-md transition-all duration-200 hover:border-[#E37C7C] hover:bg-[#FFF1F1] hover:text-[#B71C1C]"
                   aria-label="Cerrar sesión"
                   data-testid="bottom-nav-logout"
                   title="Cerrar sesión"
                 >
-                  <span className="text-[23px] font-semibold leading-none tracking-[-0.02em]">{powerGlyph}</span>
+                  <span className="text-[22px] font-semibold leading-none tracking-[-0.02em]">{powerGlyph}</span>
                 </motion.button>
+
+
               </div>
             </motion.div>
           </nav>
