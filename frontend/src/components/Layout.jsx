@@ -11,10 +11,6 @@ import {
   CaretRight,
   Sparkle,
   DoorOpen,
-  Lightning,
-  ShieldCheck,
-  TrendUp as TrendingUp,
-  DotsThree,
 } from '@phosphor-icons/react';
 
 const navigationItems = [
@@ -61,20 +57,27 @@ const quickActionVariants = {
 };
 
 export default function Layout({ children, activeTab, setActiveTab, onAddExpense, onAddIncome, onAddCash, onLogout }) {
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isMobile, setIsMobile] = useState(() => (typeof window !== 'undefined' ? window.innerWidth < 768 : false));
   const [isDesktopSidebarCollapsed, setIsDesktopSidebarCollapsed] = useState(false);
   const [isFabOpen, setIsFabOpen] = useState(false);
   const [isMoreSheetOpen, setIsMoreSheetOpen] = useState(false);
-  const [appLanguage, setAppLanguage] = useState(() => localStorage.getItem('gastospro-language') || 'ES');
+  const [appLanguage, setAppLanguage] = useState(() => {
+    if (typeof window === 'undefined') return 'ES';
+    return window.localStorage?.getItem('gastospro-language') || 'ES';
+  });
 
   useEffect(() => {
-    localStorage.setItem('gastospro-language', appLanguage);
+    if (typeof window !== 'undefined') {
+      window.localStorage?.setItem('gastospro-language', appLanguage);
+    }
   }, [appLanguage]);
 
   const powerGlyph = '⏻';
 
   useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
     const handleResize = () => setIsMobile(window.innerWidth < 768);
+    handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -207,7 +210,7 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
                 <div className="relative z-10 flex items-center gap-2.5">
                   <span className="relative flex h-7 w-7 items-center justify-center rounded-full bg-[linear-gradient(135deg,#E8F4EE,#C9E4D6)] border border-[#BBD9C8]">
                     <span className="absolute inset-0 rounded-full animate-ping bg-[#2A7B5F]/20" style={{ animationDuration: '2.4s' }} />
-                    <ShieldCheck weight="fill" className="relative h-3.5 w-3.5 text-[#2A7B5F]" />
+                    <Sparkle weight="fill" className="relative h-3.5 w-3.5 text-[#2A7B5F]" />
                   </span>
                   <div className="min-w-0 leading-tight">
                     <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-[#9A907F]">Estado</p>
@@ -338,7 +341,7 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
                 <div className="relative z-10">
                   <div className="flex items-center gap-2">
                     <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/10 border border-white/15 backdrop-blur">
-                      <Lightning weight="fill" className="h-3.5 w-3.5 text-[#F0C99A]" />
+                      <Sparkle weight="fill" className="h-3.5 w-3.5 text-[#F0C99A]" />
                     </span>
                     <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#F0C99A]">Pulso Smart Tip</span>
                   </div>
@@ -351,7 +354,7 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
                         $
                       </span>
                       <span className="h-5 w-5 rounded-full bg-[#2A7B5F] border-2 border-[#1E3A2B] flex items-center justify-center">
-                        <TrendingUp weight="bold" className="h-2.5 w-2.5 text-white" />
+                        <CaretRight weight="bold" className="h-2.5 w-2.5 text-white" />
                       </span>
                     </div>
                     <span className="text-[10px] font-medium text-white/60">Hábito diario · 2 min</span>
@@ -837,7 +840,11 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
                   aria-label="Más opciones"
                   data-testid="bottom-nav-more"
                 >
-                  <DotsThree weight="bold" className="h-4 w-4" />
+                  <span className="flex items-center gap-0.5" aria-hidden="true">
+                    <span className="h-1 w-1 rounded-full bg-current" />
+                    <span className="h-1 w-1 rounded-full bg-current" />
+                    <span className="h-1 w-1 rounded-full bg-current" />
+                  </span>
                 </motion.button>
               </div>
             </motion.div>
