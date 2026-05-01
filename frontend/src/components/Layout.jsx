@@ -328,7 +328,7 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
               </div>
             </motion.div>
 
-            {/* COLLAPSED RAIL FILLERS — keeps the compact menu from feeling empty */}
+            {/* COLLAPSED RAIL — premium mini dashboard, related to cash, cards and Pulso Smart */}
             {isDesktopSidebarCollapsed && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
@@ -337,31 +337,46 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
                 className="mt-7 flex flex-1 flex-col items-center justify-between pb-2"
                 aria-hidden="true"
               >
-                <div className="flex flex-col items-center gap-3">
+                <div className="flex flex-col items-center gap-4">
                   <div className="h-px w-12 bg-gradient-to-r from-transparent via-[#D9CFBE] to-transparent" />
-                  <div className="relative flex h-14 w-14 items-center justify-center rounded-[22px] border border-[#E7DED0] bg-[linear-gradient(145deg,#FFFDF9,#F4EEE5)] shadow-[0_12px_28px_rgba(45,36,22,0.06)]">
-                    <span className="absolute inset-0 rounded-[22px] bg-[radial-gradient(circle_at_top_left,rgba(212,139,63,0.14),transparent_54%)]" />
-                    <span className="relative flex h-8 w-8 items-center justify-center rounded-full border border-[#DCCFBC] bg-white/80">
-                      <Sparkle weight="fill" className="h-3.5 w-3.5 text-[#D48B3F]" />
+
+                  <div className="relative flex h-[104px] w-[58px] flex-col items-center justify-center overflow-hidden rounded-[28px] border border-[#E7DED0] bg-[linear-gradient(180deg,#FFFCF6_0%,#F3EEE5_100%)] shadow-[0_18px_36px_rgba(45,36,22,0.07)]">
+                    <span className="absolute -top-8 h-16 w-16 rounded-full bg-[radial-gradient(circle,rgba(42,123,95,0.18),transparent_62%)] blur-md" />
+                    <span className="absolute -bottom-8 h-16 w-16 rounded-full bg-[radial-gradient(circle,rgba(212,139,63,0.18),transparent_62%)] blur-md" />
+                    <span className="relative z-10 flex h-9 w-9 items-center justify-center rounded-[16px] border border-[#DCCFBC] bg-white/84 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
+                      <Wallet weight="duotone" className="h-[18px] w-[18px] text-[#2A7B5F]" />
                     </span>
+                    <span className="mt-3 h-1.5 w-8 rounded-full bg-[#2A4D3B]/28" />
+                    <span className="mt-1.5 h-1.5 w-5 rounded-full bg-[#D48B3F]/45" />
+                    <span className="mt-1.5 h-1.5 w-7 rounded-full bg-[#DCCFBC]" />
                   </div>
-                  <div className="flex flex-col items-center gap-1.5 py-1">
-                    <span className="h-1.5 w-1.5 rounded-full bg-[#2A4D3B]/45" />
-                    <span className="h-10 w-px bg-gradient-to-b from-[#D9CFBE] via-[#E9E2D6] to-transparent" />
-                    <span className="h-1.5 w-1.5 rounded-full bg-[#D48B3F]/55" />
+
+                  <div className="relative flex h-[92px] w-[58px] flex-col items-center justify-center rounded-[28px] border border-[#E7DED0] bg-[linear-gradient(180deg,#FDFBF7,#F4EEE5)] shadow-[0_16px_30px_rgba(45,36,22,0.055)]">
+                    <span className="absolute inset-0 rounded-[28px] bg-[radial-gradient(circle_at_top,rgba(212,139,63,0.12),transparent_56%)]" />
+                    <span className="relative flex h-10 w-10 items-center justify-center rounded-full border border-[#E2D4BF] bg-white/82">
+                      <Sparkle weight="fill" className="h-4 w-4 text-[#D48B3F]" />
+                    </span>
+                    <span className="mt-3 flex items-center gap-1">
+                      <span className="h-1.5 w-1.5 rounded-full bg-[#2A7B5F]/55" />
+                      <span className="h-1.5 w-4 rounded-full bg-[#DCCFBC]" />
+                      <span className="h-1.5 w-1.5 rounded-full bg-[#D48B3F]/60" />
+                    </span>
                   </div>
                 </div>
 
-                <div className="flex flex-col items-center gap-3">
-                  <div className="relative flex h-[72px] w-14 items-center justify-center overflow-hidden rounded-[24px] border border-[#E7DED0] bg-[linear-gradient(180deg,#FCFAF6,#F3EEE6)] shadow-[0_14px_30px_rgba(45,36,22,0.055)]">
-                    <span className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(212,139,63,0.14),transparent_52%)]" />
-                    <span className="absolute left-3 right-3 top-4 h-1.5 rounded-full bg-[#DCCFBC]" />
-                    <span className="absolute left-3 right-5 top-8 h-1.5 rounded-full bg-[#2A4D3B]/28" />
-                    <span className="absolute bottom-4 flex h-8 w-8 items-center justify-center rounded-full border border-[#DCCFBC] bg-white/82">
+                <div className="flex flex-col items-center gap-4">
+                  <div className="relative flex h-[96px] w-[58px] flex-col items-center justify-center overflow-hidden rounded-[28px] border border-[#E7DED0] bg-[linear-gradient(180deg,#FFFCF7,#F5EFE7)] shadow-[0_16px_32px_rgba(45,36,22,0.06)]">
+                    <span className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,rgba(42,77,59,0.13),transparent_56%)]" />
+                    <span className="absolute top-4 h-1.5 w-8 rounded-full bg-[#DCCFBC]" />
+                    <span className="absolute top-8 h-1.5 w-5 rounded-full bg-[#DCCFBC]/70" />
+                    <span className="relative mt-7 flex h-9 w-9 items-center justify-center rounded-[15px] border border-[#DCCFBC] bg-white/84">
                       <CreditCard weight="duotone" className="h-4 w-4 text-[#2A4D3B]" />
                     </span>
                   </div>
-                  <div className="h-px w-12 bg-gradient-to-r from-transparent via-[#D9CFBE] to-transparent" />
+                  <div className="flex flex-col items-center gap-1.5 pb-1">
+                    <span className="h-px w-12 bg-gradient-to-r from-transparent via-[#D9CFBE] to-transparent" />
+                    <span className="h-1 w-6 rounded-full bg-[#DCCFBC]/65" />
+                  </div>
                 </div>
               </motion.div>
             )}
@@ -556,7 +571,7 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 16 }}
                 transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-                className="fixed bottom-[120px] left-0 right-0 z-50 px-5 flex flex-col items-center gap-3 pointer-events-none"
+                className="fixed bottom-[158px] left-0 right-0 z-50 px-5 flex flex-col items-center gap-3.5 pointer-events-none"
                 data-testid="mobile-fab-menu"
               >
                 {/* New Expense */}
@@ -784,7 +799,7 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
                         whileTap={{ scale: 0.92 }}
                         onClick={() => handleMobileTabClick(item.id)}
                         data-testid={`bottom-nav-${item.id}`}
-                        className="relative flex -translate-x-3 flex-col items-center justify-center h-full focus:outline-none"
+                        className="relative flex flex-col items-center justify-center h-full focus:outline-none"
                         aria-label={item.label}
                       >
                         <motion.span
@@ -803,21 +818,6 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
                     );
                   })()}
                 </div>
-
-                {/* Mobile logout — placed after Ajustes on the right side of the pill */}
-                <motion.button
-                  whileTap={{ scale: 0.92 }}
-                  onClick={() => {
-                    setIsFabOpen(false);
-                    onLogout();
-                  }}
-                  className="absolute right-2 top-1/2 z-30 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-[#F1B8B8]/70 bg-[linear-gradient(135deg,rgba(255,248,248,0.98),rgba(255,226,226,0.96))] text-[#C62828] shadow-[0_10px_22px_rgba(198,40,40,0.18),inset_0_1px_0_rgba(255,255,255,0.82)] backdrop-blur-md transition-all duration-200 hover:border-[#E37C7C] hover:bg-[#FFF1F1] hover:text-[#B71C1C]"
-                  aria-label="Cerrar sesión"
-                  data-testid="bottom-nav-logout"
-                  title="Cerrar sesión"
-                >
-                  <span className="text-[22px] font-semibold leading-none tracking-[-0.02em]">{powerGlyph}</span>
-                </motion.button>
 
 
               </div>
