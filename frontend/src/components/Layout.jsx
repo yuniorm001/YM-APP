@@ -60,7 +60,6 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
   const [isMobile, setIsMobile] = useState(() => (typeof window !== 'undefined' ? window.innerWidth < 768 : false));
   const [isDesktopSidebarCollapsed, setIsDesktopSidebarCollapsed] = useState(false);
   const [isFabOpen, setIsFabOpen] = useState(false);
-  const [isMoreSheetOpen, setIsMoreSheetOpen] = useState(false);
   const [appLanguage, setAppLanguage] = useState(() => {
     if (typeof window === 'undefined') return 'ES';
     return window.localStorage?.getItem('gastospro-language') || 'ES';
@@ -85,7 +84,6 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
   const handleMobileTabClick = (id) => {
     setActiveTab(id);
     setIsFabOpen(false);
-    setIsMoreSheetOpen(false);
   };
 
   const handleNavigationItemClick = (item) => {
@@ -490,9 +488,9 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
       {/* ============= MOBILE PREMIUM BOTTOM NAV ============= */}
       {isMobile && (
         <>
-          {/* Backdrop when FAB or More-sheet is open */}
+          {/* Backdrop when FAB is open */}
           <AnimatePresence>
-            {(isFabOpen || isMoreSheetOpen) && (
+            {isFabOpen && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -500,8 +498,7 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
                 transition={{ duration: 0.2 }}
                 onClick={() => {
                   setIsFabOpen(false);
-                  setIsMoreSheetOpen(false);
-                }}
+                              }}
                 className="fixed inset-0 bg-black/45 backdrop-blur-[6px] z-40"
                 data-testid="mobile-nav-backdrop"
               />
@@ -574,74 +571,6 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
                     <CaretRight weight="bold" className="h-3.5 w-3.5 text-white/90" />
                   </span>
                 </motion.button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* "More" Bottom Sheet (Logout, etc) */}
-          <AnimatePresence>
-            {isMoreSheetOpen && (
-              <motion.div
-                initial={{ y: '100%' }}
-                animate={{ y: 0 }}
-                exit={{ y: '100%' }}
-                transition={{ type: 'spring', damping: 28, stiffness: 280 }}
-                className="fixed bottom-0 left-0 right-0 z-50 px-3 pb-3 safe-area-bottom"
-                data-testid="mobile-more-sheet"
-              >
-                <div className="mx-auto max-w-md rounded-[28px] border border-black/5 bg-[linear-gradient(180deg,rgba(255,255,255,0.99),rgba(250,246,238,0.97))] shadow-[0_-20px_50px_rgba(0,0,0,0.18)] backdrop-blur-xl overflow-hidden">
-                  <div className="flex justify-center pt-3 pb-1">
-                    <span className="block h-1.5 w-12 rounded-full bg-[#D6CCBC]" />
-                  </div>
-
-                  <div className="px-5 pt-2 pb-1">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#9A907F]">Más opciones</p>
-                  </div>
-
-                  <div className="px-3 pt-2 pb-4 space-y-2">
-                    <motion.button
-                      whileTap={{ scale: 0.985 }}
-                      onClick={() => {
-                        setActiveTab('settings');
-                        setIsMoreSheetOpen(false);
-                      }}
-                      className={`group relative flex w-full items-center gap-3 overflow-hidden rounded-[18px] border px-3 py-3.5 text-left transition-all duration-200 ${
-                        activeTab === 'settings'
-                          ? 'border-[#D8C19D] bg-[linear-gradient(135deg,rgba(255,255,255,0.99),rgba(249,243,232,0.99))]'
-                          : 'border-[#ECE6DC] bg-white/65'
-                      }`}
-                    >
-                      <span className="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] border border-[#E9E0D2] bg-white text-[#506052]">
-                        <Gear weight={activeTab === 'settings' ? 'fill' : 'duotone'} className="h-[18px] w-[18px]" />
-                      </span>
-                      <div className="relative z-10 min-w-0 flex-1">
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#9A8870]">Sistema</p>
-                        <p className="text-[13px] font-semibold text-[#24382E] mt-0.5">Ajustes</p>
-                      </div>
-                      <CaretRight weight="bold" className="h-4 w-4 text-[#9A8870]" />
-                    </motion.button>
-
-                    <motion.button
-                      whileTap={{ scale: 0.985 }}
-                      onClick={() => {
-                        onLogout();
-                        setIsMoreSheetOpen(false);
-                      }}
-                      className="group relative flex w-full items-center gap-3 overflow-hidden rounded-[18px] border border-[#E7CACA] bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(255,242,242,0.98))] px-3 py-3.5 text-left transition-all duration-200"
-                      data-testid="mobile-sheet-logout"
-                    >
-                      <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.62),transparent_48%)]" />
-                      <span className="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] border border-[#EDC3C3] bg-white">
-                        <DoorOpen weight="fill" className="h-[18px] w-[18px] text-[#B23A3A]" />
-                      </span>
-                      <div className="relative z-10 min-w-0 flex-1">
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#A47777]">Sesión</p>
-                        <p className="text-[13px] font-semibold text-[#8E2F2F] mt-0.5">Cerrar sesión</p>
-                      </div>
-                      <CaretRight weight="bold" className="h-4 w-4 text-[#B23A3A]/60" />
-                    </motion.button>
-                  </div>
-                </div>
               </motion.div>
             )}
           </AnimatePresence>
@@ -832,19 +761,20 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
                   })()}
                 </div>
 
-                {/* "More" trigger pinned to bottom-right of pill — for logout etc */}
+                {/* Mobile logout — visible, balanced and away from settings */}
                 <motion.button
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => setIsMoreSheetOpen(true)}
-                  className="absolute -top-2.5 right-3 z-10 flex h-7 px-2 items-center justify-center gap-1 rounded-full border border-white/15 bg-[#0F1610] text-white/70 shadow-[0_6px_14px_rgba(0,0,0,0.3)]"
-                  aria-label="Más opciones"
-                  data-testid="bottom-nav-more"
+                  whileTap={{ scale: 0.92 }}
+                  onClick={() => {
+                    setIsFabOpen(false);
+                    onLogout();
+                  }}
+                  className="absolute -top-3 left-3 z-10 flex h-8 min-w-[74px] items-center justify-center gap-1.5 rounded-full border border-[#F1C7C7] bg-[linear-gradient(135deg,#FFF8F8_0%,#FFEAEA_100%)] px-2.5 text-[#A83232] shadow-[0_8px_18px_rgba(80,20,20,0.20),inset_0_1px_0_rgba(255,255,255,0.85)]"
+                  aria-label="Cerrar sesión"
+                  data-testid="bottom-nav-logout"
+                  title="Cerrar sesión"
                 >
-                  <span className="flex items-center gap-0.5" aria-hidden="true">
-                    <span className="h-1 w-1 rounded-full bg-current" />
-                    <span className="h-1 w-1 rounded-full bg-current" />
-                    <span className="h-1 w-1 rounded-full bg-current" />
-                  </span>
+                  <span className="text-[16px] font-semibold leading-none">{powerGlyph}</span>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.08em]">Salir</span>
                 </motion.button>
               </div>
             </motion.div>
