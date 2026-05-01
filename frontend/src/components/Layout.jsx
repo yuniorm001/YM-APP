@@ -761,20 +761,20 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
                   })()}
                 </div>
 
-                {/* Mobile logout — visible, balanced and away from settings */}
+                {/* Mobile logout — centered under the orange FAB */}
                 <motion.button
-                  whileTap={{ scale: 0.92 }}
+                  whileTap={{ scale: 0.93 }}
                   onClick={() => {
                     setIsFabOpen(false);
                     onLogout();
                   }}
-                  className="absolute -top-3 left-3 z-10 flex h-8 min-w-[74px] items-center justify-center gap-1.5 rounded-full border border-[#F1C7C7] bg-[linear-gradient(135deg,#FFF8F8_0%,#FFEAEA_100%)] px-2.5 text-[#A83232] shadow-[0_8px_18px_rgba(80,20,20,0.20),inset_0_1px_0_rgba(255,255,255,0.85)]"
+                  className="absolute left-1/2 top-[43px] z-30 flex h-[25px] -translate-x-1/2 items-center justify-center gap-1.5 rounded-full border border-white/12 bg-white/[0.08] px-3 text-white/75 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-md transition-all duration-200 hover:bg-white/[0.12] hover:text-white"
                   aria-label="Cerrar sesión"
                   data-testid="bottom-nav-logout"
                   title="Cerrar sesión"
                 >
-                  <span className="text-[16px] font-semibold leading-none">{powerGlyph}</span>
-                  <span className="text-[10px] font-bold uppercase tracking-[0.08em]">Salir</span>
+                  <DoorOpen weight="bold" className="h-3.5 w-3.5" />
+                  <span className="text-[9.5px] font-bold uppercase tracking-[0.12em] leading-none">Salir</span>
                 </motion.button>
               </div>
             </motion.div>
