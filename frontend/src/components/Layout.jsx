@@ -512,10 +512,10 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
               >
                 {/* New Expense */}
                 <motion.button
-                  initial={{ opacity: 0, y: 24, scale: 0.9 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 24, scale: 0.9 }}
-                  transition={{ delay: 0, duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+                  initial={{ opacity: 0, scale: 0.96 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.96 }}
+                  transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
                   whileTap={{ scale: 0.97 }}
                   onClick={() => {
                     onAddExpense();
@@ -541,10 +541,10 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
 
                 {/* New Income */}
                 <motion.button
-                  initial={{ opacity: 0, y: 24, scale: 0.9 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 24, scale: 0.9 }}
-                  transition={{ delay: 0, duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+                  initial={{ opacity: 0, scale: 0.96 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.96 }}
+                  transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
                   whileTap={{ scale: 0.97 }}
                   onClick={() => {
                     onAddIncome();
@@ -570,10 +570,10 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
 
                 {/* Logout */}
                 <motion.button
-                  initial={{ opacity: 0, y: 24, scale: 0.9 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 24, scale: 0.9 }}
-                  transition={{ delay: 0, duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+                  initial={{ opacity: 0, scale: 0.96 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.96 }}
+                  transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
                   whileTap={{ scale: 0.97 }}
                   onClick={() => {
                     onLogout();
@@ -583,8 +583,9 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
                   data-testid="mobile-fab-logout"
                 >
                   <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.72),transparent_48%)]" />
+                  <span className="pointer-events-none absolute inset-y-0 -left-[42%] w-[38%] bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.58),transparent)] skew-x-[-20deg] opacity-0 transition-all duration-500 group-hover:left-[112%] group-hover:opacity-100" />
                   <span className="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-[15px] border border-[#EDC3C3] bg-white/94 shadow-[inset_0_1px_0_rgba(255,255,255,0.92)] transition-all duration-300 group-hover:border-[#D87D7D] group-hover:bg-white">
-                    <DoorOpen weight="fill" className="h-[18px] w-[18px] text-[#B23A3A]" />
+                    <DoorOpen weight="fill" className="h-[18px] w-[18px] text-[#B23A3A] transition-all duration-300 group-hover:scale-[1.06]" />
                   </span>
                   <div className="relative z-10 flex flex-col items-start text-left flex-1 min-w-0">
                     <span className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#A47777]">Sesión</span>
