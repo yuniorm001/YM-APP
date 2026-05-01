@@ -13,7 +13,7 @@ import {
   DoorOpen,
   Lightning,
   ShieldCheck,
-  TrendUp,
+  TrendUp as TrendingUp,
   DotsThree,
 } from '@phosphor-icons/react';
 
@@ -351,7 +351,7 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
                         $
                       </span>
                       <span className="h-5 w-5 rounded-full bg-[#2A7B5F] border-2 border-[#1E3A2B] flex items-center justify-center">
-                        <TrendUp weight="bold" className="h-2.5 w-2.5 text-white" />
+                        <TrendingUp weight="bold" className="h-2.5 w-2.5 text-white" />
                       </span>
                     </div>
                     <span className="text-[10px] font-medium text-white/60">Hábito diario · 2 min</span>
