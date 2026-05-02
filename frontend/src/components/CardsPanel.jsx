@@ -1115,136 +1115,153 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                 </motion.div>
 
                 {/* Card Details */}
-                <div className="premium-card fintech-details-card -mt-3 sm:-mt-4 p-3.5 sm:p-4 w-[96.5%] sm:w-[97%] mx-auto relative z-10 border border-white/70 shadow-[0_18px_40px_rgba(17,24,39,0.08)]">
-                  {/* Alerta individual si no hay crédito */}
-                  {status.isFull && (
-                    <div className="mb-2 p-3 rounded-2xl bg-[#9C382A]/10 border border-[#9C382A]/15 flex items-center gap-2">
-                      <Warning weight="fill" className="w-4 h-4 text-[#9C382A]" />
-                      <span className="text-xs text-[#9C382A] font-semibold">No tienes crédito disponible</span>
-                    </div>
-                  )}
+                <div className="premium-card fintech-details-card -mt-5 sm:-mt-6 p-0 w-[96.5%] sm:w-[97%] mx-auto relative z-10 overflow-hidden border border-white/80 shadow-[0_24px_60px_rgba(17,24,39,0.10)] bg-white/92 backdrop-blur-xl">
+                  <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-white via-[#F8F4ED]/60 to-transparent pointer-events-none" />
+                  <div className="absolute -right-12 -top-16 w-44 h-44 rounded-full bg-[#2A4D3B]/[0.05] blur-2xl pointer-events-none" />
+                  <div className="relative p-4 sm:p-5">
+                    {/* Alerta individual si no hay crédito */}
+                    {status.isFull && (
+                      <div className="mb-3 p-3 rounded-2xl bg-[#9C382A]/10 border border-[#9C382A]/20 flex items-center gap-2 shadow-[0_10px_24px_rgba(156,56,42,0.08)]">
+                        <Warning weight="fill" className="w-4 h-4 text-[#9C382A]" />
+                        <span className="text-xs text-[#9C382A] font-semibold">No tienes crédito disponible</span>
+                      </div>
+                    )}
 
-                  <div className="flex items-center justify-between mb-2">
-                    <div>
-                      <p className="text-xs text-[#737573] font-medium">Uso actual</p>
-                      <p className="metric-value text-[22px] leading-none tracking-[-0.02em]" style={{ color: status.color }}>
-                        {utilization.toFixed(1)}%
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-xs text-[#737573] font-medium">Límite</p>
-                      <p className="metric-value text-[22px] leading-none tracking-[-0.02em] text-[#1A1C1A]">
-                        ${card.limit.toLocaleString('es-MX')}
-                      </p>
-                    </div>
-                  </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-[1.05fr_0.95fr] gap-3 mb-3">
+                      <div className="rounded-[24px] border border-[#E6E0D7] bg-gradient-to-br from-white to-[#F8F4ED]/80 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <p className="text-[10px] uppercase tracking-[0.18em] text-[#8D8F8A] font-semibold">Uso actual</p>
+                            <div className="mt-1 flex items-end gap-2">
+                              <p className="metric-value text-[34px] sm:text-[40px] leading-none tracking-[-0.04em]" style={{ color: status.color }}>
+                                {utilization.toFixed(1)}%
+                              </p>
+                              <span
+                                className="mb-1.5 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-bold"
+                                style={{ color: status.color, borderColor: `${status.color}26`, backgroundColor: `${status.color}0F` }}
+                              >
+                                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: status.color }} />
+                                {status.label}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="mt-4 relative">
+                          <div className="progress-bar h-3 rounded-full overflow-hidden relative shadow-[inset_0_1px_3px_rgba(17,24,39,0.14)] bg-[#EEEAE4]">
+                            <div
+                              className="absolute inset-y-0 left-0 rounded-full transition-all duration-500 z-[1] shadow-[0_8px_18px_rgba(42,77,59,0.20)]"
+                              style={getUtilizationBarStyle(utilization)}
+                            />
+                            <div className="absolute top-0 left-[10%] w-px h-full bg-[#2A4D3B]/45 z-[2]" />
+                            <div className="absolute top-0 left-[20%] w-px h-full bg-[#D48B3F]/50 z-[2]" />
+                            <div className="absolute top-0 left-[30%] w-px h-full bg-[#9C382A]/50 z-[2]" />
+                          </div>
+                          <div className="mt-2 flex items-center justify-between text-[10px] font-semibold text-[#8D8F8A]">
+                            <span>0%</span>
+                            <span>100%</span>
+                          </div>
+                        </div>
+                      </div>
 
-                  <div className="relative mb-2.5">
-                    <div className="progress-bar h-2 rounded-full overflow-hidden relative">
-                      <div
-                        className="absolute inset-0 rounded-full transition-all duration-500 z-[1]"
-                        style={getUtilizationBarStyle(utilization)}
-                      />
-                      <div className="absolute top-0 left-[10%] w-0.5 h-full bg-[#2A4D3B]/45 z-[2]" />
-                      <div className="absolute top-0 left-[20%] w-0.5 h-full bg-[#D48B3F]/45 z-[2]" />
-                      <div className="absolute top-0 left-[30%] w-0.5 h-full bg-[#9C382A]/45 z-[2]" />
+                      <div className="grid grid-cols-2 gap-2.5">
+                        <div className="rounded-[22px] border border-[#E6E0D7] bg-white/86 p-3.5 shadow-[0_10px_24px_rgba(17,24,39,0.045)]">
+                          <p className="text-[10px] uppercase tracking-[0.16em] text-[#8D8F8A] font-semibold">Límite</p>
+                          <p className="metric-value text-[23px] leading-none tracking-[-0.03em] text-[#1A1C1A] mt-2">
+                            ${card.limit.toLocaleString('es-MX')}
+                          </p>
+                        </div>
+                        <div className="rounded-[22px] border border-[#DDEBE2] bg-[#F5FBF7] p-3.5 shadow-[0_10px_24px_rgba(42,77,59,0.06)]">
+                          <p className="text-[10px] uppercase tracking-[0.16em] text-[#8D8F8A] font-semibold">Disponible</p>
+                          <p className={`metric-value text-[23px] leading-none tracking-[-0.03em] mt-2 ${available > 0 ? 'text-[#2A4D3B]' : 'text-[#9C382A]'}`}>
+                            ${available.toLocaleString('es-MX')}
+                          </p>
+                        </div>
+                        <div className="col-span-2 rounded-[22px] border border-[#E6E0D7] bg-white/72 p-3.5 shadow-[0_10px_24px_rgba(17,24,39,0.04)]">
+                          <div className="flex items-center justify-between gap-3">
+                            <div>
+                              <p className="text-[10px] uppercase tracking-[0.16em] text-[#8D8F8A] font-semibold">Usado</p>
+                              <p className="metric-value text-[24px] leading-none tracking-[-0.03em] text-[#1A1C1A] mt-2">
+                                ${card.used.toLocaleString('es-MX')}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-2 sm:gap-3 text-[10px] sm:text-[11px] font-semibold text-[#737573]">
+                              <span className="inline-flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#2A4D3B]"></span>10%</span>
+                              <span className="inline-flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#D48B3F]"></span>20%</span>
+                              <span className="inline-flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#9C382A]"></span>30%</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="flex items-center justify-between gap-3 mt-2 text-[10px] sm:text-[11px] font-semibold text-[#737573]">
-                      
-                      <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-end">
-                        <span className="inline-flex items-center gap-1.5">
-                          <span className="w-2 h-2 rounded-full bg-[#2A4D3B]"></span>
-                          10%
-                        </span>
-                        <span className="inline-flex items-center gap-1.5">
-                          <span className="w-2 h-2 rounded-full bg-[#D48B3F]"></span>
-                          20%
-                        </span>
-                        <span className="inline-flex items-center gap-1.5">
-                          <span className="w-2 h-2 rounded-full bg-[#9C382A]"></span>
-                          30%
-                        </span>
+                    <div className="rounded-[24px] bg-gradient-to-br from-[#FFFCF6] to-[#F7F1E7] border border-[#E6DED2] p-3.5 sm:p-4 shadow-[0_12px_28px_rgba(125,92,40,0.055)]">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="text-[11px] uppercase tracking-[0.14em] text-[#7E7363] font-bold">Uso recomendado</p>
+                          <p className="text-xs sm:text-[13px] text-[#686966] mt-1 leading-relaxed">
+                            El 10% de esta línea de crédito es lo recomendado para gastar.
+                          </p>
+                        </div>
+                        <div className="text-right shrink-0 rounded-2xl bg-white/70 border border-white/80 px-3 py-2 shadow-sm">
+                          <p className="text-[10px] uppercase tracking-[0.12em] text-[#8D8F8A]">10% de ${card.limit.toLocaleString('es-MX')}</p>
+                          <p className="metric-value text-[24px] leading-none text-[#2A4D3B] mt-1">
+                            ${recommendedSpend.toLocaleString('es-MX')}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-3 pt-3 border-t border-[#E6E0D7] space-y-3">
+                      {card.paymentDate && (
+                        <div className="inline-flex items-center gap-2 rounded-2xl border border-[#E6DED2] bg-white/80 px-3 py-2 text-[13px] text-[#737573] shadow-sm">
+                          <CalendarBlank weight="fill" className="w-4 h-4 text-[#D48B3F]" />
+                          <span>Próximo pago: <span className="font-semibold text-[#3F423F]">{new Date(card.paymentDate).toLocaleDateString('es', { day: 'numeric', month: 'short' })}</span></span>
+                        </div>
+                      )}
+
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                        <button
+                          onClick={() => startEdit(card)}
+                          className="flex items-center justify-center gap-2 py-3 rounded-[18px] border border-[#DADAD5] text-[13px] font-semibold text-[#5F615F] bg-white/85 hover:bg-[#F7F5F0] hover:border-[#CFCFC9] hover:-translate-y-0.5 hover:shadow-[0_10px_22px_rgba(17,24,39,0.07)] transition-all duration-200"
+                          data-testid={`edit-card-${card.id}`}
+                        >
+                          <PencilSimple weight="fill" className="w-4 h-4" />
+                          Editar
+                        </button>
+                        <button
+                          onClick={() => onDelete(card.id)}
+                          className="flex items-center justify-center gap-2 py-3 rounded-[18px] border border-[#F1CFC5] text-[13px] font-semibold text-[#B65C47] bg-[#FFF9F7] hover:bg-[#FFF1EC] hover:border-[#E8B3A5] hover:-translate-y-0.5 hover:shadow-[0_10px_22px_rgba(182,92,71,0.10)] transition-all duration-200"
+                          data-testid={`delete-card-${card.id}`}
+                        >
+                          <Trash weight="fill" className="w-4 h-4" />
+                          Eliminar
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setGoalModalCard(card)}
+                          className="flex items-center justify-center gap-2 py-3 rounded-[18px] border border-[#F1DFB8] text-[13px] font-semibold text-[#6A4B16] bg-[#FFF9ED] hover:bg-[#FFF3D9] hover:border-[#E5C681] hover:-translate-y-0.5 hover:shadow-[0_10px_22px_rgba(212,139,63,0.10)] transition-all duration-200"
+                          data-testid={`open-goal-modal-${card.id}`}
+                        >
+                          <Sparkle weight="fill" className="w-4 h-4" />
+                          Objetivo
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setPaymentModalCard(card);
+                            setPaymentErrors((prev) => ({ ...prev, [card.id]: '' }));
+                          }}
+                          className="flex items-center justify-center gap-2 py-3 rounded-[18px] border border-[#2A4D3B]/20 text-[13px] font-bold text-white bg-gradient-to-r from-[#2A4D3B] to-[#1E3A2B] hover:-translate-y-0.5 hover:shadow-[0_14px_28px_rgba(42,77,59,0.20)] transition-all duration-200"
+                          data-testid={`open-payment-modal-${card.id}`}
+                        >
+                          <CurrencyDollar weight="fill" className="w-4 h-4" />
+                          Pagar
+                        </button>
                       </div>
                     </div>
                   </div>
-
-                  <div className="flex items-center justify-between text-[13px] sm:text-sm">
-                    <span className="text-[#737573]">
-                      Usado: <span className="metric-value text-[#1A1C1A]">${card.used.toLocaleString('es-MX')}</span>
-                    </span>
-                    <span className="text-[#737573]">
-                      Disponible: <span className={`metric-value ${available > 0 ? 'text-[#2A4D3B]' : 'text-[#9C382A]'}`}>${available.toLocaleString('es-MX')}</span>
-                    </span>
-                  </div>
-
-                  <div className="mt-3 rounded-2xl bg-[#F8F4ED] border border-[#E6DED2] p-3 flex items-center justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="text-[11px] uppercase tracking-[0.12em] text-[#737573] font-semibold">Uso recomendado</p>
-                      <p className="text-xs sm:text-[13px] text-[#5E605D] mt-1 leading-relaxed">
-                        El 10% de esta línea de crédito es lo recomendado para gastar.
-                      </p>
-                    </div>
-                    <div className="text-right shrink-0">
-                      <p className="text-[10px] uppercase tracking-[0.12em] text-[#737573]">10% de ${card.limit.toLocaleString('es-MX')}</p>
-                      <p className="metric-value text-[20px] leading-none text-[#2A4D3B] mt-1">
-                        ${recommendedSpend.toLocaleString('es-MX')}
-                      </p>
-                    </div>
-                  </div>
-
-
-
-                  
-                  <div className="mt-3 pt-3 border-t border-[#E6E6E3] space-y-3">
-                    {card.paymentDate && (
-                    <div className="flex items-center gap-2 mt-1.5 pt-2.5 border-t border-[#E6E6E3] text-[13px] text-[#737573]">
-                      <CalendarBlank weight="fill" className="w-4 h-4 text-[#D48B3F]" />
-                      <span>Próximo pago: <span className="font-semibold">{new Date(card.paymentDate).toLocaleDateString('es', { day: 'numeric', month: 'short' })}</span></span>
-                    </div>
-                  )}
-
-<div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                      <button
-                        onClick={() => startEdit(card)}
-                        className="flex items-center justify-center gap-2 py-2.5 rounded-2xl text-[13px] font-semibold text-[#5F615F] bg-[#F7F5F0] hover:bg-[#F2F0EB] transition-all duration-200"
-                        data-testid={`edit-card-${card.id}`}
-                      >
-                        <PencilSimple weight="fill" className="w-4 h-4" />
-                        Editar
-                      </button>
-                      <button
-                        onClick={() => onDelete(card.id)}
-                        className="flex items-center justify-center gap-2 py-2.5 rounded-2xl text-[13px] font-semibold text-[#B65C47] bg-[#FFF7F4] hover:bg-[#FDEEE8] transition-all duration-200"
-                        data-testid={`delete-card-${card.id}`}
-                      >
-                        <Trash weight="fill" className="w-4 h-4" />
-                        Eliminar
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setGoalModalCard(card)}
-                        className="flex items-center justify-center gap-2 py-2.5 rounded-2xl text-[13px] font-semibold text-[#6A4B16] bg-[#FFF8EA] hover:bg-[#F9EED2] transition-all duration-200"
-                        data-testid={`open-goal-modal-${card.id}`}
-                      >
-                        <Sparkle weight="fill" className="w-4 h-4" />
-                        Objetivo
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setPaymentModalCard(card);
-                          setPaymentErrors((prev) => ({ ...prev, [card.id]: '' }));
-                        }}
-                        className="flex items-center justify-center gap-2 py-2.5 rounded-2xl text-[13px] font-semibold text-white bg-gradient-to-r from-[#2A4D3B] to-[#1E3A2B] hover:shadow-lg hover:shadow-[#2A4D3B]/15 transition-all duration-200"
-                        data-testid={`open-payment-modal-${card.id}`}
-                      >
-                        <CurrencyDollar weight="fill" className="w-4 h-4" />
-                        Pagar
-                      </button>
-                    </div>
-                  </div>
                 </div>
+
               </motion.div>
             );
           })}
