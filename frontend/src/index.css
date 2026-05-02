@@ -4933,3 +4933,49 @@ textarea.premium-input:focus {
     width: 100% !important;
   }
 }
+
+/* Ajuste fino: evitar que los inputs de cada acceso se vean cortados abajo. */
+.admin-user-row {
+  padding: 1.05rem 1.05rem 1.45rem;
+  overflow: visible;
+}
+
+.admin-user-row .admin-row-controls {
+  margin-top: .15rem;
+  padding-top: 1.05rem;
+  padding-bottom: .3rem;
+  align-items: end;
+}
+
+.admin-user-row .admin-mini-input {
+  min-height: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+}
+
+.admin-user-row .admin-mini-label {
+  display: block;
+  margin-bottom: .5rem;
+}
+
+.admin-access-list,
+.admin-access-modal-list {
+  padding-bottom: .7rem;
+}
+
+@media (max-width: 768px) {
+  .admin-user-row {
+    padding: 1rem 1rem 1.35rem;
+  }
+
+  .admin-user-row .admin-row-controls {
+    gap: .95rem;
+    padding-bottom: .2rem;
+  }
+
+  .admin-user-row .admin-mini-input {
+    min-height: 52px;
+    height: 52px;
+  }
+}
