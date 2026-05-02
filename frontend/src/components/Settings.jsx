@@ -257,8 +257,6 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
   const [allowlistLoading, setAllowlistLoading] = useState(false);
   const [allowlistError, setAllowlistError] = useState('');
   const [allowlistStatus, setAllowlistStatus] = useState('');
-  const [newAccessError, setNewAccessError] = useState('');
-  const [newAccessStatus, setNewAccessStatus] = useState('');
   const [newAllowedEmail, setNewAllowedEmail] = useState('');
   const [newAllowedRole, setNewAllowedRole] = useState('client');
   const [newAllowedStatus, setNewAllowedStatus] = useState('active');
@@ -745,49 +743,53 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
     const email = newAllowedEmail.trim().toLowerCase();
     if (!email || !session?.token) return;
 
-    setNewAccessError('');
-    setNewAccessStatus('');
-
     if (!isValidEmailAddress(email)) {
-      setNewAccessError('Escribe un correo válido. Ejemplo: cliente@dominio.com');
-      return;
-    }
-
-    if (!newAllowedMembershipEnd) {
-      setNewAccessError('Selecciona una fecha de vencimiento antes de agregar el correo.');
+      setAllowlistStatus('');
+      setAllowlistError('Escribe un correo válido. Ejemplo: cliente@dominio.com');
       return;
     }
 
     const emailAlreadyExists = allowedEmails.some((item) => String(item?.email || '').trim().toLowerCase() === email);
     if (emailAlreadyExists) {
-      setNewAccessError('Ese correo ya existe en los accesos autorizados.');
+      setAllowlistStatus('');
+      setAllowlistError('Ese correo ya existe en los accesos autorizados.');
       return;
     }
 
     try {
       setAllowlistBusyEmail(email);
       setAllowlistError('');
-      setAllowlistStatus('');
       const response = await addAllowedEmail(session.token, {
         email,
         role: newAllowedRole,
         is_active: newAllowedStatus === 'active',
         membership_end: newAllowedMembershipEnd ? new Date(`${newAllowedMembershipEnd}T23:59:59`).toISOString() : null,
       });
-      setNewAccessStatus(response.message || 'Correo agregado correctamente.');
+      setAllowlistStatus(response.message || 'Correo agregado correctamente.');
       setNewAllowedEmail('');
       setNewAllowedRole('client');
       setNewAllowedStatus('active');
       setNewAllowedMembershipEnd('');
       await loadAllowlist();
     } catch (error) {
-      setNewAccessStatus('');
-      setNewAccessError(getFriendlyEmailError(error));
+      setAllowlistStatus('');
+      setAllowlistError(getFriendlyEmailError(error));
     } finally {
       setAllowlistBusyEmail('');
     }
   };
 
+  const handleMembershipQuickSet = (preset) => {
+    if (preset === 'none') {
+      setNewAllowedMembershipEnd('');
+      return;
+    }
+    const next = new Date();
+    if (preset === '1m') next.setMonth(next.getMonth() + 1);
+    if (preset === '6m') next.setMonth(next.getMonth() + 6);
+    if (preset === '1y') next.setFullYear(next.getFullYear() + 1);
+    setNewAllowedMembershipEnd(next.toISOString().split('T')[0]);
+  };
 
   const handleUpdateAllowedEmail = async (item, updates) => {
     if (!item?.email || !session?.token || item.read_only) return;
@@ -908,7 +910,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                 <div>
                   <p className="admin-section-label">Nuevo acceso</p>
                   <h4 className="mt-1 font-heading text-xl font-semibold tracking-[-0.025em] text-[#171B17]">Autorizar correo</h4>
-                  <p className="mt-1 text-sm text-[#70766F]">Configura permiso, rol y vencimiento antes de agregarlo.</p>
+                  <p className="mt-1 text-sm text-[#70766F]">Configura permiso, rol y duración antes de agregarlo.</p>
                 </div>
                 <div className="admin-small-icon">
                   <UserPlus weight="bold" className="h-5 w-5" />
@@ -923,11 +925,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                     <input
                       type="email"
                       value={newAllowedEmail}
-                      onChange={(e) => {
-                        setNewAllowedEmail(e.target.value);
-                        if (newAccessError) setNewAccessError('');
-                        if (newAccessStatus) setNewAccessStatus('');
-                      }}
+                      onChange={(e) => setNewAllowedEmail(e.target.value)}
                       placeholder="correo@dominio.com"
                       className="admin-clean-input"
                       autoComplete="off"
@@ -939,10 +937,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                   <div>
                     <label className="admin-field-label">Rol</label>
                     <div className="admin-select-wrap">
-                      <select value={newAllowedRole} onChange={(e) => {
-                        setNewAllowedRole(e.target.value);
-                        if (newAccessError) setNewAccessError('');
-                      }} className="admin-clean-input admin-clean-select">
+                      <select value={newAllowedRole} onChange={(e) => setNewAllowedRole(e.target.value)} className="admin-clean-input admin-clean-select">
                         <option value="client">Cliente</option>
                         <option value="admin">Admin</option>
                       </select>
@@ -952,10 +947,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                   <div>
                     <label className="admin-field-label">Estado</label>
                     <div className="admin-select-wrap">
-                      <select value={newAllowedStatus} onChange={(e) => {
-                        setNewAllowedStatus(e.target.value);
-                        if (newAccessError) setNewAccessError('');
-                      }} className="admin-clean-input admin-clean-select">
+                      <select value={newAllowedStatus} onChange={(e) => setNewAllowedStatus(e.target.value)} className="admin-clean-input admin-clean-select">
                         <option value="active">Activo</option>
                         <option value="inactive">Desactivado</option>
                       </select>
@@ -966,29 +958,25 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
 
                 <div>
                   <label className="admin-field-label">Fecha de vencimiento</label>
-                  <input type="date" value={newAllowedMembershipEnd} onChange={(e) => {
-                    setNewAllowedMembershipEnd(e.target.value);
-                    if (newAccessError) setNewAccessError('');
-                  }} className="admin-clean-input" required />
+                  <input type="date" value={newAllowedMembershipEnd} onChange={(e) => setNewAllowedMembershipEnd(e.target.value)} className="admin-clean-input" />
+                  <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                    {[["1m","1 mes"],["6m","6 meses"],["1y","1 año"],["none","Sin fecha"]].map(([value,label]) => (
+                      <button key={value} type="button" onClick={() => handleMembershipQuickSet(value)} className="admin-quick-chip">
+                        {label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 <button
                   type="button"
                   onClick={handleAddAllowedEmail}
-                  disabled={!newAllowedEmail.trim() || !newAllowedMembershipEnd || !!allowlistBusyEmail}
+                  disabled={!newAllowedEmail.trim() || !!allowlistBusyEmail}
                   className="admin-primary-btn"
                 >
                   <UserPlus weight="bold" className="h-4 w-4" />
                   Agregar correo
                 </button>
-
-                {newAccessStatus ? (
-                  <div className="rounded-2xl border border-[#D8E8E0] bg-[#F5FBF8] px-4 py-3 text-sm font-semibold text-[#2A4D3B]">{newAccessStatus}</div>
-                ) : null}
-
-                {newAccessError ? (
-                  <div className="rounded-2xl border border-[#F1D7CF] bg-[#FFF7F4] px-4 py-3 text-sm font-semibold text-[#9C382A]">{newAccessError}</div>
-                ) : null}
               </div>
             </div>
 
@@ -1571,7 +1559,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                               </div>
 
                               {!item.read_only ? (
-                                <div className="admin-row-controls admin-row-controls--modal">
+                                <div className="admin-row-controls">
                                   <div>
                                     <label className="admin-mini-label">Rol</label>
                                     <select defaultValue={item.role || 'client'} onChange={(e) => handleUpdateAllowedEmail(item, { role: e.target.value })} disabled={allowlistBusyEmail === item.email} className="admin-mini-input">
