@@ -836,7 +836,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
       className="space-y-6"
       data-testid="settings-view"
     >
-      <div className="hero-surface p-5 sm:p-6 text-white">
+      <div className="hero-surface hero-surface-static p-5 sm:p-6 text-white">
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5">
           <div>
             <p className="text-[11px] uppercase tracking-[0.18em] text-white/65 font-semibold mb-2">Preferencias</p>
@@ -1110,9 +1110,9 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
               <Wallet weight="fill" className="w-6 h-6" />
             </div>
             <div className="min-w-0">
-              <p className="settings-kicker">Control de entradas</p>
-              <h3>Historial de ingresos del mes</h3>
-              <p>Lectura ejecutiva de lo que entra, lo cobrado y el cash disponible para decidir mejor.</p>
+              <p className="settings-kicker">Dinero que entra</p>
+              <h3>Ingresos del mes</h3>
+              <p>Todo lo que has cobrado este mes y cuánto te queda disponible para gastos o pagos de tarjeta.</p>
             </div>
           </div>
 
@@ -1150,7 +1150,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                 <div className="settings-empty-icon"><Receipt weight="fill" className="w-5 h-5" /></div>
                 <div>
                   <p>Aún no hay ingresos registrados este mes.</p>
-                  <span>Cuando agregues ingresos, este panel mostrará la actividad mensual y el detalle disponible.</span>
+                  <span>Cuando agregues un ingreso, aquí verás cuánto entró, cuánto queda disponible y cómo eso afecta tus decisiones de pago.</span>
                 </div>
               </div>
             ) : (
@@ -1158,8 +1158,8 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                 <div className="flex items-start gap-3">
                   <div className="settings-mini-orb"><Receipt weight="fill" className="w-5 h-5" /></div>
                   <div>
-                    <p>Movimientos registrados</p>
-                    <span>Consulta el detalle de ingresos del mes sin perder la vista general del cash.</span>
+                    <p>Ingresos registrados</p>
+                    <span>Revisa cada cobro del mes y confirma de dónde viene tu efectivo disponible.</span>
                   </div>
                 </div>
                 <button
@@ -1182,9 +1182,9 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
               <Target weight="fill" className="w-6 h-6" />
             </div>
             <div className="min-w-0">
-              <p className="settings-kicker">Límite inteligente</p>
-              <h3>Meta Inteligente</h3>
-              <p>Convierte tu cash disponible en un límite claro para no gastar por impulso.</p>
+              <p className="settings-kicker">Límite de gasto</p>
+              <h3>Meta inteligente</h3>
+              <p>Define cuánto puedes gastar para cuidar tu efectivo y tener margen para pagar tarjetas.</p>
             </div>
           </div>
 
@@ -1254,7 +1254,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
             <div className="settings-goal-intel">
               <div className="settings-intel-title">
                 <Sparkle weight="fill" className={`w-4 h-4 ${canUseSmartGoal ? 'text-[#2A4D3B]' : 'text-[#B65C47]'}`} />
-                <span>Cómo funcionará</span>
+                <span>Cómo ayuda esta meta</span>
               </div>
               {!canUseSmartGoal ? (
                 <div className="settings-alert-soft settings-alert-soft--danger">
@@ -1282,7 +1282,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
               </div>
 
               <div className="settings-recommendation-card">
-                <p>Recomendación de ritmo</p>
+                <p>Ritmo recomendado</p>
                 {goalType === 'weekly' ? (
                   <span>La app medirá tus <b>gastos cash de esta semana</b> y te recomendará hasta <b>${formatMoney(smartGoalPerDay)}</b> por día restante.</span>
                 ) : (
