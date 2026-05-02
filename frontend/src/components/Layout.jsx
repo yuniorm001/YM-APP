@@ -10,6 +10,7 @@ import {
   CurrencyDollar,
   CaretRight,
   Sparkle,
+  Lightbulb,
   DoorOpen,
 } from '@phosphor-icons/react';
 
@@ -295,9 +296,9 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
                 <div className="relative z-10">
                   <div className="flex items-center gap-2">
                     <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/10 border border-white/15 backdrop-blur">
-                      <Sparkle weight="fill" className="h-3.5 w-3.5 text-[#F0C99A]" />
+                      <Lightbulb weight="duotone" className="h-3.5 w-3.5 text-[#F0C99A]" />
                     </span>
-                    <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#F0C99A]">Pulso Smart Tip</span>
+                    <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#F0C99A]">Consejo Inteligente</span>
                   </div>
                   <p className="mt-2.5 text-[13px] font-semibold leading-snug text-white">
                     Registra cada gasto al momento — tu yo del futuro lo va a agradecer.
