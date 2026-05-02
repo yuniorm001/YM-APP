@@ -1039,22 +1039,22 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                   visibleAllowedEmails.map((item) => {
                     const membershipBadge = getMembershipBadge(item);
                     return (
-                      <div key={item.email} className={`admin-user-row ${item.read_only ? 'admin-user-row--protected' : 'admin-user-row--client'}`}>
-                        <div className="admin-user-main">
-                          <div className="admin-user-identity">
-                            <div className={`admin-avatar ${item.role === 'admin' ? 'admin-avatar-admin' : ''}`}>{item.email?.charAt(0)?.toUpperCase() || 'U'}</div>
-                            <div className="admin-user-meta">
-                              <p className="admin-user-email">{item.email}</p>
-                              <div className="admin-user-pills">
-                                <span className={`admin-pill ${item.read_only ? 'admin-pill-muted' : 'admin-pill-blue'}`}>{item.read_only ? 'Protegido' : 'Editable'}</span>
-                                <span className={`admin-pill ${membershipBadge.tone}`}>{membershipBadge.label}</span>
-                                <span className="admin-pill admin-pill-neutral">{item.role === 'admin' ? 'Admin' : 'Cliente'}</span>
-                                <span className="admin-pill admin-pill-neutral">{item.membership_end ? `Vence ${new Date(item.membership_end).toLocaleDateString('es-US')}` : 'Sin vencimiento'}</span>
+                      <div key={item.email} className="admin-user-row">
+                        <div className="flex flex-col gap-4">
+                          <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                            <div className="min-w-0 flex items-start gap-3">
+                              <div className={`admin-avatar ${item.role === 'admin' ? 'admin-avatar-admin' : ''}`}>{item.email?.charAt(0)?.toUpperCase() || 'U'}</div>
+                              <div className="min-w-0 flex-1">
+                                <p className="truncate text-[15px] font-semibold text-[#141814]">{item.email}</p>
+                                <div className="mt-2 flex flex-wrap items-center gap-2">
+                                  <span className={`admin-pill ${item.read_only ? 'admin-pill-muted' : 'admin-pill-blue'}`}>{item.read_only ? 'Protegido' : 'Editable'}</span>
+                                  <span className={`admin-pill ${membershipBadge.tone}`}>{membershipBadge.label}</span>
+                                  <span className="admin-pill admin-pill-neutral">{item.role === 'admin' ? 'Admin' : 'Cliente'}</span>
+                                  <span className="admin-pill admin-pill-neutral">{item.membership_end ? `Vence ${new Date(item.membership_end).toLocaleDateString('es-US')}` : 'Sin vencimiento'}</span>
+                                </div>
                               </div>
                             </div>
-                          </div>
 
-                          <div className="admin-user-action-area">
                             {item.read_only ? (
                               <span className="admin-locked-badge">Acceso protegido</span>
                             ) : (
@@ -1069,30 +1069,30 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                               </button>
                             )}
                           </div>
-                        </div>
 
-                        {!item.read_only ? (
-                          <div className="admin-row-controls">
-                            <div className="admin-control-field">
-                              <label className="admin-mini-label">Rol</label>
-                              <select defaultValue={item.role || 'client'} onChange={(e) => handleUpdateAllowedEmail(item, { role: e.target.value })} disabled={allowlistBusyEmail === item.email} className="admin-mini-input">
-                                <option value="client">Cliente</option>
-                                <option value="admin">Admin</option>
-                              </select>
+                          {!item.read_only ? (
+                            <div className="admin-row-controls">
+                              <div>
+                                <label className="admin-mini-label">Rol</label>
+                                <select defaultValue={item.role || 'client'} onChange={(e) => handleUpdateAllowedEmail(item, { role: e.target.value })} disabled={allowlistBusyEmail === item.email} className="admin-mini-input">
+                                  <option value="client">Cliente</option>
+                                  <option value="admin">Admin</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label className="admin-mini-label">Acceso</label>
+                                <select defaultValue={item.is_active ? 'active' : 'inactive'} onChange={(e) => handleUpdateAllowedEmail(item, { is_active: e.target.value === 'active' })} disabled={allowlistBusyEmail === item.email} className="admin-mini-input">
+                                  <option value="active">Activo</option>
+                                  <option value="inactive">Desactivado</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label className="admin-mini-label">Vencimiento</label>
+                                <input type="date" defaultValue={formatDateInputValue(item.membership_end)} onBlur={(e) => handleUpdateAllowedEmail(item, { membership_end: e.target.value ? new Date(`${e.target.value}T23:59:59`).toISOString() : null })} disabled={allowlistBusyEmail === item.email} className="admin-mini-input" />
+                              </div>
                             </div>
-                            <div className="admin-control-field">
-                              <label className="admin-mini-label">Acceso</label>
-                              <select defaultValue={item.is_active ? 'active' : 'inactive'} onChange={(e) => handleUpdateAllowedEmail(item, { is_active: e.target.value === 'active' })} disabled={allowlistBusyEmail === item.email} className="admin-mini-input">
-                                <option value="active">Activo</option>
-                                <option value="inactive">Desactivado</option>
-                              </select>
-                            </div>
-                            <div className="admin-control-field">
-                              <label className="admin-mini-label">Vencimiento</label>
-                              <input type="date" defaultValue={formatDateInputValue(item.membership_end)} onBlur={(e) => handleUpdateAllowedEmail(item, { membership_end: e.target.value ? new Date(`${e.target.value}T23:59:59`).toISOString() : null })} disabled={allowlistBusyEmail === item.email} className="admin-mini-input" />
-                            </div>
-                          </div>
-                        ) : null}
+                          ) : null}
+                        </div>
                       </div>
                     );
                   })
@@ -1544,22 +1544,22 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                       ) : modalFilteredAllowedEmails.map((item) => {
                         const membershipBadge = getMembershipBadge(item);
                         return (
-                          <div key={`modal-${item.email}`} className={`admin-user-row admin-user-row-modal ${item.read_only ? 'admin-user-row--protected' : 'admin-user-row--client'}`}>
-                            <div className="admin-user-main">
-                              <div className="admin-user-identity">
-                                <div className={`admin-avatar ${item.role === 'admin' ? 'admin-avatar-admin' : ''}`}>{item.email?.charAt(0)?.toUpperCase() || 'U'}</div>
-                                <div className="admin-user-meta">
-                                  <p className="admin-user-email">{item.email}</p>
-                                  <div className="admin-user-pills">
-                                    <span className={`admin-pill ${item.read_only ? 'admin-pill-muted' : 'admin-pill-blue'}`}>{item.read_only ? 'Protegido' : 'Editable'}</span>
-                                    <span className={`admin-pill ${membershipBadge.tone}`}>{membershipBadge.label}</span>
-                                    <span className="admin-pill admin-pill-neutral">{item.role === 'admin' ? 'Admin' : 'Cliente'}</span>
-                                    <span className="admin-pill admin-pill-neutral">{item.membership_end ? `Vence ${new Date(item.membership_end).toLocaleDateString('es-US')}` : 'Sin vencimiento'}</span>
+                          <div key={`modal-${item.email}`} className="admin-user-row admin-user-row-modal">
+                            <div className="flex flex-col gap-4">
+                              <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                                <div className="min-w-0 flex items-start gap-3">
+                                  <div className={`admin-avatar ${item.role === 'admin' ? 'admin-avatar-admin' : ''}`}>{item.email?.charAt(0)?.toUpperCase() || 'U'}</div>
+                                  <div className="min-w-0 flex-1">
+                                    <p className="truncate text-[15px] font-semibold text-[#141814]">{item.email}</p>
+                                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                                      <span className={`admin-pill ${item.read_only ? 'admin-pill-muted' : 'admin-pill-blue'}`}>{item.read_only ? 'Protegido' : 'Editable'}</span>
+                                      <span className={`admin-pill ${membershipBadge.tone}`}>{membershipBadge.label}</span>
+                                      <span className="admin-pill admin-pill-neutral">{item.role === 'admin' ? 'Admin' : 'Cliente'}</span>
+                                      <span className="admin-pill admin-pill-neutral">{item.membership_end ? `Vence ${new Date(item.membership_end).toLocaleDateString('es-US')}` : 'Sin vencimiento'}</span>
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
 
-                              <div className="admin-user-action-area">
                                 {item.read_only ? (
                                   <span className="admin-locked-badge">Acceso protegido</span>
                                 ) : (
@@ -1569,30 +1569,30 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                                   </button>
                                 )}
                               </div>
-                            </div>
 
-                            {!item.read_only ? (
-                              <div className="admin-row-controls admin-row-controls--modal">
-                                <div className="admin-control-field">
-                                  <label className="admin-mini-label">Rol</label>
-                                  <select defaultValue={item.role || 'client'} onChange={(e) => handleUpdateAllowedEmail(item, { role: e.target.value })} disabled={allowlistBusyEmail === item.email} className="admin-mini-input">
-                                    <option value="client">Cliente</option>
-                                    <option value="admin">Admin</option>
-                                  </select>
+                              {!item.read_only ? (
+                                <div className="admin-row-controls admin-row-controls--modal">
+                                  <div>
+                                    <label className="admin-mini-label">Rol</label>
+                                    <select defaultValue={item.role || 'client'} onChange={(e) => handleUpdateAllowedEmail(item, { role: e.target.value })} disabled={allowlistBusyEmail === item.email} className="admin-mini-input">
+                                      <option value="client">Cliente</option>
+                                      <option value="admin">Admin</option>
+                                    </select>
+                                  </div>
+                                  <div>
+                                    <label className="admin-mini-label">Acceso</label>
+                                    <select defaultValue={item.is_active ? 'active' : 'inactive'} onChange={(e) => handleUpdateAllowedEmail(item, { is_active: e.target.value === 'active' })} disabled={allowlistBusyEmail === item.email} className="admin-mini-input">
+                                      <option value="active">Activo</option>
+                                      <option value="inactive">Desactivado</option>
+                                    </select>
+                                  </div>
+                                  <div>
+                                    <label className="admin-mini-label">Vencimiento</label>
+                                    <input type="date" defaultValue={formatDateInputValue(item.membership_end)} onBlur={(e) => handleUpdateAllowedEmail(item, { membership_end: e.target.value ? new Date(`${e.target.value}T23:59:59`).toISOString() : null })} disabled={allowlistBusyEmail === item.email} className="admin-mini-input" />
+                                  </div>
                                 </div>
-                                <div className="admin-control-field">
-                                  <label className="admin-mini-label">Acceso</label>
-                                  <select defaultValue={item.is_active ? 'active' : 'inactive'} onChange={(e) => handleUpdateAllowedEmail(item, { is_active: e.target.value === 'active' })} disabled={allowlistBusyEmail === item.email} className="admin-mini-input">
-                                    <option value="active">Activo</option>
-                                    <option value="inactive">Desactivado</option>
-                                  </select>
-                                </div>
-                                <div className="admin-control-field">
-                                  <label className="admin-mini-label">Vencimiento</label>
-                                  <input type="date" defaultValue={formatDateInputValue(item.membership_end)} onBlur={(e) => handleUpdateAllowedEmail(item, { membership_end: e.target.value ? new Date(`${e.target.value}T23:59:59`).toISOString() : null })} disabled={allowlistBusyEmail === item.email} className="admin-mini-input" />
-                                </div>
-                              </div>
-                            ) : null}
+                              ) : null}
+                            </div>
                           </div>
                         );
                       })}
