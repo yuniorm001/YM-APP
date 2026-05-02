@@ -672,35 +672,69 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
       </div>
 
       {/* Total Credit Overview */}
-      <div className="premium-card p-6 bg-gradient-to-br from-white to-[#FAFAF9]" data-testid="credit-overview">
-        <div className="flex flex-col lg:flex-row lg:items-center gap-6">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
-              <Wallet weight="fill" className="w-4 h-4 text-[#2A4D3B]" />
-              <p className="label-uppercase">Utilización Total del Crédito</p>
+      <div
+        className="relative overflow-hidden rounded-[32px] border border-[#DDE2DA] bg-gradient-to-br from-white via-[#FAFAF7] to-[#F2EFE7] p-4 sm:p-5 shadow-[0_26px_80px_rgba(32,39,34,0.10)]"
+        data-testid="credit-overview"
+      >
+        <div className="pointer-events-none absolute -left-24 -top-24 h-56 w-56 rounded-full bg-[#2A4D3B]/10 blur-3xl" />
+        <div className="pointer-events-none absolute -right-20 -bottom-24 h-64 w-64 rounded-full bg-[#D48B3F]/14 blur-3xl" />
+
+        <div className="relative z-10 grid gap-4 xl:grid-cols-[0.95fr_1.35fr] xl:items-stretch">
+          <div className="rounded-[28px] border border-white/80 bg-white/78 p-5 sm:p-6 shadow-[0_18px_45px_rgba(17,24,39,0.06)] backdrop-blur-xl">
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0">
+                <div className="mb-4 flex items-center gap-2">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-2xl border border-[#2A4D3B]/10 bg-[#2A4D3B]/8 text-[#2A4D3B] shadow-[0_10px_24px_rgba(42,77,59,0.10)]">
+                    <Wallet weight="fill" className="h-4 w-4" />
+                  </span>
+                  <p className="label-uppercase">Utilización Total del Crédito</p>
+                </div>
+
+                <div className="flex items-end gap-3 flex-wrap">
+                  <span className="font-heading text-[54px] font-semibold leading-none tracking-[-0.07em] text-[#151714] sm:text-[68px]">
+                    {totalUtilization.toFixed(1)}%
+                  </span>
+                  <span
+                    className="mb-2 rounded-full border px-3.5 py-1.5 text-sm font-semibold shadow-[0_10px_22px_rgba(17,24,39,0.05)]"
+                    style={{
+                      backgroundColor: `${getUtilizationStatus(totalUsed, totalLimit).color}12`,
+                      borderColor: `${getUtilizationStatus(totalUsed, totalLimit).color}24`,
+                      color: getUtilizationStatus(totalUsed, totalLimit).color
+                    }}
+                  >
+                    {getUtilizationStatus(totalUsed, totalLimit).label}
+                  </span>
+                </div>
+              </div>
             </div>
-            <div className="flex items-end gap-3 flex-wrap">
-              <span className="metric-value text-4xl sm:text-5xl text-[#1A1C1A]">
-                {totalUtilization.toFixed(1)}%
-              </span>
-              <span className={`px-3 py-1.5 rounded-full text-sm font-semibold mb-2`}
-                style={{ backgroundColor: `${getUtilizationStatus(totalUsed, totalLimit).color}15`, color: getUtilizationStatus(totalUsed, totalLimit).color }}>
-                {getUtilizationStatus(totalUsed, totalLimit).label}
-              </span>
+
+            <div className="mt-5 grid grid-cols-3 gap-2.5">
+              <div className="rounded-[18px] border border-[#E5E2DA] bg-[#FAFAF7] px-3 py-3">
+                <p className="text-[10px] uppercase tracking-[0.14em] text-[#8A8D88]">Usado</p>
+                <p className="mt-1 font-heading text-lg font-semibold tracking-[-0.03em] text-[#171A17]">
+                  ${totalUsed.toLocaleString('es-MX')}
+                </p>
+              </div>
+              <div className="rounded-[18px] border border-[#E5E2DA] bg-[#FAFAF7] px-3 py-3">
+                <p className="text-[10px] uppercase tracking-[0.14em] text-[#8A8D88]">Límite</p>
+                <p className="mt-1 font-heading text-lg font-semibold tracking-[-0.03em] text-[#171A17]">
+                  ${totalLimit.toLocaleString('es-MX')}
+                </p>
+              </div>
+              <div className="rounded-[18px] border border-[#DDE8DF] bg-[#F4FAF5] px-3 py-3">
+                <p className="text-[10px] uppercase tracking-[0.14em] text-[#6F8173]">Libre</p>
+                <p className="mt-1 font-heading text-lg font-semibold tracking-[-0.03em] text-[#2A4D3B]">
+                  ${Math.max(totalLimit - totalUsed, 0).toLocaleString('es-MX')}
+                </p>
+              </div>
             </div>
-            <p className="text-[#737573] mt-2">
-              <span className="metric-value text-[#1A1C1A]">${totalUsed.toLocaleString('es-MX')}</span>
-              {' '}de{' '}
-              <span className="metric-value">${totalLimit.toLocaleString('es-MX')}</span>
-              {' '}utilizados
-            </p>
-            
+
             {/* Alerta si no hay crédito disponible */}
             {totalUtilization >= 100 && (
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mt-4 p-4 rounded-xl bg-[#9C382A]/10 border border-[#9C382A]/20 flex items-center gap-3"
+                className="mt-4 rounded-[22px] border border-[#9C382A]/20 bg-[#9C382A]/10 p-4 flex items-center gap-3"
               >
                 <div className="w-10 h-10 rounded-full bg-[#9C382A]/20 flex items-center justify-center flex-shrink-0">
                   <Warning weight="fill" className="w-5 h-5 text-[#9C382A]" />
@@ -713,34 +747,57 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
             )}
           </div>
 
-          <div className="w-full lg:w-72">
-            <div className="progress-bar h-4 rounded-full overflow-hidden relative">
-              <div
-                className="absolute inset-0 rounded-full transition-all duration-500"
-                style={getUtilizationBarStyle(totalUtilization)}
-              />
-              {/* Marcadores de 10%, 20% y 30% */}
-              <div className="absolute top-0 left-[10%] w-0.5 h-full bg-[#2A4D3B]/40" />
-              <div className="absolute top-0 left-[20%] w-0.5 h-full bg-[#D48B3F]/40" />
-              <div className="absolute top-0 left-[30%] w-0.5 h-full bg-[#9C382A]/40" />
-            </div>
-            <div className="flex justify-between mt-2 text-xs text-[#737573] font-medium">
-              <span>0%</span>
-              <div className="flex items-center gap-3">
-                <span className="flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-[#2A4D3B]"></span>
-                  10%
-                </span>
-                <span className="flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-[#D48B3F]"></span>
-                  20%
-                </span>
-                <span className="flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-[#9C382A]"></span>
-                  30%
-                </span>
+          <div className="relative overflow-hidden rounded-[28px] border border-white/80 bg-white/70 p-5 sm:p-6 shadow-[0_18px_45px_rgba(17,24,39,0.055)] backdrop-blur-xl">
+            <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-white to-transparent" />
+            <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.16em] text-[#8A8D88] font-semibold">Mapa de utilización</p>
+                <p className="mt-1 text-sm text-[#737573]">
+                  ${totalUsed.toLocaleString('es-MX')} de ${totalLimit.toLocaleString('es-MX')} utilizados
+                </p>
               </div>
-              <span>100%</span>
+              <div className="flex items-center gap-2 rounded-full border border-[#E5E2DA] bg-[#FAFAF7] px-3 py-2 text-xs font-semibold text-[#5F625F]">
+                <span className="h-2 w-2 rounded-full" style={{ backgroundColor: getUtilizationStatus(totalUsed, totalLimit).color }} />
+                {getUtilizationStatus(totalUsed, totalLimit).label}
+              </div>
+            </div>
+
+            <div className="rounded-[24px] border border-[#E5E2DA] bg-gradient-to-br from-[#FFFFFF] to-[#F8F7F3] p-4 sm:p-5">
+              <div className="relative pt-5 pb-9">
+                <div className="relative h-6 overflow-hidden rounded-full border border-black/5 bg-[#E8E7E1] shadow-inner">
+                  <div className="absolute inset-y-0 left-0 rounded-full transition-all duration-500 shadow-[0_8px_20px_rgba(42,77,59,0.18)]" style={getUtilizationBarStyle(totalUtilization)} />
+                  <div className="absolute inset-y-0 left-[10%] z-[2] w-px bg-[#2A4D3B]/55" />
+                  <div className="absolute inset-y-0 left-[20%] z-[2] w-px bg-[#D48B3F]/60" />
+                  <div className="absolute inset-y-0 left-[30%] z-[2] w-px bg-[#9C382A]/60" />
+                </div>
+
+                <div
+                  className="absolute top-0 z-[3] -translate-x-1/2 rounded-full border border-white bg-[#151714] px-2.5 py-1 text-[11px] font-semibold text-white shadow-[0_10px_22px_rgba(17,24,39,0.18)]"
+                  style={{ left: `${Math.min(Math.max(totalUtilization, 3), 97)}%` }}
+                >
+                  {totalUtilization.toFixed(1)}%
+                </div>
+
+                <div className="absolute bottom-0 left-0 right-0 flex justify-between text-xs font-medium text-[#7A7D78]">
+                  <span>0%</span>
+                  <span>100%</span>
+                </div>
+              </div>
+
+              <div className="mt-2 grid grid-cols-3 gap-2">
+                <div className="rounded-2xl border border-[#2A4D3B]/12 bg-[#2A4D3B]/6 px-3 py-2 text-center">
+                  <div className="mx-auto mb-1 h-2 w-2 rounded-full bg-[#2A4D3B]" />
+                  <p className="text-[11px] font-semibold text-[#2A4D3B]">10%</p>
+                </div>
+                <div className="rounded-2xl border border-[#D48B3F]/18 bg-[#D48B3F]/8 px-3 py-2 text-center">
+                  <div className="mx-auto mb-1 h-2 w-2 rounded-full bg-[#D48B3F]" />
+                  <p className="text-[11px] font-semibold text-[#8B5A24]">20%</p>
+                </div>
+                <div className="rounded-2xl border border-[#9C382A]/18 bg-[#9C382A]/8 px-3 py-2 text-center">
+                  <div className="mx-auto mb-1 h-2 w-2 rounded-full bg-[#9C382A]" />
+                  <p className="text-[11px] font-semibold text-[#9C382A]">30%</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
