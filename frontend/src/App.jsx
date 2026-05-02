@@ -895,6 +895,7 @@ function App() {
             >
               <ExpensesList
                 expenses={data.expenses}
+                cards={data.cards}
                 onEdit={handleOpenExpenseModal}
                 onDelete={deleteExpense}
               />

@@ -39,7 +39,7 @@ const CATEGORY_ICONS = {
 
 const formatCurrency = (value) => Number(value || 0).toLocaleString('es-MX', { minimumFractionDigits: 2 });
 
-export default function ExpensesList({ expenses, onEdit, onDelete }) {
+export default function ExpensesList({ expenses, cards = [], onEdit, onDelete }) {
   const [filter, setFilter] = useState('all');
   const [methodFilter, setMethodFilter] = useState('all');
   const [sortBy, setSortBy] = useState('recent');
@@ -68,6 +68,15 @@ export default function ExpensesList({ expenses, onEdit, onDelete }) {
   const cardExpenses = filteredExpenses.filter((expense) => expense.method !== 'Cash').length;
   const cashExpenses = filteredExpenses.filter((expense) => expense.method === 'Cash').length;
   const methodLabel = (method) => method === 'Cash' ? 'Pagado en efectivo' : 'Pagado con tarjeta';
+
+  const getCardLabel = (expense) => {
+    if (expense.method === 'Cash') return 'Efectivo';
+    const card = cards.find((item) => item.id === expense.cardId);
+    if (!card) return 'Tarjeta';
+    const cardName = card.name || 'Tarjeta';
+    const lastFour = card.lastFour ? ` • ${card.lastFour}` : '';
+    return `${cardName}${lastFour}`;
+  };
 
   return (
     <motion.div
@@ -236,7 +245,7 @@ export default function ExpensesList({ expenses, onEdit, onDelete }) {
                           </span>
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-[#F7F6F3] text-[#5F625F] border border-[#E6E6E3]">
                             {expense.method === 'Cash' ? <Wallet weight="duotone" className="w-3.5 h-3.5" /> : <CreditCard weight="duotone" className="w-3.5 h-3.5" />}
-                            {expense.method === 'Cash' ? 'Efectivo' : 'Tarjeta'}
+                            {getCardLabel(expense)}
                           </span>
                           <span className="inline-flex px-2.5 py-1 rounded-full text-xs font-medium text-[#737573] bg-white border border-[#ECE9E2]">
                             {new Date(expense.date).toLocaleDateString('es', { day: 'numeric', month: 'short' })}
