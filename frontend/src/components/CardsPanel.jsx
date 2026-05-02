@@ -685,13 +685,14 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
               onClick={() => setShowForm(true)}
               className="group relative flex min-h-[76px] w-full sm:min-w-[226px] items-center justify-center gap-3 overflow-hidden rounded-[26px] border border-[#D9B06F]/35 bg-[#173123] px-8 py-4 font-semibold text-white shadow-[0_24px_56px_rgba(23,49,35,0.34),0_8px_18px_rgba(217,176,111,0.10),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-18px_34px_rgba(0,0,0,0.22)] ring-1 ring-white/40 backdrop-blur transition-colors duration-200 hover:border-[#E7C98F]/60 hover:bg-[#1F422F] hover:shadow-[0_28px_68px_rgba(23,49,35,0.42),0_10px_24px_rgba(217,176,111,0.16),inset_0_1px_0_rgba(255,255,255,0.26),inset_0_-16px_30px_rgba(0,0,0,0.20)] active:bg-[#173123] active:shadow-[0_16px_40px_rgba(23,49,35,0.32),inset_0_2px_12px_rgba(0,0,0,0.24)]"
               data-testid="add-card-btn"
+              style={{ color: '#FFFFFF' }}
             >
               <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_0%,rgba(255,255,255,0.30),transparent_34%),radial-gradient(circle_at_84%_110%,rgba(217,176,111,0.22),transparent_36%),linear-gradient(135deg,rgba(255,255,255,0.13),transparent_44%)]" />
               <span className="pointer-events-none absolute inset-x-5 top-0 h-px bg-gradient-to-r from-transparent via-[#F4E3BD]/80 to-transparent" />
               <span className="relative flex h-10 w-10 items-center justify-center rounded-full border border-[#F4E3BD]/35 bg-white/95 text-[#1F422F] shadow-[0_12px_26px_rgba(0,0,0,0.20),inset_0_1px_0_rgba(255,255,255,0.95)]">
                 <Plus weight="bold" className="h-4 w-4" />
               </span>
-              <span className="relative text-[15px] font-bold tracking-[-0.01em] text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.35)]">Nueva Tarjeta</span>
+              <span style={{ color: '#FFFFFF' }} className="relative text-[15px] font-semibold tracking-[-0.01em] drop-shadow-[0_1px_2px_rgba(0,0,0,0.55)]">Nueva Tarjeta</span>
             </button>
           </div>
         </div>
@@ -857,10 +858,11 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
               }}
               className="group relative shrink-0 inline-flex items-center justify-center gap-3 overflow-hidden rounded-[30px] border border-[#D9B06F]/35 bg-[#173123] px-5 py-3.5 font-semibold text-white shadow-[0_24px_56px_rgba(23,49,35,0.34),0_8px_18px_rgba(217,176,111,0.10),inset_0_1px_0_rgba(255,255,255,0.20),inset_0_-18px_34px_rgba(0,0,0,0.22)] ring-1 ring-white/40 backdrop-blur transition-colors duration-200 hover:border-[#E7C98F]/60 hover:bg-[#1F422F] hover:shadow-[0_28px_68px_rgba(23,49,35,0.42),0_10px_24px_rgba(217,176,111,0.16),inset_0_1px_0_rgba(255,255,255,0.26),inset_0_-16px_30px_rgba(0,0,0,0.20)] active:bg-[#173123] active:shadow-[0_16px_40px_rgba(23,49,35,0.32),inset_0_2px_12px_rgba(0,0,0,0.24)]"
               data-testid="toggle-card-recommendations"
+              style={{ color: '#FFFFFF' }}
             >
               <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_0%,rgba(255,255,255,0.30),transparent_34%),radial-gradient(circle_at_84%_110%,rgba(217,176,111,0.22),transparent_36%),linear-gradient(135deg,rgba(255,255,255,0.13),transparent_44%)]" />
               <span className="pointer-events-none absolute inset-x-5 top-0 h-px bg-gradient-to-r from-transparent via-[#F4E3BD]/80 to-transparent" />
-              <span className="relative text-[15px] font-bold tracking-[-0.01em] text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.35)]">Ver detalles</span>
+              <span style={{ color: '#FFFFFF' }} className="relative text-[15px] font-semibold tracking-[-0.01em] drop-shadow-[0_1px_2px_rgba(0,0,0,0.55)]">Ver detalles</span>
               <span className="relative flex h-10 w-10 items-center justify-center rounded-full border border-[#F4E3BD]/35 bg-white/95 text-[#1F422F] shadow-[0_12px_26px_rgba(0,0,0,0.20),inset_0_1px_0_rgba(255,255,255,0.95)]">
                 <CaretRight className="h-4 w-4" />
               </span>
