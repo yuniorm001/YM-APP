@@ -531,11 +531,10 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
 
                 {/* Logout */}
                 <motion.button
-                  initial={{ opacity: 0, scale: 0.96 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.96 }}
-                  transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
-                  whileTap={{ scale: 0.97 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
                   onClick={() => {
                     onLogout();
                     setIsFabOpen(false);
@@ -545,7 +544,7 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
                 >
                   <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.72),transparent_48%)]" />
                   <span className="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-[15px] border border-[#EDC3C3] bg-white/94 shadow-[inset_0_1px_0_rgba(255,255,255,0.92)] transition-all duration-300 group-hover:border-[#D87D7D] group-hover:bg-white">
-                    <DoorOpen weight="fill" className="h-[18px] w-[18px] text-[#B23A3A] transition-all duration-300 group-hover:scale-[1.06]" />
+                    <DoorOpen weight="fill" className="h-[18px] w-[18px] text-[#B23A3A]" />
                   </span>
                   <div className="relative z-10 flex flex-col items-start text-left flex-1 min-w-0">
                     <span className="text-[9px] font-semibold uppercase tracking-[0.16em] text-[#A47777]">Sesión</span>
