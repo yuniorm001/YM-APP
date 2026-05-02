@@ -20,12 +20,27 @@ import {
 } from '@phosphor-icons/react';
 
 const CARD_TYPES = [
-  { id: 'visa', name: 'Visa', gradient: 'credit-card-black' },
-  { id: 'mastercard', name: 'Mastercard', gradient: 'credit-card-green' },
-  { id: 'amex', name: 'American Express', gradient: 'credit-card-gold' },
-  { id: 'discover', name: 'Discover', gradient: 'credit-card-sand' },
-  { id: 'capital', name: 'Capital One', gradient: 'credit-card-black' },
-  { id: 'other', name: 'Otro', gradient: 'credit-card-sand' }
+  { id: 'chase', name: 'Chase', mark: 'CH', gradient: 'linear-gradient(135deg, #0B2E69 0%, #0A5DB8 46%, #071D3F 100%)', accent: '#2B76D2', textTone: 'light' },
+  { id: 'capital_one', name: 'Capital One', mark: 'CO', gradient: 'linear-gradient(135deg, #14233B 0%, #C8202F 52%, #0A1B33 100%)', accent: '#C8202F', textTone: 'light' },
+  { id: 'bank_of_america', name: 'Bank of America', mark: 'BA', gradient: 'linear-gradient(135deg, #123C7C 0%, #D71920 58%, #071E44 100%)', accent: '#D71920', textTone: 'light' },
+  { id: 'wells_fargo', name: 'Wells Fargo', mark: 'WF', gradient: 'linear-gradient(135deg, #7A1E18 0%, #B31B1B 58%, #D6A13B 100%)', accent: '#B31B1B', textTone: 'light' },
+  { id: 'citi', name: 'Citi', mark: 'CI', gradient: 'linear-gradient(135deg, #003B70 0%, #0A6FB5 48%, #C81E2B 100%)', accent: '#C81E2B', textTone: 'light' },
+  { id: 'american_express', name: 'American Express', mark: 'AX', gradient: 'linear-gradient(135deg, #123D63 0%, #2E77A6 50%, #0D2B45 100%)', accent: '#2E77A6', textTone: 'light' },
+  { id: 'discover', name: 'Discover', mark: 'DS', gradient: 'linear-gradient(135deg, #F5EFE4 0%, #E8942E 52%, #B85B1A 100%)', accent: '#E87722', textTone: 'dark' },
+  { id: 'us_bank', name: 'U.S. Bank', mark: 'US', gradient: 'linear-gradient(135deg, #0E2F5A 0%, #1E5AA8 46%, #B4202A 100%)', accent: '#B4202A', textTone: 'light' },
+  { id: 'td_bank', name: 'TD Bank', mark: 'TD', gradient: 'linear-gradient(135deg, #083B2A 0%, #148442 56%, #06251C 100%)', accent: '#148442', textTone: 'light' },
+  { id: 'pnc', name: 'PNC Bank', mark: 'PN', gradient: 'linear-gradient(135deg, #102A43 0%, #F28C28 58%, #182C3A 100%)', accent: '#F28C28', textTone: 'light' },
+  { id: 'navy_federal', name: 'Navy Federal', mark: 'NF', gradient: 'linear-gradient(135deg, #0B2F4F 0%, #1C4F74 50%, #D3B067 100%)', accent: '#D3B067', textTone: 'light' },
+  { id: 'synchrony', name: 'Synchrony', mark: 'SY', gradient: 'linear-gradient(135deg, #4B2E83 0%, #7154B8 52%, #20153B 100%)', accent: '#7154B8', textTone: 'light' },
+  { id: 'barclays', name: 'Barclays', mark: 'BC', gradient: 'linear-gradient(135deg, #003D7C 0%, #00AEEF 54%, #052647 100%)', accent: '#00AEEF', textTone: 'light' },
+  { id: 'apple_card', name: 'Apple Card / Goldman Sachs', mark: 'AC', gradient: 'linear-gradient(135deg, #F8F7F3 0%, #E6E2DA 52%, #CFC9BF 100%)', accent: '#8F8A82', textTone: 'dark' },
+  { id: 'credit_one', name: 'Credit One Bank', mark: 'C1', gradient: 'linear-gradient(135deg, #132A45 0%, #1D6AA5 50%, #0A1E32 100%)', accent: '#1D6AA5', textTone: 'light' },
+  { id: 'comenity', name: 'Comenity / Bread Financial', mark: 'BR', gradient: 'linear-gradient(135deg, #321B4A 0%, #6E3AA7 50%, #F2B84B 100%)', accent: '#6E3AA7', textTone: 'light' },
+  { id: 'visa', name: 'Visa', mark: 'VI', gradient: 'linear-gradient(135deg, #172033 0%, #263B69 52%, #0B1220 100%)', accent: '#263B69', textTone: 'light' },
+  { id: 'mastercard', name: 'Mastercard', mark: 'MC', gradient: 'linear-gradient(135deg, #251515 0%, #C84E30 50%, #D9902F 100%)', accent: '#C84E30', textTone: 'light' },
+  { id: 'amex', name: 'American Express', mark: 'AX', gradient: 'linear-gradient(135deg, #123D63 0%, #2E77A6 50%, #0D2B45 100%)', accent: '#2E77A6', textTone: 'light' },
+  { id: 'capital', name: 'Capital One', mark: 'CO', gradient: 'linear-gradient(135deg, #14233B 0%, #C8202F 52%, #0A1B33 100%)', accent: '#C8202F', textTone: 'light' },
+  { id: 'other', name: 'Otro banco / emisor', mark: 'OT', gradient: 'linear-gradient(135deg, #171917 0%, #2A4D3B 54%, #111411 100%)', accent: '#2A4D3B', textTone: 'light' }
 ];
 
 const PAYMENT_GOAL_OPTIONS = [
@@ -66,7 +81,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
   const [editingCard, setEditingCard] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
-    type: 'visa',
+    type: 'chase',
     number: '',
     limit: '',
     used: '',
@@ -90,6 +105,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
   const totalLimit = cards.reduce((sum, c) => sum + c.limit, 0);
   const totalUsed = cards.reduce((sum, c) => sum + c.used, 0);
   const totalUtilization = totalLimit > 0 ? (totalUsed / totalLimit) * 100 : 0;
+  const selectedIssuer = CARD_TYPES.find(t => t.id === formData.type) || CARD_TYPES[0];
 
 
   // Validación reactiva: mantiene el error sincronizado con lo que el usuario corrige.
@@ -108,7 +124,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
     }
 
     if (duplicateCard) {
-      setError('Ya existe una tarjeta con ese mismo tipo y los mismos últimos 4 dígitos');
+      setError('Ya existe una tarjeta con ese mismo banco/emisor y los mismos últimos 4 dígitos');
       return;
     }
 
@@ -124,7 +140,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
 
     if (
       error === 'El uso no puede exceder el límite de la tarjeta' ||
-      error === 'Ya existe una tarjeta con ese mismo tipo y los mismos últimos 4 dígitos'
+      error === 'Ya existe una tarjeta con ese mismo banco/emisor y los mismos últimos 4 dígitos'
     ) {
       setError('');
     }
@@ -179,7 +195,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
     const duplicatedCard = getDuplicateCard(cards, formData, editingCard);
 
     if (duplicatedCard) {
-      setError('Ya existe una tarjeta con ese mismo tipo y los mismos últimos 4 dígitos');
+      setError('Ya existe una tarjeta con ese mismo banco/emisor y los mismos últimos 4 dígitos');
       return;
     }
     
@@ -200,7 +216,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
   };
 
   const resetForm = () => {
-    setFormData({ name: '', type: 'visa', number: '', limit: '', used: '', paymentDate: '', paymentGoal: '0' });
+    setFormData({ name: '', type: 'chase', number: '', limit: '', used: '', paymentDate: '', paymentGoal: '0' });
     setEditingCard(null);
     setShowForm(false);
     setError('');
@@ -927,7 +943,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
         <AnimatePresence mode="popLayout">
           {cards.map((card, index) => {
             const utilization = card.limit > 0 ? (card.used / card.limit) * 100 : 0;
-            const cardType = CARD_TYPES.find(t => t.id === card.type) || CARD_TYPES[5];
+            const cardType = CARD_TYPES.find(t => t.id === card.type) || CARD_TYPES[CARD_TYPES.length - 1];
             const status = getUtilizationStatus(card.used, card.limit);
             const available = getCardAvailable(card);
             const daysLeft = getDaysUntilPayment(card.paymentDate);
@@ -999,7 +1015,8 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                 <motion.div
                   animate={{ scale: isAlertPreview ? 1.01 : 1, y: isAlertPreview ? -2 : 0 }}
                   transition={{ duration: 0.22, ease: 'easeOut' }}
-                  className={`${cardType.gradient} rounded-[28px] px-5 sm:px-6 py-4 sm:py-[18px] min-h-[250px] sm:min-h-[260px] pb-7 sm:pb-8 relative overflow-hidden shadow-[0_22px_45px_rgba(17,24,39,0.10)] hover:shadow-[0_28px_60px_rgba(17,24,39,0.14)] transition-all duration-300 border border-white/10 ${status.isFull ? 'opacity-70' : ''}`}
+                  className={`rounded-[28px] px-5 sm:px-6 py-4 sm:py-[18px] min-h-[250px] sm:min-h-[260px] pb-7 sm:pb-8 relative overflow-hidden shadow-[0_22px_45px_rgba(17,24,39,0.10)] hover:shadow-[0_28px_60px_rgba(17,24,39,0.14)] transition-all duration-300 border border-white/10 ${status.isFull ? 'opacity-70' : ''}`}
+                  style={{ background: cardType.gradient }}
                 >
                   <div className="absolute inset-0 opacity-10 pointer-events-none">
                     <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full border border-white/30" />
@@ -1095,19 +1112,21 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                       >
                         <div className="flex items-start justify-between gap-4">
                           <div>
-                            <p className={`text-xs font-semibold uppercase tracking-wider ${cardType.gradient.includes('sand') ? 'text-[#737573]' : 'text-white/70'}`}>
+                            <p className={`text-xs font-semibold uppercase tracking-wider ${cardType.textTone === 'dark' ? 'text-[#737573]' : 'text-white/70'}`}>
                               {cardType.name}
                             </p>
-                            <p className={`font-semibold text-lg mt-1.5 ${cardType.gradient.includes('sand') ? 'text-[#1A1C1A]' : 'text-white'}`}>
+                            <p className={`font-semibold text-lg mt-1.5 ${cardType.textTone === 'dark' ? 'text-[#1A1C1A]' : 'text-white'}`}>
                               {card.name}
                             </p>
                           </div>
-                          <CreditCardIcon weight="fill" className={`w-7 h-7 ${cardType.gradient.includes('sand') ? 'text-[#737573]' : 'text-white/80'}`} />
+                          <div className={`flex h-10 w-10 items-center justify-center rounded-2xl border text-[11px] font-extrabold tracking-[0.08em] shadow-[0_10px_22px_rgba(0,0,0,0.12)] ${cardType.textTone === 'dark' ? 'border-black/10 bg-white/55 text-[#1A1C1A]' : 'border-white/15 bg-white/12 text-white'}`}>
+                            {cardType.mark}
+                          </div>
                         </div>
 
                         <div className="flex items-end justify-between gap-3 mt-6">
                           <div>
-                            <p className={`font-mono text-lg sm:text-[21px] tracking-[0.24em] ${cardType.gradient.includes('sand') ? 'text-[#1A1C1A]' : 'text-white'}`}>
+                            <p className={`font-mono text-lg sm:text-[21px] tracking-[0.24em] ${cardType.textTone === 'dark' ? 'text-[#1A1C1A]' : 'text-white'}`}>
                               •••• •••• •••• {card.number.slice(-4) || '0000'}
                             </p>
                           </div>
@@ -1938,7 +1957,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                         </div>
 
                         <div>
-                          <label className="text-sm font-semibold text-[#1A1C1A] block mb-2">Tipo de tarjeta</label>
+                          <label className="text-sm font-semibold text-[#1A1C1A] block mb-2">Banco / emisor</label>
                           <select
                             value={formData.type}
                             onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value }))}
@@ -1949,6 +1968,20 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                               <option key={type.id} value={type.id}>{type.name}</option>
                             ))}
                           </select>
+                          <div
+                            className="mt-3 overflow-hidden rounded-[24px] border border-white/70 p-4 shadow-[0_14px_32px_rgba(17,24,39,0.08)]"
+                            style={{ background: selectedIssuer.gradient }}
+                          >
+                            <div className="flex items-center justify-between gap-3">
+                              <div>
+                                <p className={`text-[10px] font-bold uppercase tracking-[0.18em] ${selectedIssuer.textTone === 'dark' ? 'text-[#5F615F]' : 'text-white/70'}`}>Vista previa</p>
+                                <p className={`mt-1 text-lg font-bold ${selectedIssuer.textTone === 'dark' ? 'text-[#1A1C1A]' : 'text-white'}`}>{selectedIssuer.name}</p>
+                              </div>
+                              <div className={`flex h-11 w-11 items-center justify-center rounded-2xl border text-xs font-extrabold tracking-[0.08em] ${selectedIssuer.textTone === 'dark' ? 'border-black/10 bg-white/60 text-[#1A1C1A]' : 'border-white/15 bg-white/15 text-white'}`}>
+                                {selectedIssuer.mark}
+                              </div>
+                            </div>
+                          </div>
                         </div>
 
                         <div>
