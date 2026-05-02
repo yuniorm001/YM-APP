@@ -4979,3 +4979,20 @@ textarea.premium-input:focus {
     height: 52px;
   }
 }
+
+/* Ajuste fino: borde lateral de cada correo alineado al radio del bloque. */
+.admin-user-row::before {
+  inset: 1.05rem auto 1.05rem 0 !important;
+  width: 4px !important;
+  border-radius: 0 999px 999px 0 !important;
+  background: linear-gradient(180deg, #2A4D3B 0%, rgba(212,139,63,.72) 100%) !important;
+  opacity: .9 !important;
+}
+
+@media (max-width: 768px) {
+  .admin-user-row::before {
+    inset: 1rem auto 1rem 0 !important;
+    width: 4px !important;
+    border-radius: 0 999px 999px 0 !important;
+  }
+}
