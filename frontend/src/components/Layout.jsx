@@ -10,7 +10,7 @@ import {
   CurrencyDollar,
   CaretRight,
   Sparkle,
-  Lightbulb,
+  Info,
   DoorOpen,
 } from '@phosphor-icons/react';
 
@@ -296,7 +296,7 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
                 <div className="relative z-10">
                   <div className="flex items-center gap-2">
                     <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/10 border border-white/15 backdrop-blur">
-                      <Lightbulb weight="duotone" className="h-3.5 w-3.5 text-[#F0C99A]" />
+                      <Info weight="duotone" className="h-3.5 w-3.5 text-[#F0C99A]" />
                     </span>
                     <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#F0C99A]">Consejo Inteligente</span>
                   </div>
