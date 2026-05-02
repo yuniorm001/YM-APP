@@ -287,14 +287,13 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
 
   const getUtilizationBarStyle = (utilization) => {
     const fillWidth = Math.min(Math.max(Number(utilization) || 0, 0), 100);
+    const pctEntero = Math.floor(fillWidth);
+    const fillColor = pctEntero <= 19 ? '#2A4D3B' : pctEntero <= 29 ? '#D48B3F' : '#9C382A';
 
     return {
       width: `${fillWidth}%`,
       right: 'auto',
-      background: 'linear-gradient(to right, #2A4D3B 0%, #2A4D3B 20%, #D48B3F 20%, #D48B3F 30%, #9C382A 30%, #9C382A 100%)',
-      backgroundSize: fillWidth > 0 ? `${10000 / fillWidth}% 100%` : '100% 100%',
-      backgroundPosition: 'left center',
-      backgroundRepeat: 'no-repeat'
+      backgroundColor: fillColor
     };
   };
 
