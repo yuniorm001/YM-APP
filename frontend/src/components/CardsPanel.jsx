@@ -747,18 +747,22 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
       </div>
 
       {/* Smart Card Recommendation */}
-      <div className="premium-card p-5 bg-gradient-to-br from-white via-[#FCFBF8] to-[#F5F0E8]" data-testid="card-usage-recommendations">
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div className="relative overflow-hidden rounded-[32px] border border-[#D8DDD5] bg-[#FAFAF7] p-4 sm:p-5 shadow-[0_24px_70px_rgba(32,39,34,0.10)]" data-testid="card-usage-recommendations">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(42,77,59,0.13),transparent_28%),radial-gradient(circle_at_82%_8%,rgba(212,139,63,0.18),transparent_24%),linear-gradient(135deg,rgba(255,255,255,0.95),rgba(246,242,234,0.62))]" />
+        <div className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full border border-white/70 bg-white/35 blur-2xl" />
+        <div className="pointer-events-none absolute left-8 top-0 h-px w-[55%] bg-gradient-to-r from-transparent via-white to-transparent" />
+
+        <div className="relative flex flex-col gap-4">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div className="min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                <Clock weight="fill" className="w-4 h-4 text-[#2A4D3B]" />
-                <p className="label-uppercase">Guía inteligente de uso</p>
+              <div className="inline-flex items-center gap-2 rounded-full border border-[#DDE7DE] bg-white/80 px-3 py-1.5 shadow-sm backdrop-blur">
+                <Clock weight="fill" className="h-4 w-4 text-[#2A4D3B]" />
+                <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#6E756D]">Guía inteligente de uso</p>
               </div>
-              <h2 className="font-heading text-xl sm:text-2xl font-semibold text-[#1A1C1A] tracking-tight">
+              <h2 className="mt-3 font-heading text-2xl font-semibold tracking-tight text-[#151714] sm:text-[28px]">
                 Decisión inteligente de uso
               </h2>
-              <p className="text-sm text-[#737573] mt-1">
+              <p className="mt-2 max-w-3xl text-sm leading-relaxed text-[#737573]">
                 Identifica qué tarjeta conviene usar hoy según fecha de pago, utilización y cupo disponible.
               </p>
             </div>
@@ -768,44 +772,69 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                 setRecommendationIndex(0);
                 setShowRecommendationDetails(true);
               }}
-              className="btn-app-secondary shrink-0 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl border border-[#E6DED2] bg-white text-[#1A1C1A] font-semibold shadow-sm hover:bg-[#F8F4ED] transition-all"
+              className="group shrink-0 inline-flex items-center justify-center gap-3 rounded-[22px] border border-[#DDD6CA] bg-white/90 px-5 py-3.5 font-semibold text-[#1A1C1A] shadow-[0_12px_30px_rgba(28,31,27,0.10)] backdrop-blur transition-all hover:-translate-y-0.5 hover:border-[#CDBFAF] hover:bg-[#FFFDF8] hover:shadow-[0_16px_38px_rgba(28,31,27,0.14)] active:translate-y-0"
               data-testid="toggle-card-recommendations"
             >
               <span>Ver detalles</span>
-              <CaretRight className="w-4 h-4 transition-transform" />
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#F3EFE7] transition-all group-hover:bg-[#2A4D3B] group-hover:text-white">
+                <CaretRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              </span>
             </button>
           </div>
 
           {bestCardToUse ? (
-            <div className="rounded-[24px] border border-[#D7E6DC] bg-gradient-to-r from-[#F7FBF8] via-white to-[#FCFBF8] p-4 sm:p-5 shadow-[0_10px_24px_rgba(42,77,59,0.08)]">
-              <div className="flex flex-col lg:flex-row lg:items-center gap-4">
-                <div className="flex items-start gap-3 flex-1 min-w-0">
-                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#2A4D3B] to-[#1E3A2B] flex items-center justify-center shadow-lg shadow-[#2A4D3B]/20 shrink-0">
-                    <CheckCircle weight="fill" className="w-5 h-5 text-white" />
+            <div className="relative overflow-hidden rounded-[28px] border border-[#D8E8DE] bg-white/88 shadow-[0_18px_44px_rgba(42,77,59,0.12)] backdrop-blur">
+              <div className="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b from-[#2A4D3B] via-[#5F8A70] to-[#D9B06F]" />
+              <div className="pointer-events-none absolute right-0 top-0 h-full w-1/2 bg-gradient-to-l from-[#F7F2E8] via-white/60 to-transparent" />
+
+              <div className="relative grid gap-4 p-4 sm:p-5 lg:grid-cols-[minmax(0,1fr)_minmax(360px,0.85fr)] lg:items-center">
+                <div className="flex items-start gap-4 min-w-0">
+                  <div className="relative shrink-0">
+                    <div className="absolute inset-0 rounded-[24px] bg-[#2A4D3B]/25 blur-xl" />
+                    <div className="relative flex h-16 w-16 items-center justify-center rounded-[24px] bg-gradient-to-br from-[#2A4D3B] to-[#173324] text-white shadow-[0_18px_30px_rgba(42,77,59,0.24)]">
+                      <CheckCircle weight="fill" className="h-7 w-7" />
+                    </div>
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#2A4D3B]">Opción más saludable hoy</p>
-                    <h3 className="font-semibold text-lg text-[#1A1C1A] mt-1 truncate">{bestCardToUse.name}</h3>
-                    <p className="text-sm text-[#5E605D] mt-1">{bestCardToUse.summary}</p>
+
+                  <div className="min-w-0 pt-1">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#2A4D3B]">Opción más saludable hoy</p>
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      <h3 className="font-heading text-2xl font-semibold leading-tight text-[#171A17] truncate">{bestCardToUse.name}</h3>
+                      <span className="rounded-full border border-[#DDE7DE] bg-[#F4FAF6] px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-[#2A4D3B]">
+                        Recomendada
+                      </span>
+                    </div>
+                    <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#5E605D]">{bestCardToUse.summary}</p>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2 sm:gap-3 lg:min-w-[360px]">
-                  <div className="rounded-2xl bg-white border border-[#E6E6E3] p-3">
-                    <p className="text-[10px] uppercase tracking-[0.12em] text-[#737573]">Disponible</p>
-                    <p className="text-sm sm:text-base font-semibold text-[#1A1C1A] mt-1">${bestCardToUse.available.toLocaleString('es-MX')}</p>
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-3">
+                  <div className="group rounded-[22px] border border-[#E5E3DE] bg-white/92 p-4 shadow-[0_10px_22px_rgba(28,31,27,0.06)] transition-all hover:-translate-y-0.5 hover:border-[#D5DDD3] hover:shadow-[0_14px_30px_rgba(28,31,27,0.10)]">
+                    <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-2xl bg-[#F3F7F3] text-[#2A4D3B]">
+                      <Wallet weight="fill" className="h-4 w-4" />
+                    </div>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#8A8D88]">Disponible</p>
+                    <p className="mt-1 text-xl font-semibold text-[#171A17]">${bestCardToUse.available.toLocaleString('es-MX')}</p>
                   </div>
-                  <div className="rounded-2xl bg-white border border-[#E6E6E3] p-3">
-                    <p className="text-[10px] uppercase tracking-[0.12em] text-[#737573]">Pago</p>
-                    <p className="text-sm sm:text-base font-semibold text-[#1A1C1A] mt-1">
+
+                  <div className="group rounded-[22px] border border-[#E5E3DE] bg-white/92 p-4 shadow-[0_10px_22px_rgba(28,31,27,0.06)] transition-all hover:-translate-y-0.5 hover:border-[#D5DDD3] hover:shadow-[0_14px_30px_rgba(28,31,27,0.10)]">
+                    <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-2xl bg-[#F7F1E8] text-[#B97835]">
+                      <CalendarBlank weight="fill" className="h-4 w-4" />
+                    </div>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#8A8D88]">Pago</p>
+                    <p className="mt-1 text-xl font-semibold text-[#171A17]">
                       {bestCardToUse.nextPaymentDate
                         ? bestCardToUse.nextPaymentDate.toLocaleDateString('es', { day: 'numeric', month: 'short' })
                         : 'Sin fecha'}
                     </p>
                   </div>
-                  <div className="rounded-2xl bg-white border border-[#E6E6E3] p-3">
-                    <p className="text-[10px] uppercase tracking-[0.12em] text-[#737573]">Acción</p>
-                    <p className="text-sm sm:text-base font-semibold mt-1" style={{ color: bestCardToUse.color }}>
+
+                  <div className="group rounded-[22px] border border-[#E5E3DE] bg-white/92 p-4 shadow-[0_10px_22px_rgba(28,31,27,0.06)] transition-all hover:-translate-y-0.5 hover:border-[#D5DDD3] hover:shadow-[0_14px_30px_rgba(28,31,27,0.10)]">
+                    <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-2xl bg-[#F4F1FA] text-[#6D5B95]">
+                      <Sparkle weight="fill" className="h-4 w-4" />
+                    </div>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#8A8D88]">Acción</p>
+                    <p className="mt-1 text-base font-semibold leading-tight" style={{ color: bestCardToUse.color }}>
                       {bestCardToUse.action}
                     </p>
                   </div>
@@ -813,9 +842,17 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
               </div>
             </div>
           ) : (
-            <div className="rounded-[24px] border border-[#E6E6E3] bg-white p-4">
-              <p className="text-sm font-semibold text-[#1A1C1A]">Aún no hay una tarjeta recomendada</p>
-              <p className="text-sm text-[#737573] mt-1">Registra tarjetas con cupo disponible y fecha de pago para activar esta guía.</p>
+            <div className="relative overflow-hidden rounded-[28px] border border-[#E6E6E3] bg-white/90 p-5 shadow-[0_14px_34px_rgba(28,31,27,0.08)]">
+              <div className="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b from-[#C9B9A3] to-[#EEE6D9]" />
+              <div className="flex items-center gap-4 pl-2">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[22px] border border-[#E6DED2] bg-[#FAF7F1] text-[#8A7C68]">
+                  <CreditCardIcon weight="fill" className="h-6 w-6" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-[#1A1C1A]">Aún no hay una tarjeta recomendada</p>
+                  <p className="mt-1 text-sm text-[#737573]">Registra tarjetas con cupo disponible y fecha de pago para activar esta guía.</p>
+                </div>
+              </div>
             </div>
           )}
 
