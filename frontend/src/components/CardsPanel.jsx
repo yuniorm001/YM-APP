@@ -669,7 +669,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
       data-testid="cards-panel"
     >
       {/* Header */}
-      <div className="hero-surface p-5 sm:p-6 text-white">
+      <div className="hero-surface hero-surface-static p-5 sm:p-6 text-white">
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5">
           <div>
             <p className="text-[11px] uppercase tracking-[0.18em] text-white/65 font-semibold mb-2">Portafolio</p>
@@ -851,11 +851,11 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                 setRecommendationIndex(0);
                 setShowRecommendationDetails(true);
               }}
-              className="group shrink-0 inline-flex items-center justify-center gap-3 rounded-[22px] border border-[#DDD6CA] bg-white/90 px-5 py-3.5 font-semibold text-[#1A1C1A] shadow-[0_12px_30px_rgba(28,31,27,0.10)] backdrop-blur transition-all hover:-translate-y-0.5 hover:border-[#CDBFAF] hover:bg-[#FFFDF8] hover:shadow-[0_16px_38px_rgba(28,31,27,0.14)] active:translate-y-0"
+              className="group shrink-0 inline-flex items-center justify-center gap-3 rounded-[24px] border border-[#2A4D3B]/15 bg-gradient-to-br from-white via-[#FFFDF8] to-[#F4EFE5] px-5 py-3.5 font-semibold text-[#151714] shadow-[0_18px_42px_rgba(28,31,27,0.13),inset_0_1px_0_rgba(255,255,255,0.95)] ring-1 ring-white/80 backdrop-blur transition-all hover:-translate-y-0.5 hover:border-[#2A4D3B]/25 hover:shadow-[0_22px_52px_rgba(42,77,59,0.16),inset_0_1px_0_rgba(255,255,255,1)] active:translate-y-0"
               data-testid="toggle-card-recommendations"
             >
-              <span>Ver detalles</span>
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#F3EFE7] transition-all group-hover:bg-[#2A4D3B] group-hover:text-white">
+              <span className="tracking-[-0.01em]">Ver detalles</span>
+              <span className="flex h-8 w-8 items-center justify-center rounded-full border border-[#2A4D3B]/10 bg-[#2A4D3B] text-white shadow-[0_10px_22px_rgba(42,77,59,0.22)] transition-all group-hover:scale-105 group-hover:bg-[#1F3E2F]">
                 <CaretRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </span>
             </button>

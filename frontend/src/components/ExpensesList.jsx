@@ -76,7 +76,7 @@ export default function ExpensesList({ expenses, onEdit, onDelete }) {
       className="space-y-6"
       data-testid="expenses-list"
     >
-      <div className="hero-surface p-5 sm:p-6 text-white">
+      <div className="hero-surface hero-surface-static p-5 sm:p-6 text-white">
         <div className="relative z-10 flex flex-col xl:flex-row xl:items-end xl:justify-between gap-5">
           <div className="max-w-3xl">
             <p className="text-[11px] uppercase tracking-[0.18em] text-white/65 font-semibold mb-2">Resumen de efectivo</p>
