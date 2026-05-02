@@ -749,6 +749,12 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
       return;
     }
 
+    if (!newAllowedMembershipEnd) {
+      setAllowlistStatus('');
+      setAllowlistError('Selecciona una fecha de vencimiento antes de agregar el correo.');
+      return;
+    }
+
     const emailAlreadyExists = allowedEmails.some((item) => String(item?.email || '').trim().toLowerCase() === email);
     if (emailAlreadyExists) {
       setAllowlistStatus('');
@@ -779,17 +785,6 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
     }
   };
 
-  const handleMembershipQuickSet = (preset) => {
-    if (preset === 'none') {
-      setNewAllowedMembershipEnd('');
-      return;
-    }
-    const next = new Date();
-    if (preset === '1m') next.setMonth(next.getMonth() + 1);
-    if (preset === '6m') next.setMonth(next.getMonth() + 6);
-    if (preset === '1y') next.setFullYear(next.getFullYear() + 1);
-    setNewAllowedMembershipEnd(next.toISOString().split('T')[0]);
-  };
 
   const handleUpdateAllowedEmail = async (item, updates) => {
     if (!item?.email || !session?.token || item.read_only) return;
@@ -910,7 +905,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                 <div>
                   <p className="admin-section-label">Nuevo acceso</p>
                   <h4 className="mt-1 font-heading text-xl font-semibold tracking-[-0.025em] text-[#171B17]">Autorizar correo</h4>
-                  <p className="mt-1 text-sm text-[#70766F]">Configura permiso, rol y duración antes de agregarlo.</p>
+                  <p className="mt-1 text-sm text-[#70766F]">Configura permiso, rol y vencimiento antes de agregarlo.</p>
                 </div>
                 <div className="admin-small-icon">
                   <UserPlus weight="bold" className="h-5 w-5" />
@@ -958,20 +953,13 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
 
                 <div>
                   <label className="admin-field-label">Fecha de vencimiento</label>
-                  <input type="date" value={newAllowedMembershipEnd} onChange={(e) => setNewAllowedMembershipEnd(e.target.value)} className="admin-clean-input" />
-                  <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                    {[["1m","1 mes"],["6m","6 meses"],["1y","1 año"],["none","Sin fecha"]].map(([value,label]) => (
-                      <button key={value} type="button" onClick={() => handleMembershipQuickSet(value)} className="admin-quick-chip">
-                        {label}
-                      </button>
-                    ))}
-                  </div>
+                  <input type="date" value={newAllowedMembershipEnd} onChange={(e) => setNewAllowedMembershipEnd(e.target.value)} className="admin-clean-input" required />
                 </div>
 
                 <button
                   type="button"
                   onClick={handleAddAllowedEmail}
-                  disabled={!newAllowedEmail.trim() || !!allowlistBusyEmail}
+                  disabled={!newAllowedEmail.trim() || !newAllowedMembershipEnd || !!allowlistBusyEmail}
                   className="admin-primary-btn"
                 >
                   <UserPlus weight="bold" className="h-4 w-4" />
@@ -1559,7 +1547,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                               </div>
 
                               {!item.read_only ? (
-                                <div className="admin-row-controls">
+                                <div className="admin-row-controls admin-row-controls--modal">
                                   <div>
                                     <label className="admin-mini-label">Rol</label>
                                     <select defaultValue={item.role || 'client'} onChange={(e) => handleUpdateAllowedEmail(item, { role: e.target.value })} disabled={allowlistBusyEmail === item.email} className="admin-mini-input">
