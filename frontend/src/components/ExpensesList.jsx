@@ -72,20 +72,24 @@ export default function ExpensesList({ expenses, onEdit, onDelete }) {
       data-testid="expenses-list"
     >
       <div className="hero-surface p-5 sm:p-6 text-white">
-        <div className="relative z-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-          <div>
+        <div className="relative z-10 flex flex-col xl:flex-row xl:items-end xl:justify-between gap-5">
+          <div className="max-w-3xl">
             <p className="text-[11px] uppercase tracking-[0.18em] text-white/65 font-semibold mb-2">Control de efectivo</p>
             <h1 className="font-heading text-3xl sm:text-4xl font-semibold tracking-[-0.04em]">Mi Dinero</h1>
-            <p className="mt-2 text-sm text-white/70">Administra ingresos, gastos y efectivo disponible para decidir cuánto puedes pagar a tus tarjetas.</p>
+            <p className="mt-2 text-sm text-white/70 leading-relaxed">
+              Revisa tus gastos registrados, entiende de dónde salió el dinero y decide cuánto puedes pagar a tus tarjetas sin afectar tu efectivo.
+            </p>
           </div>
-          <div className="grid grid-cols-2 gap-3 sm:min-w-[260px]">
-            <div className="rounded-[20px] border border-white/10 bg-white/10 px-4 py-3 backdrop-blur-sm">
-              <p className="text-[11px] uppercase tracking-[0.14em] text-white/60 font-semibold">Registros</p>
+          <div className="grid grid-cols-2 gap-3 sm:min-w-[280px]">
+            <div className="rounded-[20px] border border-white/10 bg-white/10 px-4 py-3 backdrop-blur-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]">
+              <p className="text-[11px] uppercase tracking-[0.14em] text-white/60 font-semibold">Gastos</p>
               <p className="metric-value mt-2 text-2xl">{filteredExpenses.length}</p>
+              <p className="mt-1 text-[11px] text-white/50">registros visibles</p>
             </div>
-            <div className="rounded-[20px] border border-white/10 bg-white/10 px-4 py-3 backdrop-blur-sm">
-              <p className="text-[11px] uppercase tracking-[0.14em] text-white/60 font-semibold">Total</p>
+            <div className="rounded-[20px] border border-white/10 bg-white/10 px-4 py-3 backdrop-blur-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]">
+              <p className="text-[11px] uppercase tracking-[0.14em] text-white/60 font-semibold">Gastado</p>
               <p className="metric-value mt-2 text-2xl">${formatCurrency(totalFiltered)}</p>
+              <p className="mt-1 text-[11px] text-white/50">según filtros</p>
             </div>
           </div>
         </div>
@@ -106,7 +110,7 @@ export default function ExpensesList({ expenses, onEdit, onDelete }) {
 
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-2 px-4 py-3 rounded-xl border transition-colors ${
+            className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl border transition-colors ${
               showFilters || filter !== 'all'
                 ? 'bg-[#2A4D3B] text-white border-[#2A4D3B]'
                 : 'bg-white border-[#E6E6E3] text-[#737573] hover:border-[#2A4D3B]'
@@ -163,12 +167,13 @@ export default function ExpensesList({ expenses, onEdit, onDelete }) {
         </AnimatePresence>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-4">
         <AnimatePresence mode="popLayout">
           {filteredExpenses.length > 0 ? (
             filteredExpenses.map((expense, index) => {
               const historyCount = expense.editHistory?.length || 0;
               const lastEdit = historyCount > 0 ? expense.editHistory[historyCount - 1] : null;
+              const categoryColor = CATEGORY_COLORS[expense.category];
 
               return (
                 <motion.div
@@ -177,67 +182,106 @@ export default function ExpensesList({ expenses, onEdit, onDelete }) {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0, transition: { delay: index * 0.05 } }}
                   exit={{ opacity: 0, scale: 0.9 }}
-                  className="premium-card p-4 sm:p-5"
+                  className="premium-card p-4 sm:p-5 overflow-hidden"
                   data-testid={`expense-item-${expense.id}`}
                 >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: `${CATEGORY_COLORS[expense.category]}15` }}>
+                  <div className="grid grid-cols-[52px_1fr] lg:grid-cols-[56px_1fr_auto] gap-4 lg:gap-5 items-start">
+                    <div
+                      className="w-[52px] h-[52px] sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center flex-shrink-0 border shadow-[0_10px_24px_rgba(26,28,26,0.06)]"
+                      style={{ backgroundColor: `${categoryColor}12`, borderColor: `${categoryColor}22` }}
+                    >
                       <span className="text-2xl">{CATEGORY_ICONS[expense.category]}</span>
                     </div>
 
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 lg:block">
                         <div className="min-w-0">
-                          <h3 className="font-medium text-[#1A1C1A] truncate">{expense.name}</h3>
-                          <div className="flex items-center gap-2 mt-1 flex-wrap">
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium" style={{ backgroundColor: `${CATEGORY_COLORS[expense.category]}15`, color: CATEGORY_COLORS[expense.category] }}>
-                              {expense.category}
-                            </span>
-                            <span className="flex items-center gap-1 text-xs text-[#737573]">
-                              {expense.method === 'Cash' ? <Wallet weight="duotone" className="w-3 h-3" /> : <CreditCard weight="duotone" className="w-3 h-3" />}
-                              {expense.method}
-                            </span>
-                            {expense.isEdited && (
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-[#1A1C1A]/5 text-[#1A1C1A]">
-                                <ClockCounterClockwise weight="duotone" className="w-3 h-3" />
-                                Editado{historyCount > 1 ? ` ${historyCount}x` : ''}
-                              </span>
-                            )}
-                          </div>
+                          <p className="text-[11px] uppercase tracking-[0.16em] text-[#9CA39C] font-semibold mb-1">Movimiento registrado</p>
+                          <h3 className="font-heading text-xl sm:text-2xl font-semibold tracking-[-0.03em] text-[#1A1C1A] truncate">{expense.name}</h3>
                         </div>
-                        <div className="text-right flex-shrink-0">
-                          <p className="metric-value text-lg text-[#1A1C1A]">-${formatCurrency(expense.amount)}</p>
+
+                        <div className="lg:hidden rounded-2xl border border-[#E6E6E3] bg-[#FAF9F6] px-4 py-3 sm:text-right">
+                          <p className="text-[11px] uppercase tracking-[0.14em] text-[#9CA39C] font-semibold">Monto</p>
+                          <p className="metric-value text-xl text-[#1A1C1A] mt-1">-${formatCurrency(expense.amount)}</p>
                           <p className="text-xs text-[#737573] mt-1">{new Date(expense.date).toLocaleDateString('es', { day: 'numeric', month: 'short' })}</p>
                         </div>
                       </div>
 
-                      {lastEdit && (
-                        <div className="mt-3 rounded-xl bg-[#F7F6F3] border border-[#E6E6E3] px-3 py-2">
-                          <div className="flex items-center gap-2 text-xs font-semibold text-[#737573] uppercase tracking-wider">
+                      <div className="flex items-center gap-2 mt-3 flex-wrap">
+                        <span
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border"
+                          style={{ backgroundColor: `${categoryColor}12`, color: categoryColor, borderColor: `${categoryColor}24` }}
+                        >
+                          {expense.category}
+                        </span>
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#F7F6F3] text-[#737573] border border-[#E6E6E3]">
+                          {expense.method === 'Cash' ? <Wallet weight="duotone" className="w-3.5 h-3.5" /> : <CreditCard weight="duotone" className="w-3.5 h-3.5" />}
+                          {expense.method}
+                        </span>
+                        {expense.isEdited && (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-[#1A1C1A]/5 text-[#1A1C1A] border border-[#1A1C1A]/10">
                             <ClockCounterClockwise weight="duotone" className="w-3.5 h-3.5" />
-                            Historial de edición
+                            Editado{historyCount > 1 ? ` ${historyCount}x` : ''}
+                          </span>
+                        )}
+                      </div>
+
+                      {lastEdit && (
+                        <div className="mt-4 rounded-2xl bg-[#FAF9F6] border border-[#E6E6E3] p-3 sm:p-4">
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 mb-3">
+                            <div className="flex items-center gap-2 text-xs font-semibold text-[#737573] uppercase tracking-wider">
+                              <ClockCounterClockwise weight="duotone" className="w-3.5 h-3.5" />
+                              Última edición del gasto
+                            </div>
+                            <p className="text-xs text-[#9CA39C]">
+                              {new Date(lastEdit.editedAt).toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' })}
+                            </p>
                           </div>
-                          <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-[#1A1C1A]">
-                            <span>Gasto:</span>
-                            <span className="font-semibold">${formatCurrency(lastEdit.previousAmount)}</span>
-                            <ArrowRight weight="bold" className="w-3.5 h-3.5 text-[#737573]" />
-                            <span className="font-semibold text-[#2A4D3B]">${formatCurrency(lastEdit.newAmount)}</span>
+
+                          <div className="grid grid-cols-[1fr_auto_1fr] gap-2 sm:gap-3 items-center">
+                            <div className="rounded-xl border border-[#E6E6E3] bg-white px-3 py-2">
+                              <p className="text-[10px] uppercase tracking-[0.13em] text-[#9CA39C] font-semibold">Antes</p>
+                              <p className="mt-1 font-semibold text-[#1A1C1A]">${formatCurrency(lastEdit.previousAmount)}</p>
+                            </div>
+                            <div className="w-8 h-8 rounded-full bg-[#F2F0EB] border border-[#E6E6E3] flex items-center justify-center text-[#737573]">
+                              <ArrowRight weight="bold" className="w-3.5 h-3.5" />
+                            </div>
+                            <div className="rounded-xl border border-[#2A4D3B]/18 bg-[#EEF4F0] px-3 py-2">
+                              <p className="text-[10px] uppercase tracking-[0.13em] text-[#2A4D3B]/75 font-semibold">Ahora</p>
+                              <p className="mt-1 font-semibold text-[#2A4D3B]">${formatCurrency(lastEdit.newAmount)}</p>
+                            </div>
                           </div>
-                          <p className="mt-1 text-xs text-[#737573]">
-                            Última edición: {new Date(lastEdit.editedAt).toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' })}
-                            {lastEdit.previousMethod !== lastEdit.newMethod && ` · ${lastEdit.previousMethod} → ${lastEdit.newMethod}`}
-                          </p>
+
+                          {lastEdit.previousMethod !== lastEdit.newMethod && (
+                            <p className="mt-2 text-xs text-[#737573]">
+                              Método actualizado: {lastEdit.previousMethod} → {lastEdit.newMethod}
+                            </p>
+                          )}
                         </div>
                       )}
                     </div>
+
+                    <div className="hidden lg:block text-right rounded-2xl border border-[#E6E6E3] bg-[#FAF9F6] px-4 py-3 min-w-[150px]">
+                      <p className="text-[11px] uppercase tracking-[0.14em] text-[#9CA39C] font-semibold">Monto</p>
+                      <p className="metric-value text-2xl text-[#1A1C1A] mt-1">-${formatCurrency(expense.amount)}</p>
+                      <p className="text-xs text-[#737573] mt-1">{new Date(expense.date).toLocaleDateString('es', { day: 'numeric', month: 'short' })}</p>
+                    </div>
                   </div>
 
-                  <div className="flex items-center justify-end gap-2 mt-4 pt-4 border-t border-[#E6E6E3]">
-                    <button onClick={() => onEdit(expense)} className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-[#737573] hover:bg-[#F2F0EB] transition-colors" data-testid={`edit-expense-${expense.id}`}>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2 mt-5 pt-4 border-t border-[#E6E6E3]">
+                    <button
+                      onClick={() => onEdit(expense)}
+                      className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-[#5F625F] bg-white border border-[#DAD7CF] hover:border-[#2A4D3B]/45 hover:bg-[#F7F6F3] hover:text-[#2A4D3B] transition-all shadow-[0_8px_18px_rgba(26,28,26,0.04)]"
+                      data-testid={`edit-expense-${expense.id}`}
+                    >
                       <PencilSimple weight="duotone" className="w-4 h-4" />
                       Editar
                     </button>
-                    <button onClick={() => onDelete(expense.id)} className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-[#B65C47] hover:bg-[#B65C47]/10 transition-colors" data-testid={`delete-expense-${expense.id}`}>
+                    <button
+                      onClick={() => onDelete(expense.id)}
+                      className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-[#B65C47] bg-[#FBF4F2] border border-[#B65C47]/25 hover:border-[#B65C47]/55 hover:bg-[#B65C47]/10 hover:text-[#9E4435] transition-all shadow-[0_8px_18px_rgba(182,92,71,0.06)]"
+                      data-testid={`delete-expense-${expense.id}`}
+                    >
                       <Trash weight="duotone" className="w-4 h-4" />
                       Eliminar
                     </button>
