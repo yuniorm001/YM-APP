@@ -851,12 +851,13 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                 setRecommendationIndex(0);
                 setShowRecommendationDetails(true);
               }}
-              className="group shrink-0 inline-flex items-center justify-center gap-3 rounded-[24px] border border-[#2A4D3B]/15 bg-gradient-to-br from-white via-[#FFFDF8] to-[#F4EFE5] px-5 py-3.5 font-semibold text-[#151714] shadow-[0_18px_42px_rgba(28,31,27,0.13),inset_0_1px_0_rgba(255,255,255,0.95)] ring-1 ring-white/80 backdrop-blur transition-all hover:-translate-y-0.5 hover:border-[#2A4D3B]/25 hover:shadow-[0_22px_52px_rgba(42,77,59,0.16),inset_0_1px_0_rgba(255,255,255,1)] active:translate-y-0"
+              className="group relative shrink-0 inline-flex items-center justify-center gap-3 overflow-hidden rounded-[28px] border border-[#2A4D3B]/30 bg-gradient-to-br from-[#1F3E2F] via-[#294D3B] to-[#14251B] px-5 py-3.5 font-semibold text-white shadow-[0_20px_48px_rgba(42,77,59,0.26),inset_0_1px_0_rgba(255,255,255,0.18),inset_0_-10px_28px_rgba(0,0,0,0.14)] ring-1 ring-white/35 backdrop-blur transition-colors duration-200 hover:border-[#D9B06F]/45 hover:from-[#244936] hover:via-[#315B45] hover:to-[#182E22] hover:shadow-[0_24px_58px_rgba(42,77,59,0.32),inset_0_1px_0_rgba(255,255,255,0.22)] active:shadow-[0_14px_34px_rgba(42,77,59,0.24),inset_0_2px_10px_rgba(0,0,0,0.18)]"
               data-testid="toggle-card-recommendations"
             >
-              <span className="tracking-[-0.01em]">Ver detalles</span>
-              <span className="flex h-8 w-8 items-center justify-center rounded-full border border-[#2A4D3B]/10 bg-[#2A4D3B] text-white shadow-[0_10px_22px_rgba(42,77,59,0.22)] transition-all group-hover:scale-105 group-hover:bg-[#1F3E2F]">
-                <CaretRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_24%_0%,rgba(255,255,255,0.24),transparent_34%),linear-gradient(135deg,rgba(255,255,255,0.10),transparent_42%)]" />
+              <span className="relative tracking-[-0.01em]">Ver detalles</span>
+              <span className="relative flex h-9 w-9 items-center justify-center rounded-full border border-white/30 bg-white text-[#244936] shadow-[0_12px_24px_rgba(0,0,0,0.18),inset_0_1px_0_rgba(255,255,255,0.9)]">
+                <CaretRight className="h-4 w-4" />
               </span>
             </button>
           </div>
