@@ -41,6 +41,7 @@ const formatCurrency = (value) => Number(value || 0).toLocaleString('es-MX', { m
 
 export default function ExpensesList({ expenses, onEdit, onDelete }) {
   const [filter, setFilter] = useState('all');
+  const [methodFilter, setMethodFilter] = useState('all');
   const [sortBy, setSortBy] = useState('recent');
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
@@ -48,6 +49,7 @@ export default function ExpensesList({ expenses, onEdit, onDelete }) {
   const filteredExpenses = expenses
     .filter((expense) => {
       if (filter !== 'all' && expense.category !== filter) return false;
+      if (methodFilter !== 'all' && expense.method !== methodFilter) return false;
       if (searchQuery && !expense.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
       return true;
     })
@@ -63,6 +65,9 @@ export default function ExpensesList({ expenses, onEdit, onDelete }) {
     });
 
   const totalFiltered = filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+  const cardExpenses = filteredExpenses.filter((expense) => expense.method !== 'Cash').length;
+  const cashExpenses = filteredExpenses.filter((expense) => expense.method === 'Cash').length;
+  const methodLabel = (method) => method === 'Cash' ? 'Pagado en efectivo' : 'Pagado con tarjeta';
 
   return (
     <motion.div
@@ -74,22 +79,22 @@ export default function ExpensesList({ expenses, onEdit, onDelete }) {
       <div className="hero-surface p-5 sm:p-6 text-white">
         <div className="relative z-10 flex flex-col xl:flex-row xl:items-end xl:justify-between gap-5">
           <div className="max-w-3xl">
-            <p className="text-[11px] uppercase tracking-[0.18em] text-white/65 font-semibold mb-2">Control de efectivo</p>
-            <h1 className="font-heading text-3xl sm:text-4xl font-semibold tracking-[-0.04em]">Mi Dinero</h1>
+            <p className="text-[11px] uppercase tracking-[0.18em] text-white/65 font-semibold mb-2">Resumen de efectivo</p>
+            <h1 className="font-heading text-3xl sm:text-4xl font-semibold tracking-[-0.04em]">Tus gastos registrados</h1>
             <p className="mt-2 text-sm text-white/70 leading-relaxed">
-              Revisa tus gastos registrados, entiende de dónde salió el dinero y decide cuánto puedes pagar a tus tarjetas sin afectar tu efectivo.
+              Mira qué salió de tu efectivo o de tus tarjetas, cuánto gastaste y qué cambió cuando editaste un movimiento.
             </p>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:min-w-[280px]">
             <div className="rounded-[20px] border border-white/10 bg-white/10 px-4 py-3 backdrop-blur-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]">
-              <p className="text-[11px] uppercase tracking-[0.14em] text-white/60 font-semibold">Gastos</p>
+              <p className="text-[11px] uppercase tracking-[0.14em] text-white/60 font-semibold">Movimientos</p>
               <p className="metric-value mt-2 text-2xl">{filteredExpenses.length}</p>
-              <p className="mt-1 text-[11px] text-white/50">registros visibles</p>
+              <p className="mt-1 text-[11px] text-white/50">gastos visibles</p>
             </div>
             <div className="rounded-[20px] border border-white/10 bg-white/10 px-4 py-3 backdrop-blur-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]">
-              <p className="text-[11px] uppercase tracking-[0.14em] text-white/60 font-semibold">Gastado</p>
+              <p className="text-[11px] uppercase tracking-[0.14em] text-white/60 font-semibold">Total gastado</p>
               <p className="metric-value mt-2 text-2xl">${formatCurrency(totalFiltered)}</p>
-              <p className="mt-1 text-[11px] text-white/50">según filtros</p>
+              <p className="mt-1 text-[11px] text-white/50">según búsqueda</p>
             </div>
           </div>
         </div>
@@ -100,7 +105,7 @@ export default function ExpensesList({ expenses, onEdit, onDelete }) {
           <div className="flex-1">
             <input
               type="text"
-              placeholder="Buscar gastos..."
+              placeholder="Buscar por nombre del gasto..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="premium-input px-5"
@@ -111,7 +116,7 @@ export default function ExpensesList({ expenses, onEdit, onDelete }) {
           <button
             onClick={() => setShowFilters(!showFilters)}
             className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl border transition-colors ${
-              showFilters || filter !== 'all'
+              showFilters || filter !== 'all' || methodFilter !== 'all'
                 ? 'bg-[#2A4D3B] text-white border-[#2A4D3B]'
                 : 'bg-white border-[#E6E6E3] text-[#737573] hover:border-[#2A4D3B]'
             }`}
@@ -127,10 +132,21 @@ export default function ExpensesList({ expenses, onEdit, onDelete }) {
           {showFilters && (
             <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
               <div className="pt-4 border-t border-[#E6E6E3] mt-4 space-y-4">
+                <div className="rounded-2xl border border-[#E6E6E3] bg-[#FAF9F6] p-3 text-sm text-[#5F625F]">
+                  Usa estos filtros para entender si tus gastos salieron de una tarjeta o de tu efectivo disponible.
+                </div>
                 <div>
-                  <p className="text-sm font-medium text-[#737573] mb-2">Categoría</p>
+                  <p className="text-sm font-medium text-[#737573] mb-2">Forma de pago</p>
                   <div className="flex flex-wrap gap-2">
-                    <button onClick={() => setFilter('all')} className={`category-pill ${filter === 'all' ? 'bg-[#2A4D3B] text-white' : 'bg-[#F2F0EB] text-[#737573] hover:bg-[#E6E6E3]'}`} data-testid="filter-all">Todas</button>
+                    <button onClick={() => setMethodFilter('all')} className={`category-pill ${methodFilter === 'all' ? 'bg-[#1A1C1A] text-white' : 'bg-[#F2F0EB] text-[#737573] hover:bg-[#E6E6E3]'}`}>Ver todos</button>
+                    <button onClick={() => setMethodFilter('Tarjeta')} className={`category-pill ${methodFilter === 'Tarjeta' ? 'bg-[#2A4D3B] text-white' : 'bg-[#F2F0EB] text-[#737573] hover:bg-[#E6E6E3]'}`}>Pagados con tarjeta</button>
+                    <button onClick={() => setMethodFilter('Cash')} className={`category-pill ${methodFilter === 'Cash' ? 'bg-[#B65C47] text-white' : 'bg-[#F2F0EB] text-[#737573] hover:bg-[#E6E6E3]'}`}>Pagados en efectivo</button>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-[#737573] mb-2">Categoría del gasto</p>
+                  <div className="flex flex-wrap gap-2">
+                    <button onClick={() => setFilter('all')} className={`category-pill ${filter === 'all' ? 'bg-[#2A4D3B] text-white' : 'bg-[#F2F0EB] text-[#737573] hover:bg-[#E6E6E3]'}`} data-testid="filter-all">Todas las categorías</button>
                     {CATEGORIES.map((cat) => (
                       <button
                         key={cat}
@@ -167,6 +183,21 @@ export default function ExpensesList({ expenses, onEdit, onDelete }) {
         </AnimatePresence>
       </div>
 
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+        <div className="premium-card p-4 border border-[#D7E6DC] bg-[#F7FBF8]">
+          <p className="text-[11px] uppercase tracking-[0.16em] text-[#2A4D3B] font-bold">Siguiente paso recomendado</p>
+          <p className="mt-2 text-sm text-[#405246] leading-relaxed">Registra cada gasto el mismo día para saber cuánto puedes pagar a tus tarjetas sin quedarte corto de efectivo.</p>
+        </div>
+        <div className="premium-card p-4 bg-white">
+          <p className="text-[11px] uppercase tracking-[0.16em] text-[#9CA39C] font-bold">Cómo leer esta pantalla</p>
+          <p className="mt-2 text-sm text-[#5F625F] leading-relaxed"><span className="font-semibold text-[#B65C47]">Gasto</span> = dinero que salió. <span className="font-semibold text-[#2A4D3B]">Tarjeta</span> = puede afectar tu utilización.</p>
+        </div>
+        <div className="premium-card p-4 bg-white">
+          <p className="text-[11px] uppercase tracking-[0.16em] text-[#9CA39C] font-bold">Lectura rápida</p>
+          <p className="mt-2 text-sm text-[#5F625F] leading-relaxed">{cardExpenses} con tarjeta · {cashExpenses} en efectivo · ${formatCurrency(totalFiltered)} gastados.</p>
+        </div>
+      </div>
+
       <div className="space-y-4">
         <AnimatePresence mode="popLayout">
           {filteredExpenses.length > 0 ? (
@@ -196,13 +227,13 @@ export default function ExpensesList({ expenses, onEdit, onDelete }) {
                     <div className="min-w-0">
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 lg:block">
                         <div className="min-w-0">
-                          <p className="text-[11px] uppercase tracking-[0.16em] text-[#9CA39C] font-semibold mb-1">Movimiento registrado</p>
+                          <p className="text-[11px] uppercase tracking-[0.16em] text-[#9CA39C] font-semibold mb-1">Gasto registrado</p>
                           <h3 className="font-heading text-xl sm:text-2xl font-semibold tracking-[-0.03em] text-[#1A1C1A] truncate">{expense.name}</h3>
                         </div>
 
                         <div className="lg:hidden rounded-2xl border border-[#E6E6E3] bg-[#FAF9F6] px-4 py-3 sm:text-right">
-                          <p className="text-[11px] uppercase tracking-[0.14em] text-[#9CA39C] font-semibold">Monto</p>
-                          <p className="metric-value text-xl text-[#1A1C1A] mt-1">-${formatCurrency(expense.amount)}</p>
+                          <p className="text-[11px] uppercase tracking-[0.14em] text-[#B65C47] font-semibold">Gasto</p>
+                          <p className="metric-value text-xl text-[#9C382A] mt-1">-${formatCurrency(expense.amount)}</p>
                           <p className="text-xs text-[#737573] mt-1">{new Date(expense.date).toLocaleDateString('es', { day: 'numeric', month: 'short' })}</p>
                         </div>
                       </div>
@@ -216,7 +247,7 @@ export default function ExpensesList({ expenses, onEdit, onDelete }) {
                         </span>
                         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#F7F6F3] text-[#737573] border border-[#E6E6E3]">
                           {expense.method === 'Cash' ? <Wallet weight="duotone" className="w-3.5 h-3.5" /> : <CreditCard weight="duotone" className="w-3.5 h-3.5" />}
-                          {expense.method}
+                          {methodLabel(expense.method)}
                         </span>
                         {expense.isEdited && (
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-[#1A1C1A]/5 text-[#1A1C1A] border border-[#1A1C1A]/10">
@@ -231,7 +262,7 @@ export default function ExpensesList({ expenses, onEdit, onDelete }) {
                           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 mb-3">
                             <div className="flex items-center gap-2 text-xs font-semibold text-[#737573] uppercase tracking-wider">
                               <ClockCounterClockwise weight="duotone" className="w-3.5 h-3.5" />
-                              Última edición del gasto
+                              Cambio realizado
                             </div>
                             <p className="text-xs text-[#9CA39C]">
                               {new Date(lastEdit.editedAt).toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' })}
@@ -254,7 +285,7 @@ export default function ExpensesList({ expenses, onEdit, onDelete }) {
 
                           {lastEdit.previousMethod !== lastEdit.newMethod && (
                             <p className="mt-2 text-xs text-[#737573]">
-                              Método actualizado: {lastEdit.previousMethod} → {lastEdit.newMethod}
+                              Forma de pago actualizada: {methodLabel(lastEdit.previousMethod)} → {methodLabel(lastEdit.newMethod)}
                             </p>
                           )}
                         </div>
@@ -262,8 +293,8 @@ export default function ExpensesList({ expenses, onEdit, onDelete }) {
                     </div>
 
                     <div className="hidden lg:block text-right rounded-2xl border border-[#E6E6E3] bg-[#FAF9F6] px-4 py-3 min-w-[150px]">
-                      <p className="text-[11px] uppercase tracking-[0.14em] text-[#9CA39C] font-semibold">Monto</p>
-                      <p className="metric-value text-2xl text-[#1A1C1A] mt-1">-${formatCurrency(expense.amount)}</p>
+                      <p className="text-[11px] uppercase tracking-[0.14em] text-[#B65C47] font-semibold">Gasto</p>
+                      <p className="metric-value text-2xl text-[#9C382A] mt-1">-${formatCurrency(expense.amount)}</p>
                       <p className="text-xs text-[#737573] mt-1">{new Date(expense.date).toLocaleDateString('es', { day: 'numeric', month: 'short' })}</p>
                     </div>
                   </div>
@@ -275,7 +306,7 @@ export default function ExpensesList({ expenses, onEdit, onDelete }) {
                       data-testid={`edit-expense-${expense.id}`}
                     >
                       <PencilSimple weight="duotone" className="w-4 h-4" />
-                      Editar
+                      Editar gasto
                     </button>
                     <button
                       onClick={() => onDelete(expense.id)}
@@ -283,7 +314,7 @@ export default function ExpensesList({ expenses, onEdit, onDelete }) {
                       data-testid={`delete-expense-${expense.id}`}
                     >
                       <Trash weight="duotone" className="w-4 h-4" />
-                      Eliminar
+                      Eliminar gasto
                     </button>
                   </div>
                 </motion.div>
@@ -294,8 +325,8 @@ export default function ExpensesList({ expenses, onEdit, onDelete }) {
               <div className="empty-state-icon w-16 h-16 rounded-2xl bg-[#F2F0EB] flex items-center justify-center mx-auto mb-4">
                 <Wallet weight="duotone" className="w-8 h-8 text-[#737573]" />
               </div>
-              <h3 className="font-heading text-xl font-medium text-[#1A1C1A] mb-2">Activa tu historial de gastos</h3>
-              <p className="text-[#737573] max-w-md mx-auto">Cuando registres tus movimientos aparecerán aquí con su historial de edición para que tu control financiero sea más transparente.</p>
+              <h3 className="font-heading text-xl font-medium text-[#1A1C1A] mb-2">Aún no tienes gastos registrados</h3>
+              <p className="text-[#737573] max-w-md mx-auto">Cuando agregues un gasto, aparecerá aquí con su categoría, forma de pago e historial de cambios. Esto te ayudará a decidir cuánto puedes pagar a tus tarjetas sin afectar tu efectivo.</p>
             </motion.div>
           )}
         </AnimatePresence>
