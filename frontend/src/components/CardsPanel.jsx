@@ -999,7 +999,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                 <motion.div
                   animate={{ scale: isAlertPreview ? 1.01 : 1, y: isAlertPreview ? -2 : 0 }}
                   transition={{ duration: 0.22, ease: 'easeOut' }}
-                  className={`${cardType.gradient} rounded-[28px] px-5 sm:px-6 py-4 sm:py-[18px] min-h-[210px] sm:min-h-[220px] relative overflow-hidden shadow-[0_22px_45px_rgba(17,24,39,0.10)] hover:shadow-[0_28px_60px_rgba(17,24,39,0.14)] transition-all duration-300 border border-white/10 ${status.isFull ? 'opacity-70' : ''}`}
+                  className={`${cardType.gradient} rounded-[28px] px-5 sm:px-6 py-4 sm:py-[18px] ${isAlertPreview ? 'min-h-[250px] sm:min-h-[260px] pb-7 sm:pb-8' : 'min-h-[210px] sm:min-h-[220px]'} relative overflow-hidden shadow-[0_22px_45px_rgba(17,24,39,0.10)] hover:shadow-[0_28px_60px_rgba(17,24,39,0.14)] transition-all duration-300 border border-white/10 ${status.isFull ? 'opacity-70' : ''}`}
                 >
                   <div className="absolute inset-0 opacity-10 pointer-events-none">
                     <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full border border-white/30" />
@@ -1065,12 +1065,12 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                           </div>
 
                           <div className="relative z-10 mt-4 grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2.5 sm:items-end">
-                            <div className="inline-flex w-fit items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.06] px-3 py-2 text-xs text-white/86 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+                            <div className="inline-flex w-fit items-center gap-2 rounded-2xl border border-white/15 bg-black/25 px-3.5 py-2.5 text-xs shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_10px_24px_rgba(0,0,0,0.12)] backdrop-blur-md">
                               <span className="h-2 w-2 rounded-full" style={{ backgroundColor: paymentAdvice.color }} />
                               {Number(card.used || 0) > 0 ? (
-                                <>Deuda actual <span className="font-extrabold text-white">${card.used.toLocaleString('es-MX')}</span></>
+                                <> <span className="font-semibold text-white/75">Deuda actual</span> <span className="font-extrabold text-white">${card.used.toLocaleString('es-MX')}</span></>
                               ) : (
-                                <>Saldo actual <span className="font-extrabold text-white">$0</span></>
+                                <> <span className="font-semibold text-white/75">Saldo actual</span> <span className="font-extrabold text-white">$0</span></>
                               )}
                             </div>
                             {daysLeft !== null && daysLeft > 0 && (
@@ -1137,7 +1137,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                 </motion.div>
 
                 {/* Card Details */}
-                <div className="premium-card fintech-details-card -mt-5 sm:-mt-6 p-0 w-[96.5%] sm:w-[97%] mx-auto relative z-10 overflow-hidden border border-white/80 shadow-[0_24px_60px_rgba(17,24,39,0.10)] bg-white/92 backdrop-blur-xl">
+                <div className={`premium-card fintech-details-card ${isAlertPreview ? '-mt-3 sm:-mt-4' : '-mt-5 sm:-mt-6'} p-0 w-[96.5%] sm:w-[97%] mx-auto relative z-10 overflow-hidden border border-white/80 shadow-[0_24px_60px_rgba(17,24,39,0.10)] bg-white/92 backdrop-blur-xl`}>
                   <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-white via-[#F8F4ED]/60 to-transparent pointer-events-none" />
                   <div className="absolute -right-12 -top-16 w-44 h-44 rounded-full bg-[#2A4D3B]/[0.05] blur-2xl pointer-events-none" />
                   <div className="relative p-4 sm:p-5">
