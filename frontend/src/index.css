@@ -2180,6 +2180,15 @@ input[type="date"].premium-input {
   left: 105%;
   opacity: 1;
 }
+
+/* Disable moving shine/particle on static section headers (Cards + Money). */
+.hero-surface-static::after,
+.hero-surface-static:hover::after {
+  content: none !important;
+  display: none !important;
+  opacity: 0 !important;
+}
+
 .hero-surface.text-white {
   color: #171B17 !important;
 }
@@ -4613,4 +4622,14 @@ textarea.premium-input:focus {
 }
 [data-testid="sidebar-collapsed-settings-button"] + [data-testid="sidebar-power-logout-button"] {
   box-shadow: 0 12px 24px rgba(142, 47, 47, 0.08), inset 0 1px 0 rgba(255,255,255,0.82);
+}
+
+
+/* Disable moving shine effect only on selected header blocks */
+.hero-surface.hero-surface-static::after {
+  display: none;
+}
+.hero-surface.hero-surface-static:hover::after {
+  left: -34%;
+  opacity: 0;
 }
