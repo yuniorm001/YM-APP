@@ -5010,3 +5010,203 @@ textarea.premium-input:focus {
     font-size: 16px !important;
   }
 }
+
+/* === Admin access rows: God-level responsive polish === */
+.admin-user-row,
+.admin-user-row-modal {
+  position: relative !important;
+  isolation: isolate !important;
+  overflow: hidden !important;
+  border-radius: 30px !important;
+  border: 1px solid rgba(42, 77, 59, 0.13) !important;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(42, 77, 59, 0.08), transparent 34%),
+    radial-gradient(circle at 100% 0%, rgba(212, 139, 63, 0.07), transparent 30%),
+    linear-gradient(180deg, rgba(255,255,255,0.99), rgba(252,250,245,0.96)) !important;
+  box-shadow:
+    0 20px 48px rgba(20, 24, 20, 0.065),
+    inset 0 1px 0 rgba(255,255,255,0.96) !important;
+  padding: clamp(1rem, 1.45vw, 1.4rem) !important;
+}
+
+.admin-user-row::before,
+.admin-user-row-modal::before {
+  content: '' !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 1rem !important;
+  bottom: 1rem !important;
+  width: 5px !important;
+  border-radius: 0 999px 999px 0 !important;
+  background: linear-gradient(180deg, #2A4D3B 0%, rgba(42,77,59,.72) 58%, rgba(212,139,63,.58) 100%) !important;
+  opacity: .92 !important;
+  pointer-events: none !important;
+  z-index: 1 !important;
+}
+
+.admin-user-row--admin::before,
+.admin-user-row--protected::before {
+  background: linear-gradient(180deg, #2A4D3B 0%, rgba(42,77,59,.75) 64%, rgba(212,139,63,.64) 100%) !important;
+}
+
+.admin-user-row--client::before {
+  background: linear-gradient(180deg, #557B64 0%, rgba(85,123,100,.74) 62%, rgba(212,139,63,.54) 100%) !important;
+}
+
+.admin-user-row > div,
+.admin-user-row-modal > div {
+  position: relative !important;
+  z-index: 2 !important;
+  min-width: 0 !important;
+}
+
+.admin-user-row > div > .flex:first-child,
+.admin-user-row-modal > div > .flex:first-child {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: start !important;
+  gap: 1rem !important;
+  width: 100% !important;
+}
+
+.admin-user-row .min-w-0.flex.items-start.gap-3,
+.admin-user-row-modal .min-w-0.flex.items-start.gap-3 {
+  min-width: 0 !important;
+  width: 100% !important;
+  align-items: center !important;
+}
+
+.admin-user-row p.truncate,
+.admin-user-row-modal p.truncate {
+  max-width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.admin-avatar {
+  flex: 0 0 auto !important;
+  box-shadow: 0 16px 34px rgba(42,77,59,.12), inset 0 1px 0 rgba(255,255,255,.45) !important;
+}
+
+.admin-delete-btn,
+.admin-locked-badge {
+  flex: 0 0 auto !important;
+  min-width: 164px !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
+}
+
+.admin-row-controls,
+.admin-row-controls--modal {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+  gap: .95rem !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  overflow: visible !important;
+  padding-top: 1.15rem !important;
+  margin-top: .25rem !important;
+  border-top: 1px solid rgba(42, 77, 59, 0.10) !important;
+}
+
+.admin-row-controls > div,
+.admin-row-controls--modal > div {
+  display: block !important;
+  min-width: 0 !important;
+  width: 100% !important;
+}
+
+.admin-mini-label {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  margin-bottom: .55rem !important;
+  font-size: 11px !important;
+  letter-spacing: .14em !important;
+  color: #6A736B !important;
+}
+
+.admin-mini-input {
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  min-height: 58px !important;
+  border-radius: 20px !important;
+  background: rgba(255,255,255,.94) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.92), 0 10px 24px rgba(20,24,20,.035) !important;
+  box-sizing: border-box !important;
+}
+
+.admin-access-modal--fullscreen .admin-access-modal-list {
+  width: 100% !important;
+  max-width: 1180px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding-inline: clamp(.85rem, 3vw, 1.5rem) !important;
+}
+
+.admin-access-modal--fullscreen .admin-user-row-modal {
+  width: 100% !important;
+}
+
+@media (max-width: 900px) {
+  .admin-user-row,
+  .admin-user-row-modal {
+    border-radius: 28px !important;
+    padding: 1rem !important;
+  }
+
+  .admin-user-row::before,
+  .admin-user-row-modal::before {
+    top: 1rem !important;
+    bottom: 1rem !important;
+  }
+
+  .admin-user-row > div > .flex:first-child,
+  .admin-user-row-modal > div > .flex:first-child {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 1rem !important;
+  }
+
+  .admin-delete-btn,
+  .admin-locked-badge {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 58px !important;
+    border-radius: 20px !important;
+  }
+
+  .admin-row-controls,
+  .admin-row-controls--modal,
+  .admin-access-modal--fullscreen .admin-row-controls--modal {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: .9rem !important;
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 520px) {
+  .admin-user-row .min-w-0.flex.items-start.gap-3,
+  .admin-user-row-modal .min-w-0.flex.items-start.gap-3 {
+    align-items: flex-start !important;
+    gap: .85rem !important;
+  }
+
+  .admin-avatar {
+    width: 50px !important;
+    height: 50px !important;
+    border-radius: 18px !important;
+  }
+
+  .admin-pill {
+    font-size: 10px !important;
+    padding: .4rem .58rem !important;
+  }
+
+  .admin-user-row p.truncate,
+  .admin-user-row-modal p.truncate {
+    font-size: 14px !important;
+  }
+}
