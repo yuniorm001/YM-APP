@@ -183,20 +183,6 @@ export default function ExpensesList({ expenses, onEdit, onDelete }) {
         </AnimatePresence>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-        <div className="premium-card p-4 border border-[#D7E6DC] bg-[#F7FBF8]">
-          <p className="text-[11px] uppercase tracking-[0.16em] text-[#2A4D3B] font-bold">Siguiente paso recomendado</p>
-          <p className="mt-2 text-sm text-[#405246] leading-relaxed">Registra cada gasto el mismo día para saber cuánto puedes pagar a tus tarjetas sin quedarte corto de efectivo.</p>
-        </div>
-        <div className="premium-card p-4 bg-white">
-          <p className="text-[11px] uppercase tracking-[0.16em] text-[#9CA39C] font-bold">Cómo leer esta pantalla</p>
-          <p className="mt-2 text-sm text-[#5F625F] leading-relaxed"><span className="font-semibold text-[#B65C47]">Gasto</span> = dinero que salió. <span className="font-semibold text-[#2A4D3B]">Tarjeta</span> = puede afectar tu utilización.</p>
-        </div>
-        <div className="premium-card p-4 bg-white">
-          <p className="text-[11px] uppercase tracking-[0.16em] text-[#9CA39C] font-bold">Lectura rápida</p>
-          <p className="mt-2 text-sm text-[#5F625F] leading-relaxed">{cardExpenses} con tarjeta · {cashExpenses} en efectivo · ${formatCurrency(totalFiltered)} gastados.</p>
-        </div>
-      </div>
 
       <div className="space-y-4">
         <AnimatePresence mode="popLayout">
@@ -295,12 +281,12 @@ export default function ExpensesList({ expenses, onEdit, onDelete }) {
                               <span className="text-[#2A4D3B]">${formatCurrency(lastEdit.newAmount)}</span>
                             </div>
                           </div>
-                          <div className="flex flex-row sm:flex-col items-center sm:items-end gap-2 sm:gap-1 text-xs text-[#9CA39C] sm:text-right">
-                            <span className="inline-flex items-center rounded-full border border-[#E6E6E3] bg-white px-2.5 py-1 font-semibold text-[#737573]">
-                              {historyCount} {historyCount === 1 ? 'cambio' : 'cambios'} registrados
-                            </span>
+                          <div className="flex flex-row items-center justify-start sm:justify-end gap-2 text-xs text-[#9CA39C] sm:text-right flex-wrap">
                             <span>
                               {new Date(lastEdit.editedAt).toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' })}
+                            </span>
+                            <span className="inline-flex items-center rounded-full border border-[#E6E6E3] bg-white px-2.5 py-1 font-semibold text-[#737573]">
+                              {historyCount} {historyCount === 1 ? 'cambio' : 'cambios'} registrados
                             </span>
                           </div>
                         </div>
