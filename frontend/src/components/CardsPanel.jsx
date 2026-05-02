@@ -56,16 +56,16 @@ const capitalizeFirst = (str) => {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 };
 
-// Función para formatear texto mientras se escribe
+// Función para formatear nombre: cada palabra inicia en mayúscula y el resto en minúscula
 const formatTextInput = (value) => {
   if (!value) return '';
-  const words = value.split(' ');
-  return words.map((word, index) => {
-    if (index === 0 && word.length > 0) {
-      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-    }
-    return word.toLowerCase();
-  }).join(' ');
+  return value
+    .split(/(\s+)/)
+    .map((part) => {
+      if (/^\s+$/.test(part) || part.length === 0) return part;
+      return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
+    })
+    .join('');
 };
 
 const getDuplicateCard = (cards, formData, editingCard) => (
@@ -1953,7 +1953,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                             autoFocus
                             data-testid="card-name-input"
                           />
-                          <p className="text-xs text-[#737573] mt-1.5">Solo letras. Primera letra mayúscula.</p>
+                          <p className="text-xs text-[#737573] mt-1.5">Solo letras. Cada palabra inicia en mayúscula.</p>
                         </div>
 
                         <div>
