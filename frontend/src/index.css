@@ -4996,32 +4996,3 @@ textarea.premium-input:focus {
     border-radius: 0 999px 999px 0 !important;
   }
 }
-
-/* Ajuste fino v2: la línea lateral de cada correo sigue el radio del bloque. */
-.admin-user-row {
-  position: relative;
-}
-
-.admin-user-row::before {
-  content: '' !important;
-  position: absolute !important;
-  top: 0 !important;
-  bottom: 0 !important;
-  left: 0 !important;
-  width: 5px !important;
-  border-radius: 28px 0 0 28px !important;
-  background: linear-gradient(180deg, #2A4D3B 0%, rgba(42,77,59,.78) 44%, rgba(212,139,63,.74) 100%) !important;
-  opacity: .92 !important;
-  pointer-events: none !important;
-  box-shadow: 1px 0 0 rgba(255,255,255,.35), 8px 0 24px rgba(42,77,59,.055) !important;
-}
-
-@media (max-width: 768px) {
-  .admin-user-row::before {
-    top: 0 !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    width: 5px !important;
-    border-radius: 26px 0 0 26px !important;
-  }
-}
