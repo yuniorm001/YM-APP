@@ -5011,108 +5011,141 @@ textarea.premium-input:focus {
   }
 }
 
-/* === Admin access rows: God-level responsive polish === */
+/* === LizoNexus final admin access redesign: stable premium responsive === */
+.admin-list-panel {
+  overflow: hidden !important;
+}
+
+.admin-access-list {
+  display: grid !important;
+  gap: 1rem !important;
+}
+
 .admin-user-row,
 .admin-user-row-modal {
   position: relative !important;
-  isolation: isolate !important;
+  width: 100% !important;
   overflow: hidden !important;
-  border-radius: 30px !important;
-  border: 1px solid rgba(42, 77, 59, 0.13) !important;
+  border: 1px solid rgba(42, 77, 59, 0.12) !important;
+  border-radius: 28px !important;
   background:
-    radial-gradient(circle at 0% 0%, rgba(42, 77, 59, 0.08), transparent 34%),
-    radial-gradient(circle at 100% 0%, rgba(212, 139, 63, 0.07), transparent 30%),
-    linear-gradient(180deg, rgba(255,255,255,0.99), rgba(252,250,245,0.96)) !important;
+    radial-gradient(circle at 0% 0%, rgba(42, 77, 59, 0.06), transparent 34%),
+    linear-gradient(135deg, rgba(255,255,255,0.98), rgba(250,248,241,0.92)) !important;
   box-shadow:
-    0 20px 48px rgba(20, 24, 20, 0.065),
-    inset 0 1px 0 rgba(255,255,255,0.96) !important;
-  padding: clamp(1rem, 1.45vw, 1.4rem) !important;
+    0 22px 54px rgba(20, 24, 20, 0.07),
+    inset 0 1px 0 rgba(255,255,255,0.92) !important;
+  padding: 1.2rem 1.25rem 1.15rem 1.55rem !important;
+  margin: 0 !important;
 }
 
 .admin-user-row::before,
 .admin-user-row-modal::before {
-  content: '' !important;
+  content: "" !important;
   position: absolute !important;
-  left: 0 !important;
-  top: 1rem !important;
-  bottom: 1rem !important;
+  inset: 18px auto 18px 0 !important;
   width: 5px !important;
-  border-radius: 0 999px 999px 0 !important;
-  background: linear-gradient(180deg, #2A4D3B 0%, rgba(42,77,59,.72) 58%, rgba(212,139,63,.58) 100%) !important;
-  opacity: .92 !important;
-  pointer-events: none !important;
-  z-index: 1 !important;
+  border-radius: 999px !important;
+  background: linear-gradient(180deg, #2A4D3B 0%, #8DA586 62%, #D4A85F 100%) !important;
+  box-shadow: 0 0 0 1px rgba(255,255,255,.35), 0 14px 34px rgba(42,77,59,.16) !important;
 }
 
-.admin-user-row--admin::before,
-.admin-user-row--protected::before {
-  background: linear-gradient(180deg, #2A4D3B 0%, rgba(42,77,59,.75) 64%, rgba(212,139,63,.64) 100%) !important;
+.admin-user-row--protected::before,
+.admin-user-row--admin::before {
+  background: linear-gradient(180deg, #2A4D3B 0%, #6F8B78 55%, #E0B76C 100%) !important;
 }
 
 .admin-user-row--client::before {
-  background: linear-gradient(180deg, #557B64 0%, rgba(85,123,100,.74) 62%, rgba(212,139,63,.54) 100%) !important;
+  background: linear-gradient(180deg, #2A4D3B 0%, #90A18D 58%, #D7B26B 100%) !important;
 }
 
 .admin-user-row > div,
 .admin-user-row-modal > div {
   position: relative !important;
-  z-index: 2 !important;
-  min-width: 0 !important;
+  z-index: 1 !important;
+  width: 100% !important;
 }
 
 .admin-user-row > div > .flex:first-child,
 .admin-user-row-modal > div > .flex:first-child {
   display: grid !important;
   grid-template-columns: minmax(0, 1fr) auto !important;
-  align-items: start !important;
-  gap: 1rem !important;
+  align-items: center !important;
+  gap: 1.2rem !important;
   width: 100% !important;
 }
 
 .admin-user-row .min-w-0.flex.items-start.gap-3,
 .admin-user-row-modal .min-w-0.flex.items-start.gap-3 {
+  display: flex !important;
+  align-items: center !important;
   min-width: 0 !important;
   width: 100% !important;
+}
+
+.admin-avatar {
+  width: 56px !important;
+  height: 56px !important;
+  min-width: 56px !important;
+  border-radius: 18px !important;
+  display: inline-flex !important;
   align-items: center !important;
+  justify-content: center !important;
+  font-weight: 800 !important;
+  font-size: 1.05rem !important;
+  box-shadow: 0 15px 32px rgba(42, 77, 59, .12), inset 0 1px 0 rgba(255,255,255,.32) !important;
 }
 
 .admin-user-row p.truncate,
 .admin-user-row-modal p.truncate {
   max-width: 100% !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  white-space: nowrap !important;
+  font-size: 1rem !important;
+  line-height: 1.2 !important;
+  color: #111611 !important;
 }
 
-.admin-avatar {
-  flex: 0 0 auto !important;
-  box-shadow: 0 16px 34px rgba(42,77,59,.12), inset 0 1px 0 rgba(255,255,255,.45) !important;
+.admin-pill {
+  min-height: 28px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  border-radius: 999px !important;
+  padding: .34rem .72rem !important;
+  letter-spacing: .11em !important;
+  font-size: .68rem !important;
+  font-weight: 800 !important;
 }
 
 .admin-delete-btn,
 .admin-locked-badge {
-  flex: 0 0 auto !important;
-  min-width: 164px !important;
+  min-height: 52px !important;
+  border-radius: 18px !important;
+  padding: 0 1.35rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
   justify-content: center !important;
+  gap: .55rem !important;
   white-space: nowrap !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.75) !important;
+}
+
+.admin-delete-btn:hover {
+  transform: none !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.75), 0 10px 24px rgba(156,56,42,.08) !important;
 }
 
 .admin-row-controls,
 .admin-row-controls--modal {
   display: grid !important;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
-  gap: .95rem !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: .9rem !important;
   width: 100% !important;
-  min-width: 0 !important;
+  margin-top: .2rem !important;
+  padding-top: 1rem !important;
+  border-top: 1px solid rgba(42, 77, 59, 0.08) !important;
   overflow: visible !important;
-  padding-top: 1.15rem !important;
-  margin-top: .25rem !important;
-  border-top: 1px solid rgba(42, 77, 59, 0.10) !important;
 }
 
 .admin-row-controls > div,
 .admin-row-controls--modal > div {
-  display: block !important;
   min-width: 0 !important;
   width: 100% !important;
 }
@@ -5121,73 +5154,79 @@ textarea.premium-input:focus {
   display: block !important;
   visibility: visible !important;
   opacity: 1 !important;
-  margin-bottom: .55rem !important;
-  font-size: 11px !important;
-  letter-spacing: .14em !important;
-  color: #6A736B !important;
+  margin-bottom: .48rem !important;
+  color: #70776E !important;
+  font-size: .72rem !important;
+  font-weight: 850 !important;
+  letter-spacing: .16em !important;
+  text-transform: uppercase !important;
 }
 
 .admin-mini-input {
-  display: block !important;
   width: 100% !important;
-  min-width: 0 !important;
   max-width: 100% !important;
   min-height: 58px !important;
-  border-radius: 20px !important;
-  background: rgba(255,255,255,.94) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.92), 0 10px 24px rgba(20,24,20,.035) !important;
-  box-sizing: border-box !important;
+  border-radius: 18px !important;
+  border: 1px solid rgba(42,77,59,.12) !important;
+  background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(252,250,244,.96)) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.85), 0 10px 24px rgba(20,24,20,.04) !important;
+  color: #111611 !important;
+  font-size: .95rem !important;
+  font-weight: 750 !important;
+  padding: 0 1rem !important;
+}
+
+.admin-mini-input:focus {
+  outline: none !important;
+  border-color: rgba(42,77,59,.35) !important;
+  box-shadow: 0 0 0 4px rgba(42,77,59,.08), inset 0 1px 0 rgba(255,255,255,.85) !important;
+}
+
+.admin-access-modal.admin-access-modal--fullscreen {
+  background: linear-gradient(135deg, #FFFFFF 0%, #FBFAF5 56%, #F7F2EA 100%) !important;
+}
+
+.admin-access-modal--fullscreen .admin-access-modal-search,
+.admin-access-modal--fullscreen .admin-access-modal-list,
+.admin-access-modal--fullscreen .admin-access-modal-head > div {
+  width: min(100%, 1320px) !important;
+  max-width: calc(100vw - 64px) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
 }
 
 .admin-access-modal--fullscreen .admin-access-modal-list {
-  width: 100% !important;
-  max-width: 1180px !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-  padding-inline: clamp(.85rem, 3vw, 1.5rem) !important;
+  display: grid !important;
+  gap: 1rem !important;
+  padding-bottom: 3rem !important;
 }
 
-.admin-access-modal--fullscreen .admin-user-row-modal {
-  width: 100% !important;
-}
-
-@media (max-width: 900px) {
-  .admin-user-row,
-  .admin-user-row-modal {
-    border-radius: 28px !important;
-    padding: 1rem !important;
-  }
-
-  .admin-user-row::before,
-  .admin-user-row-modal::before {
-    top: 1rem !important;
-    bottom: 1rem !important;
-  }
-
+@media (max-width: 1024px) {
   .admin-user-row > div > .flex:first-child,
   .admin-user-row-modal > div > .flex:first-child {
-    grid-template-columns: minmax(0, 1fr) !important;
-    gap: 1rem !important;
+    grid-template-columns: 1fr !important;
+    align-items: stretch !important;
   }
 
   .admin-delete-btn,
   .admin-locked-badge {
     width: 100% !important;
-    min-width: 0 !important;
-    min-height: 58px !important;
-    border-radius: 20px !important;
-  }
-
-  .admin-row-controls,
-  .admin-row-controls--modal,
-  .admin-access-modal--fullscreen .admin-row-controls--modal {
-    grid-template-columns: minmax(0, 1fr) !important;
-    gap: .9rem !important;
-    width: 100% !important;
   }
 }
 
-@media (max-width: 520px) {
+@media (max-width: 760px) {
+  .admin-user-row,
+  .admin-user-row-modal {
+    border-radius: 26px !important;
+    padding: 1rem 1rem 1.05rem 1.25rem !important;
+  }
+
+  .admin-user-row::before,
+  .admin-user-row-modal::before {
+    inset: 18px auto 18px 0 !important;
+    width: 4px !important;
+  }
+
   .admin-user-row .min-w-0.flex.items-start.gap-3,
   .admin-user-row-modal .min-w-0.flex.items-start.gap-3 {
     align-items: flex-start !important;
@@ -5195,18 +5234,49 @@ textarea.premium-input:focus {
   }
 
   .admin-avatar {
-    width: 50px !important;
-    height: 50px !important;
-    border-radius: 18px !important;
-  }
-
-  .admin-pill {
-    font-size: 10px !important;
-    padding: .4rem .58rem !important;
+    width: 52px !important;
+    height: 52px !important;
+    min-width: 52px !important;
+    border-radius: 17px !important;
   }
 
   .admin-user-row p.truncate,
   .admin-user-row-modal p.truncate {
-    font-size: 14px !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+    font-size: .96rem !important;
+  }
+
+  .admin-row-controls,
+  .admin-row-controls--modal,
+  .admin-access-modal--fullscreen .admin-row-controls--modal {
+    grid-template-columns: 1fr !important;
+    gap: .85rem !important;
+    padding-top: .95rem !important;
+  }
+
+  .admin-mini-input {
+    min-height: 56px !important;
+    border-radius: 18px !important;
+    font-size: 1rem !important;
+  }
+
+  .admin-access-modal--fullscreen .admin-access-modal-search,
+  .admin-access-modal--fullscreen .admin-access-modal-list,
+  .admin-access-modal--fullscreen .admin-access-modal-head > div {
+    max-width: calc(100vw - 28px) !important;
+  }
+
+  .admin-access-modal--fullscreen .admin-access-modal-head {
+    padding: 1.1rem .9rem 1rem !important;
+  }
+
+  .admin-access-modal--fullscreen .admin-access-modal-search {
+    padding: 1rem .9rem !important;
+  }
+
+  .admin-access-modal--fullscreen .admin-access-modal-list {
+    padding: 1rem .9rem 2rem !important;
   }
 }

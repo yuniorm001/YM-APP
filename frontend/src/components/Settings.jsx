@@ -1039,7 +1039,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                   visibleAllowedEmails.map((item) => {
                     const membershipBadge = getMembershipBadge(item);
                     return (
-                      <div key={item.email} className={`admin-user-row ${item.role === 'admin' ? 'admin-user-row--admin' : 'admin-user-row--client'} ${item.read_only ? 'admin-user-row--protected' : ''}`}>
+                      <div key={item.email} className="admin-user-row">
                         <div className="flex flex-col gap-4">
                           <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                             <div className="min-w-0 flex items-start gap-3">
@@ -1544,7 +1544,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                       ) : modalFilteredAllowedEmails.map((item) => {
                         const membershipBadge = getMembershipBadge(item);
                         return (
-                          <div key={`modal-${item.email}`} className={`admin-user-row admin-user-row-modal ${item.role === 'admin' ? 'admin-user-row--admin' : 'admin-user-row--client'} ${item.read_only ? 'admin-user-row--protected' : ''}`}>
+                          <div key={`modal-${item.email}`} className="admin-user-row admin-user-row-modal">
                             <div className="flex flex-col gap-4">
                               <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                                 <div className="min-w-0 flex items-start gap-3">
