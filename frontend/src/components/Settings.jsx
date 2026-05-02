@@ -257,6 +257,8 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
   const [allowlistLoading, setAllowlistLoading] = useState(false);
   const [allowlistError, setAllowlistError] = useState('');
   const [allowlistStatus, setAllowlistStatus] = useState('');
+  const [newAccessError, setNewAccessError] = useState('');
+  const [newAccessStatus, setNewAccessStatus] = useState('');
   const [newAllowedEmail, setNewAllowedEmail] = useState('');
   const [newAllowedRole, setNewAllowedRole] = useState('client');
   const [newAllowedStatus, setNewAllowedStatus] = useState('active');
@@ -743,43 +745,44 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
     const email = newAllowedEmail.trim().toLowerCase();
     if (!email || !session?.token) return;
 
+    setNewAccessError('');
+    setNewAccessStatus('');
+
     if (!isValidEmailAddress(email)) {
-      setAllowlistStatus('');
-      setAllowlistError('Escribe un correo válido. Ejemplo: cliente@dominio.com');
+      setNewAccessError('Escribe un correo válido. Ejemplo: cliente@dominio.com');
       return;
     }
 
     if (!newAllowedMembershipEnd) {
-      setAllowlistStatus('');
-      setAllowlistError('Selecciona una fecha de vencimiento antes de agregar el correo.');
+      setNewAccessError('Selecciona una fecha de vencimiento antes de agregar el correo.');
       return;
     }
 
     const emailAlreadyExists = allowedEmails.some((item) => String(item?.email || '').trim().toLowerCase() === email);
     if (emailAlreadyExists) {
-      setAllowlistStatus('');
-      setAllowlistError('Ese correo ya existe en los accesos autorizados.');
+      setNewAccessError('Ese correo ya existe en los accesos autorizados.');
       return;
     }
 
     try {
       setAllowlistBusyEmail(email);
       setAllowlistError('');
+      setAllowlistStatus('');
       const response = await addAllowedEmail(session.token, {
         email,
         role: newAllowedRole,
         is_active: newAllowedStatus === 'active',
         membership_end: newAllowedMembershipEnd ? new Date(`${newAllowedMembershipEnd}T23:59:59`).toISOString() : null,
       });
-      setAllowlistStatus(response.message || 'Correo agregado correctamente.');
+      setNewAccessStatus(response.message || 'Correo agregado correctamente.');
       setNewAllowedEmail('');
       setNewAllowedRole('client');
       setNewAllowedStatus('active');
       setNewAllowedMembershipEnd('');
       await loadAllowlist();
     } catch (error) {
-      setAllowlistStatus('');
-      setAllowlistError(getFriendlyEmailError(error));
+      setNewAccessStatus('');
+      setNewAccessError(getFriendlyEmailError(error));
     } finally {
       setAllowlistBusyEmail('');
     }
@@ -920,7 +923,11 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                     <input
                       type="email"
                       value={newAllowedEmail}
-                      onChange={(e) => setNewAllowedEmail(e.target.value)}
+                      onChange={(e) => {
+                        setNewAllowedEmail(e.target.value);
+                        if (newAccessError) setNewAccessError('');
+                        if (newAccessStatus) setNewAccessStatus('');
+                      }}
                       placeholder="correo@dominio.com"
                       className="admin-clean-input"
                       autoComplete="off"
@@ -932,7 +939,10 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                   <div>
                     <label className="admin-field-label">Rol</label>
                     <div className="admin-select-wrap">
-                      <select value={newAllowedRole} onChange={(e) => setNewAllowedRole(e.target.value)} className="admin-clean-input admin-clean-select">
+                      <select value={newAllowedRole} onChange={(e) => {
+                        setNewAllowedRole(e.target.value);
+                        if (newAccessError) setNewAccessError('');
+                      }} className="admin-clean-input admin-clean-select">
                         <option value="client">Cliente</option>
                         <option value="admin">Admin</option>
                       </select>
@@ -942,7 +952,10 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                   <div>
                     <label className="admin-field-label">Estado</label>
                     <div className="admin-select-wrap">
-                      <select value={newAllowedStatus} onChange={(e) => setNewAllowedStatus(e.target.value)} className="admin-clean-input admin-clean-select">
+                      <select value={newAllowedStatus} onChange={(e) => {
+                        setNewAllowedStatus(e.target.value);
+                        if (newAccessError) setNewAccessError('');
+                      }} className="admin-clean-input admin-clean-select">
                         <option value="active">Activo</option>
                         <option value="inactive">Desactivado</option>
                       </select>
@@ -953,7 +966,10 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
 
                 <div>
                   <label className="admin-field-label">Fecha de vencimiento</label>
-                  <input type="date" value={newAllowedMembershipEnd} onChange={(e) => setNewAllowedMembershipEnd(e.target.value)} className="admin-clean-input" required />
+                  <input type="date" value={newAllowedMembershipEnd} onChange={(e) => {
+                    setNewAllowedMembershipEnd(e.target.value);
+                    if (newAccessError) setNewAccessError('');
+                  }} className="admin-clean-input" required />
                 </div>
 
                 <button
@@ -965,6 +981,14 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                   <UserPlus weight="bold" className="h-4 w-4" />
                   Agregar correo
                 </button>
+
+                {newAccessStatus ? (
+                  <div className="rounded-2xl border border-[#D8E8E0] bg-[#F5FBF8] px-4 py-3 text-sm font-semibold text-[#2A4D3B]">{newAccessStatus}</div>
+                ) : null}
+
+                {newAccessError ? (
+                  <div className="rounded-2xl border border-[#F1D7CF] bg-[#FFF7F4] px-4 py-3 text-sm font-semibold text-[#9C382A]">{newAccessError}</div>
+                ) : null}
               </div>
             </div>
 
