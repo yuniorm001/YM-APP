@@ -581,7 +581,6 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
                 >
                   <span className="absolute inset-0 bg-[linear-gradient(135deg,#E8A95A_0%,#D48B3F_45%,#B85F2E_100%)]" />
                   <span className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.42),transparent_55%)]" />
-                  <span className="absolute inset-x-2 top-1 h-px bg-white/40" />
                   <AnimatePresence>
                     {isFabOpen && (
                       <motion.span
@@ -598,8 +597,8 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
               </div>
 
               {/* The dark pill with notch for FAB */}
-              <div className="relative">
-                <svg viewBox="0 0 360 76" preserveAspectRatio="none" className="absolute inset-0 w-full h-full" aria-hidden>
+              <div className="relative rounded-[38px] shadow-[0_18px_38px_rgba(0,0,0,0.24)]">
+                <svg viewBox="0 0 360 76" preserveAspectRatio="none" className="absolute inset-0 w-full h-full overflow-visible" aria-hidden>
                   <defs>
                     <linearGradient id="pillBg" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="#243025" />
@@ -610,9 +609,6 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
                       <stop offset="0%" stopColor="rgba(255,255,255,0.22)" />
                       <stop offset="100%" stopColor="rgba(255,255,255,0.04)" />
                     </linearGradient>
-                    <filter id="pillShadow" x="-10%" y="-50%" width="120%" height="220%">
-                      <feDropShadow dx="0" dy="14" stdDeviation="14" floodColor="#000" floodOpacity="0.30" />
-                    </filter>
                   </defs>
                   {/* Pill with circular notch in the top-center for the FAB */}
                   <path
@@ -620,7 +616,6 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
                     fill="url(#pillBg)"
                     stroke="url(#pillStroke)"
                     strokeWidth="1"
-                    filter="url(#pillShadow)"
                   />
                 </svg>
 
