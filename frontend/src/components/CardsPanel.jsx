@@ -285,11 +285,15 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
   };
 
 
-  const getUtilizationBarStyle = (utilization) => ({
-    background: 'linear-gradient(to right, #2A4D3B 0%, #2A4D3B 20%, #D48B3F 20%, #D48B3F 30%, #9C382A 30%, #9C382A 100%)',
-    clipPath: `inset(0 ${100 - Math.min(utilization, 100)}% 0 0 round 999px)`,
-    WebkitClipPath: `inset(0 ${100 - Math.min(utilization, 100)}% 0 0 round 999px)`
-  });
+  const getUtilizationBarStyle = (utilization) => {
+    const fillWidth = Math.min(Math.max(Number(utilization) || 0, 0), 100);
+
+    return {
+      width: `${fillWidth}%`,
+      right: 'auto',
+      background: 'linear-gradient(to right, #2A4D3B 0%, #2A4D3B 20%, #D48B3F 20%, #D48B3F 30%, #9C382A 30%, #9C382A 100%)'
+    };
+  };
 
   // Calcular disponible y si está llena
   const getCardAvailable = (card) => {
