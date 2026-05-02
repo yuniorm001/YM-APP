@@ -192,23 +192,27 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
               </motion.button>
             )}
 
-            {/* Status pill — premium accent */}
+            {/* Smart advice card — no label/name */}
             {!isDesktopSidebarCollapsed && (
               <motion.div
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.18, duration: 0.32 }}
-                className="mt-4 relative overflow-hidden rounded-[18px] border border-[#E7DED0] bg-[linear-gradient(135deg,rgba(255,255,255,0.96),rgba(247,243,235,0.94))] px-3 py-2.5 shadow-[0_8px_22px_rgba(0,0,0,0.04)]"
+                className="mt-4 relative overflow-hidden rounded-[20px] border border-[#E6DDCE] bg-[linear-gradient(135deg,rgba(255,255,255,0.98),rgba(247,243,235,0.96))] px-3.5 py-3 shadow-[0_10px_26px_rgba(30,51,40,0.055)]"
               >
-                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(42,123,95,0.10),transparent_55%)]" />
-                <div className="relative z-10 flex items-center gap-2.5">
-                  <span className="relative flex h-7 w-7 items-center justify-center rounded-full bg-[linear-gradient(135deg,#E8F4EE,#C9E4D6)] border border-[#BBD9C8]">
-                    <span className="absolute inset-0 rounded-full animate-ping bg-[#2A7B5F]/20" style={{ animationDuration: '2.4s' }} />
-                    <Sparkle weight="fill" className="relative h-3.5 w-3.5 text-[#2A7B5F]" />
+                <div className="pointer-events-none absolute inset-0">
+                  <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-[radial-gradient(circle,rgba(42,123,95,0.13),transparent_62%)] blur-xl" />
+                  <div className="absolute -left-8 bottom-0 h-20 w-20 rounded-full bg-[radial-gradient(circle,rgba(212,139,63,0.12),transparent_65%)] blur-xl" />
+                  <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/90 to-transparent" />
+                </div>
+                <div className="relative z-10 flex items-center gap-3">
+                  <span className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-[16px] border border-[#D9CDBA] bg-[linear-gradient(135deg,#FFFFFF,#F4EEE4)] shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_10px_22px_rgba(42,77,59,0.07)]">
+                    <span className="absolute -right-1 -top-1 h-3 w-3 rounded-full border-2 border-[#F8F4EC] bg-[#2A7B5F]" />
+                    <CurrencyDollar weight="bold" className="h-4.5 w-4.5 text-[#2A7B5F]" />
                   </span>
                   <div className="min-w-0 leading-tight">
-                    <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-[#9A907F]">Estado</p>
-                    <p className="text-[12px] font-semibold text-[#1E3328] truncate">Pulso Smart · Online</p>
+                    <p className="text-[12.5px] font-semibold leading-snug text-[#1E3328]">Antes de gastar, mira tu margen.</p>
+                    <p className="mt-1 text-[10.5px] font-medium leading-snug text-[#7C766B]">Una decisión pequeña hoy protege tu cash mañana.</p>
                   </div>
                 </div>
               </motion.div>
