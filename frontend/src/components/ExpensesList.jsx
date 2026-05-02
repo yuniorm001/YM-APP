@@ -295,9 +295,14 @@ export default function ExpensesList({ expenses, onEdit, onDelete }) {
                               <span className="text-[#2A4D3B]">${formatCurrency(lastEdit.newAmount)}</span>
                             </div>
                           </div>
-                          <p className="text-xs text-[#9CA39C] sm:text-right">
-                            {new Date(lastEdit.editedAt).toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' })}
-                          </p>
+                          <div className="flex flex-row sm:flex-col items-center sm:items-end gap-2 sm:gap-1 text-xs text-[#9CA39C] sm:text-right">
+                            <span className="inline-flex items-center rounded-full border border-[#E6E6E3] bg-white px-2.5 py-1 font-semibold text-[#737573]">
+                              {historyCount} {historyCount === 1 ? 'cambio' : 'cambios'} registrados
+                            </span>
+                            <span>
+                              {new Date(lastEdit.editedAt).toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' })}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     )}
