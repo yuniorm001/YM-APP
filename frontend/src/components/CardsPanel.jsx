@@ -1023,42 +1023,64 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                         className="relative z-10 h-full"
                       >
                         <div
-                          className="h-full rounded-[24px] border p-4 sm:p-5 backdrop-blur-md flex flex-col justify-between"
-                          style={{ backgroundColor: `${paymentAdvice.color}10`, borderColor: `${paymentAdvice.color}45` }}
+                          className="relative h-full overflow-hidden rounded-[26px] border p-4 sm:p-5 backdrop-blur-xl flex flex-col justify-between shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_18px_42px_rgba(0,0,0,0.16)]"
+                          style={{
+                            background: `linear-gradient(135deg, ${paymentAdvice.color}18 0%, rgba(20,22,20,0.74) 42%, rgba(20,22,20,0.56) 100%)`,
+                            borderColor: `${paymentAdvice.color}55`,
+                          }}
                         >
-                          <div className="flex items-start gap-3">
+                          <div
+                            className="absolute inset-x-0 top-0 h-[3px]"
+                            style={{ background: `linear-gradient(90deg, ${paymentAdvice.color} 0%, ${paymentAdvice.color}70 42%, transparent 100%)` }}
+                          />
+                          <div
+                            className="absolute -right-12 -top-14 h-36 w-36 rounded-full blur-3xl opacity-35 pointer-events-none"
+                            style={{ backgroundColor: paymentAdvice.color }}
+                          />
+                          <div className="relative z-10 flex items-start gap-3 sm:gap-4">
                             <div
-                              className="w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm"
-                              style={{ backgroundColor: `${paymentAdvice.color}22` }}
+                              className="w-12 h-12 rounded-[20px] flex items-center justify-center flex-shrink-0 shadow-[0_14px_28px_rgba(0,0,0,0.18)] border border-white/10"
+                              style={{ backgroundColor: `${paymentAdvice.color}24` }}
                             >
                               <Clock weight="fill" className="w-5 h-5" style={{ color: paymentAdvice.color }} />
                             </div>
-                            <div className="min-w-0">
-                              <p className="font-bold text-sm tracking-[-0.01em]" style={{ color: paymentAdvice.color }}>
-                                {paymentAdvice.title}
-                              </p>
-                              <p className="text-xs sm:text-[13px] mt-2 leading-relaxed text-[#F8FAF8] max-w-[95%]">
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-start justify-between gap-3">
+                                <p className="font-extrabold text-[15px] sm:text-base tracking-[-0.015em]" style={{ color: paymentAdvice.color }}>
+                                  {paymentAdvice.title}
+                                </p>
+                                {daysLeft !== null && daysLeft > 0 && (
+                                  <span
+                                    className="hidden sm:inline-flex px-3 py-1.5 rounded-full text-[10px] font-extrabold uppercase tracking-[0.12em] shadow-sm border border-white/10 whitespace-nowrap"
+                                    style={{ backgroundColor: `${paymentAdvice.color}26`, color: paymentAdvice.color }}
+                                  >
+                                    {daysLeft} día{daysLeft > 1 ? 's' : ''}
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-[13px] sm:text-sm mt-2.5 leading-relaxed text-white/90 max-w-[98%]">
                                 {paymentAdvice.message}
                               </p>
                             </div>
                           </div>
 
-                          <div className="mt-4 flex items-center gap-2 flex-wrap">
+                          <div className="relative z-10 mt-4 grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2.5 sm:items-end">
+                            <div className="inline-flex w-fit items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.06] px-3 py-2 text-xs text-white/86 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+                              <span className="h-2 w-2 rounded-full" style={{ backgroundColor: paymentAdvice.color }} />
+                              {Number(card.used || 0) > 0 ? (
+                                <>Deuda actual <span className="font-extrabold text-white">${card.used.toLocaleString('es-MX')}</span></>
+                              ) : (
+                                <>Saldo actual <span className="font-extrabold text-white">$0</span></>
+                              )}
+                            </div>
                             {daysLeft !== null && daysLeft > 0 && (
                               <span
-                                className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase shadow-lg"
-                                style={{ backgroundColor: paymentAdvice.color, color: 'white' }}
+                                className="sm:hidden inline-flex w-fit px-3 py-1.5 rounded-full text-[10px] font-extrabold uppercase tracking-[0.12em] shadow-sm border border-white/10"
+                                style={{ backgroundColor: `${paymentAdvice.color}26`, color: paymentAdvice.color }}
                               >
                                 {daysLeft} día{daysLeft > 1 ? 's' : ''} restante{daysLeft > 1 ? 's' : ''}
                               </span>
                             )}
-                            <span className="text-xs text-[#F8FAF8]">
-                              {Number(card.used || 0) > 0 ? (
-                                <>Deuda actual: <span className="font-semibold">${card.used.toLocaleString('es-MX')}</span></>
-                              ) : (
-                                <>Saldo actual: <span className="font-semibold">$0</span></>
-                              )}
-                            </span>
                           </div>
                         </div>
                       </motion.div>
