@@ -73,9 +73,12 @@ export default function ExpensesList({ expenses, cards = [], onEdit, onDelete })
     if (expense.method === 'Cash') return 'Efectivo';
     const card = cards.find((item) => item.id === expense.cardId);
     if (!card) return 'Tarjeta';
+
     const cardName = card.name || 'Tarjeta';
-    const lastFour = card.lastFour ? ` • ${card.lastFour}` : '';
-    return `${cardName}${lastFour}`;
+    const rawLastFour = card.lastFour || card.last4 || card.lastDigits || card.number || '';
+    const lastFour = String(rawLastFour).replace(/\D/g, '').slice(-4);
+
+    return lastFour ? `${cardName} • ${lastFour}` : cardName;
   };
 
   return (
