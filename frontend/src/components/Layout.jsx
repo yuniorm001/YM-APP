@@ -216,7 +216,7 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
           </div>
 
           {/* MAIN NAV */}
-          <nav className={`relative overflow-y-auto ${isDesktopSidebarCollapsed ? 'px-3 py-4 flex-none' : 'px-4 py-6 flex-1'} flex flex-col`}>
+          <nav className={`relative overflow-y-auto ${isDesktopSidebarCollapsed ? 'px-3 py-3 flex-none mt-auto' : 'px-4 py-6 flex-1'} flex flex-col`}>
             {!isDesktopSidebarCollapsed && (
               <div className="px-1 pb-2 flex items-center gap-2">
                 <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#9A907F]">Navegar</span>
@@ -359,7 +359,7 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
           </nav>
 
           {/* FOOTER — settings + logout */}
-          <div className={`relative p-3 border-t border-black/5 ${isDesktopSidebarCollapsed ? 'mt-1' : ''}`}>
+          <div className={`relative p-3 border-t border-black/5 ${isDesktopSidebarCollapsed ? 'mt-1 mb-auto' : ''}`}>
             <motion.div
               className={`rounded-[22px] border border-[#ECE6DC] bg-gradient-to-br from-[#FCFBF8] to-[#F3EEE6] px-3 py-3 shadow-[0_10px_22px_rgba(0,0,0,0.025)]`}
             >
@@ -503,18 +503,18 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
           <AnimatePresence>
             {isFabOpen && (
               <motion.div
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 16 }}
-                transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
                 className="fixed bottom-[166px] left-0 right-0 z-50 px-5 flex flex-col items-center gap-3.5 pointer-events-none"
                 data-testid="mobile-fab-menu"
               >
                 {/* New Expense */}
                 <motion.button
-                  initial={{ opacity: 0, scale: 0.96 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.96 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
                   transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
                   whileTap={{ scale: 0.97 }}
                   onClick={() => {
@@ -527,23 +527,23 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
                   <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.22),transparent_46%)] opacity-85 transition-opacity duration-300 group-hover:opacity-100" />
                   <span className="pointer-events-none absolute inset-y-0 -left-[42%] w-[38%] bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.35),transparent)] skew-x-[-20deg] opacity-0 transition-all duration-500 group-hover:left-[112%] group-hover:opacity-100" />
                   <span className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/30" />
-                  <span className="relative z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/18 border border-white/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.28)] flex-shrink-0 transition-all duration-300 group-hover:bg-white/22 group-hover:scale-[1.03]">
+                  <span className="relative z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/18 border border-white/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.28)] flex-shrink-0 transition-all duration-300 group-hover:bg-white/22">
                     <PlusCircle weight="fill" className="h-5 w-5 text-white" />
                   </span>
                   <div className="relative z-10 flex flex-col items-start text-left flex-1 min-w-0">
                     <span className="text-[15px] font-bold leading-none">Nuevo gasto</span>
                     <span className="text-[11.5px] font-medium text-white/80 leading-none mt-1.5">Registrar consumo</span>
                   </div>
-                  <span className="relative z-10 flex h-7 w-7 items-center justify-center rounded-full bg-white/15 border border-white/15 transition-all duration-300 group-hover:bg-white/22 group-hover:translate-x-0.5">
+                  <span className="relative z-10 flex h-7 w-7 items-center justify-center rounded-full bg-white/15 border border-white/15 transition-all duration-300 group-hover:bg-white/22">
                     <CaretRight weight="bold" className="h-3.5 w-3.5 text-white/90" />
                   </span>
                 </motion.button>
 
                 {/* New Income */}
                 <motion.button
-                  initial={{ opacity: 0, scale: 0.96 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.96 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
                   transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
                   whileTap={{ scale: 0.97 }}
                   onClick={() => {
@@ -556,14 +556,14 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
                   <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.22),transparent_46%)] opacity-85 transition-opacity duration-300 group-hover:opacity-100" />
                   <span className="pointer-events-none absolute inset-y-0 -left-[42%] w-[38%] bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.35),transparent)] skew-x-[-20deg] opacity-0 transition-all duration-500 group-hover:left-[112%] group-hover:opacity-100" />
                   <span className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/30" />
-                  <span className="relative z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/18 border border-white/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.28)] flex-shrink-0 transition-all duration-300 group-hover:bg-white/22 group-hover:scale-[1.03]">
+                  <span className="relative z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/18 border border-white/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.28)] flex-shrink-0 transition-all duration-300 group-hover:bg-white/22">
                     <CurrencyDollar weight="fill" className="h-5 w-5 text-white" />
                   </span>
                   <div className="relative z-10 flex flex-col items-start text-left flex-1 min-w-0">
                     <span className="text-[15px] font-bold leading-none">Nuevo ingreso</span>
                     <span className="text-[11.5px] font-medium text-white/80 leading-none mt-1.5">Registrar cobro</span>
                   </div>
-                  <span className="relative z-10 flex h-7 w-7 items-center justify-center rounded-full bg-white/15 border border-white/15 transition-all duration-300 group-hover:bg-white/22 group-hover:translate-x-0.5">
+                  <span className="relative z-10 flex h-7 w-7 items-center justify-center rounded-full bg-white/15 border border-white/15 transition-all duration-300 group-hover:bg-white/22">
                     <CaretRight weight="bold" className="h-3.5 w-3.5 text-white/90" />
                   </span>
                 </motion.button>
