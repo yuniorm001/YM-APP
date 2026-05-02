@@ -540,7 +540,7 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
                     onLogout();
                     setIsFabOpen(false);
                   }}
-                  className="pointer-events-auto group relative w-full max-w-[340px] flex items-center gap-3.5 rounded-[22px] border border-[#E7CACA] bg-[linear-gradient(135deg,rgba(255,255,255,0.98),rgba(255,241,241,0.98))] px-5 py-3.5 text-[#8E2F2F] overflow-hidden shadow-[0_18px_38px_rgba(142,47,47,0.18),inset_0_1px_0_rgba(255,255,255,0.82)] ring-1 ring-white/35"
+                  className="pointer-events-auto group relative w-full max-w-[340px] flex items-center gap-3.5 rounded-[22px] border border-[#E7CACA] bg-[linear-gradient(135deg,rgba(255,255,255,0.98),rgba(255,241,241,0.98))] px-5 py-3.5 text-[#8E2F2F] overflow-hidden shadow-[0_18px_38px_rgba(142,47,47,0.18),inset_0_1px_0_rgba(255,255,255,0.82)] ring-1 ring-white/35 transition-all duration-300 hover:border-[#D87D7D] hover:bg-[linear-gradient(135deg,rgba(255,255,255,1),rgba(255,236,236,1))] hover:shadow-[0_20px_44px_rgba(142,47,47,0.22),inset_0_1px_0_rgba(255,255,255,0.88)] focus-visible:border-[#D87D7D] active:border-[#D87D7D]"
                   data-testid="mobile-fab-logout"
                 >
                   <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.72),transparent_48%)]" />
