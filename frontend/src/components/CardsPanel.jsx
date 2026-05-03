@@ -989,7 +989,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                           className="w-9 h-9 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm"
                           style={{ backgroundColor: `${paymentAdvice.color}20` }}
                         >
-                          <Clock weight="fill" className="w-5 h-5" style={{ color: paymentAdvice.color }} />
+                          <Clock weight="fill" className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: paymentAdvice.color }} />
                         </div>
                         <div className="flex-1">
                           <p className="font-bold text-[13px] tracking-[-0.01em]" style={{ color: paymentAdvice.color }}>
@@ -1023,7 +1023,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                 <motion.div
                   animate={{ scale: isAlertPreview ? 1.01 : 1, y: isAlertPreview ? -2 : 0 }}
                   transition={{ duration: 0.22, ease: 'easeOut' }}
-                  className={`rounded-[28px] px-5 sm:px-6 py-4 sm:py-[18px] min-h-[250px] sm:min-h-[260px] pb-7 sm:pb-8 relative overflow-hidden shadow-[0_22px_45px_rgba(17,24,39,0.10)] hover:shadow-[0_28px_60px_rgba(17,24,39,0.14)] transition-all duration-300 border border-white/10 ${status.isFull ? 'opacity-70' : ''}`}
+                  className={`rounded-[28px] px-5 sm:px-6 py-4 sm:py-[18px] h-[250px] sm:h-auto min-h-[250px] sm:min-h-[260px] pb-7 sm:pb-8 relative overflow-hidden shadow-[0_22px_45px_rgba(17,24,39,0.10)] hover:shadow-[0_28px_60px_rgba(17,24,39,0.14)] transition-all duration-300 border border-white/10 ${status.isFull ? 'opacity-70' : ''}`}
                   style={{ background: cardType.gradient }}
                 >
                   <div className="absolute inset-0 opacity-10 pointer-events-none">
@@ -1048,7 +1048,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                         className="relative z-10 h-full"
                       >
                         <div
-                          className="relative h-full overflow-hidden rounded-[26px] border p-4 sm:p-5 backdrop-blur-xl flex flex-col justify-between shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_18px_42px_rgba(0,0,0,0.16)]"
+                          className="relative h-full overflow-hidden rounded-[26px] border p-3 sm:p-5 backdrop-blur-xl flex flex-col justify-between shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_18px_42px_rgba(0,0,0,0.16)]"
                           style={{
                             background: `linear-gradient(135deg, ${paymentAdvice.color}18 0%, rgba(20,22,20,0.74) 42%, rgba(20,22,20,0.56) 100%)`,
                             borderColor: `${paymentAdvice.color}55`,
@@ -1062,16 +1062,16 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                             className="absolute -right-12 -top-14 h-36 w-36 rounded-full blur-3xl opacity-35 pointer-events-none"
                             style={{ backgroundColor: paymentAdvice.color }}
                           />
-                          <div className="relative z-10 flex items-start gap-3 sm:gap-4">
+                          <div className="relative z-10 flex items-start gap-2.5 sm:gap-4">
                             <div
-                              className="w-12 h-12 rounded-[20px] flex items-center justify-center flex-shrink-0 shadow-[0_14px_28px_rgba(0,0,0,0.18)] border border-white/10"
+                              className="w-10 h-10 sm:w-12 sm:h-12 rounded-[18px] sm:rounded-[20px] flex items-center justify-center flex-shrink-0 shadow-[0_14px_28px_rgba(0,0,0,0.18)] border border-white/10"
                               style={{ backgroundColor: `${paymentAdvice.color}24` }}
                             >
                               <Clock weight="fill" className="w-5 h-5" style={{ color: paymentAdvice.color }} />
                             </div>
                             <div className="min-w-0 flex-1">
                               <div className="flex items-start justify-between gap-3">
-                                <p className="font-extrabold text-[15px] sm:text-base tracking-[-0.015em]" style={{ color: paymentAdvice.color }}>
+                                <p className="font-extrabold text-[14px] sm:text-base tracking-[-0.015em] leading-tight" style={{ color: paymentAdvice.color }}>
                                   {paymentAdvice.title}
                                 </p>
                                 {daysLeft !== null && daysLeft > 0 && (
@@ -1083,14 +1083,14 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                                   </span>
                                 )}
                               </div>
-                              <p className="text-[13px] sm:text-sm mt-2.5 leading-relaxed text-white/90 max-w-[98%]">
+                              <p className="text-[12px] sm:text-sm mt-2 sm:mt-2.5 leading-[1.45] sm:leading-relaxed text-white/90 max-w-[98%]">
                                 {paymentAdvice.message}
                               </p>
                             </div>
                           </div>
 
-                          <div className="relative z-10 mt-4 grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2.5 sm:items-end">
-                            <div className="inline-flex w-fit items-center gap-2 rounded-2xl border border-white/15 bg-black/25 px-3.5 py-2.5 text-xs shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_10px_24px_rgba(0,0,0,0.12)] backdrop-blur-md">
+                          <div className="relative z-10 mt-3 sm:mt-4 grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-2 sm:gap-2.5 sm:items-end">
+                            <div className="inline-flex w-fit items-center gap-2 rounded-2xl border border-white/15 bg-black/25 px-3 py-2 sm:px-3.5 sm:py-2.5 text-[11px] sm:text-xs shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_10px_24px_rgba(0,0,0,0.12)] backdrop-blur-md">
                               <span className="h-2 w-2 rounded-full" style={{ backgroundColor: paymentAdvice.color }} />
                               {Number(card.used || 0) > 0 ? (
                                 <> <span className="font-semibold text-white/75">Deuda actual</span> <span className="font-extrabold text-white">${card.used.toLocaleString('es-MX')}</span></>
@@ -1100,7 +1100,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                             </div>
                             {daysLeft !== null && daysLeft > 0 && (
                               <span
-                                className="sm:hidden inline-flex w-fit px-3 py-1.5 rounded-full text-[10px] font-extrabold uppercase tracking-[0.12em] shadow-sm border border-white/10"
+                                className="sm:hidden inline-flex w-fit px-2.5 py-1.5 rounded-full text-[9px] font-extrabold uppercase tracking-[0.10em] shadow-sm border border-white/10"
                                 style={{ backgroundColor: `${paymentAdvice.color}26`, color: paymentAdvice.color }}
                               >
                                 {daysLeft} día{daysLeft > 1 ? 's' : ''} restante{daysLeft > 1 ? 's' : ''}
