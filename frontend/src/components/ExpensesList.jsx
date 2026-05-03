@@ -82,9 +82,7 @@ export default function ExpensesList({ expenses, cards = [], onEdit, onDelete })
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+    <div
       className="space-y-6"
       data-testid="expenses-list"
     >
@@ -197,7 +195,7 @@ export default function ExpensesList({ expenses, cards = [], onEdit, onDelete })
 
 
       <div className="space-y-4">
-        <AnimatePresence mode="popLayout">
+        <>
           {filteredExpenses.length > 0 ? (
             filteredExpenses.map((expense, index) => {
               const historyCount = expense.editHistory?.length || 0;
@@ -205,13 +203,9 @@ export default function ExpensesList({ expenses, cards = [], onEdit, onDelete })
               const categoryColor = CATEGORY_COLORS[expense.category];
 
               return (
-                <motion.div
+                <div
                   key={expense.id}
-                  layout
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0, transition: { delay: index * 0.05 } }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  className="group relative overflow-hidden rounded-[28px] border border-[#E6E6E3] bg-white p-0 shadow-[0_18px_50px_rgba(26,28,26,0.07)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#DAD7CF] hover:shadow-[0_24px_70px_rgba(26,28,26,0.10)]"
+                  className="group relative overflow-hidden rounded-[28px] border border-[#E6E6E3] bg-white p-0 shadow-[0_18px_50px_rgba(26,28,26,0.07)] transition-colors duration-200 hover:border-[#DAD7CF]"
                   data-testid={`expense-item-${expense.id}`}
                 >
                   <div
@@ -305,20 +299,20 @@ export default function ExpensesList({ expenses, cards = [], onEdit, onDelete })
                       </div>
                     )}
                   </div>
-                </motion.div>
+                </div>
               );
             })
           ) : (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="premium-card empty-state-premium p-8 sm:p-12 text-center">
+            <div className="premium-card empty-state-premium p-8 sm:p-12 text-center">
               <div className="empty-state-icon w-16 h-16 rounded-2xl bg-[#F2F0EB] flex items-center justify-center mx-auto mb-4">
                 <Wallet weight="duotone" className="w-8 h-8 text-[#737573]" />
               </div>
               <h3 className="font-heading text-xl font-medium text-[#1A1C1A] mb-2">Aún no tienes gastos registrados</h3>
               <p className="text-[#737573] max-w-md mx-auto">Cuando agregues un gasto, aparecerá aquí con su categoría, forma de pago e historial de cambios. Esto te ayudará a decidir cuánto puedes pagar a tus tarjetas sin afectar tu efectivo.</p>
-            </motion.div>
+            </div>
           )}
-        </AnimatePresence>
+        </>
       </div>
-    </motion.div>
+    </div>
   );
 }
