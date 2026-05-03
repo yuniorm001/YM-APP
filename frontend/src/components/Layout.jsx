@@ -177,7 +177,7 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
           </div>
 
           {/* MAIN NAV */}
-          <nav className={`relative overflow-y-auto ${isDesktopSidebarCollapsed ? 'px-3 py-3 flex-none mt-auto' : 'px-4 py-6 flex-1'} flex flex-col`}>
+          <nav className={`relative min-h-0 overflow-y-auto overscroll-contain ${isDesktopSidebarCollapsed ? 'px-3 py-3 flex-none mt-auto' : 'px-4 py-6 flex-1'} flex flex-col`}>
             {!isDesktopSidebarCollapsed && (
               <div className="px-1 pb-2 flex items-center gap-2">
                 <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#9A907F]">Navegar</span>
@@ -286,7 +286,7 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.45, duration: 0.4 }}
-                className="mt-6 relative overflow-hidden rounded-[22px] border border-[#1E3328]/10 bg-[linear-gradient(135deg,#0F2A1F_0%,#1E3A2B_45%,#2A4D3B_100%)] p-4 shadow-[0_18px_40px_rgba(15,42,31,0.22)]"
+                className="premium-tip-card mt-6 mb-2 relative shrink-0 overflow-hidden rounded-[22px] border border-[#1E3328]/10 bg-[linear-gradient(135deg,#0F2A1F_0%,#1E3A2B_45%,#2A4D3B_100%)] p-4 shadow-[0_18px_40px_rgba(15,42,31,0.22)]"
               >
                 <div className="pointer-events-none absolute inset-0">
                   <div className="absolute -top-10 -right-10 h-32 w-32 rounded-full bg-[radial-gradient(circle,rgba(212,139,63,0.32),transparent_60%)] blur-xl" />
@@ -320,7 +320,7 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
           </nav>
 
           {/* FOOTER — settings + logout */}
-          <div className={`relative p-3 border-t border-black/5 ${isDesktopSidebarCollapsed ? 'mt-1 mb-auto' : ''}`}>
+          <div className={`relative shrink-0 p-3 border-t border-black/5 ${isDesktopSidebarCollapsed ? 'mt-1 mb-auto' : ''}`}>
             <motion.div
               className={`rounded-[24px] border border-[#ECE6DC] bg-gradient-to-br from-[#FCFBF8] to-[#F3EEE6] ${isDesktopSidebarCollapsed ? 'p-0 bg-transparent border-transparent shadow-none' : 'px-3 py-3'} shadow-[0_10px_22px_rgba(0,0,0,0.025)]`}
             >
