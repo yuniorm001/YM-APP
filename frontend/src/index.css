@@ -5008,3 +5008,17 @@ textarea.premium-input:focus {
     box-shadow: 0 18px 46px rgba(32,39,34,0.08) !important;
   }
 }
+
+/* Ajuste móvil: elimina sombra que se asomaba en el bloque de detalles de cada tarjeta. */
+@media (max-width: 640px) {
+  [data-testid^="card-item-"] .fintech-details-card {
+    box-shadow: none !important;
+  }
+}
+
+/* Configuración: remover línea lateral de colores en cada correo autorizado. */
+.admin-user-row::before,
+.admin-access-modal--fullscreen .admin-user-row-modal::before {
+  display: none !important;
+  content: none !important;
+}
