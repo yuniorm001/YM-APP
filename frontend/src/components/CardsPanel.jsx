@@ -1023,7 +1023,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                 <motion.div
                   animate={{ scale: isAlertPreview ? 1.01 : 1, y: isAlertPreview ? -2 : 0 }}
                   transition={{ duration: 0.22, ease: 'easeOut' }}
-                  className={`rounded-[28px] px-5 sm:px-6 py-4 sm:py-[18px] h-[250px] sm:h-auto min-h-[250px] sm:min-h-[260px] pb-7 sm:pb-8 relative overflow-hidden shadow-[0_22px_45px_rgba(17,24,39,0.10)] hover:shadow-[0_28px_60px_rgba(17,24,39,0.14)] transition-all duration-300 border border-white/10 ${status.isFull ? 'opacity-70' : ''}`}
+                  className={`rounded-[28px] px-5 sm:px-6 py-4 sm:py-[18px] h-[250px] sm:h-auto min-h-[250px] sm:min-h-[260px] pb-7 sm:pb-8 relative overflow-hidden transition-all duration-300 border border-white/10 ${isAlertPreview ? 'shadow-none hover:shadow-none sm:shadow-[0_22px_45px_rgba(17,24,39,0.10)] sm:hover:shadow-[0_28px_60px_rgba(17,24,39,0.14)]' : 'shadow-[0_22px_45px_rgba(17,24,39,0.10)] hover:shadow-[0_28px_60px_rgba(17,24,39,0.14)]'} ${status.isFull ? 'opacity-70' : ''}`}
                   style={{ background: cardType.gradient }}
                 >
                   <div className="absolute inset-0 opacity-10 pointer-events-none">
@@ -1048,7 +1048,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                         className="relative z-10 h-full"
                       >
                         <div
-                          className="relative h-full overflow-hidden rounded-[26px] border p-3 sm:p-5 backdrop-blur-xl flex flex-col justify-between shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_18px_42px_rgba(0,0,0,0.16)]"
+                          className="relative h-full overflow-hidden rounded-[26px] border p-3 sm:p-5 backdrop-blur-xl flex flex-col justify-between shadow-none sm:shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_18px_42px_rgba(0,0,0,0.16)]"
                           style={{
                             background: `linear-gradient(135deg, ${paymentAdvice.color}18 0%, rgba(20,22,20,0.74) 42%, rgba(20,22,20,0.56) 100%)`,
                             borderColor: `${paymentAdvice.color}55`,
@@ -1059,7 +1059,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                             style={{ background: `linear-gradient(90deg, ${paymentAdvice.color} 0%, ${paymentAdvice.color}70 42%, transparent 100%)` }}
                           />
                           <div
-                            className="absolute -right-12 -top-14 h-36 w-36 rounded-full blur-3xl opacity-35 pointer-events-none"
+                            className="hidden sm:block absolute -right-12 -top-14 h-36 w-36 rounded-full blur-3xl opacity-35 pointer-events-none"
                             style={{ backgroundColor: paymentAdvice.color }}
                           />
                           <div className="relative z-10 flex items-start gap-2.5 sm:gap-4">
