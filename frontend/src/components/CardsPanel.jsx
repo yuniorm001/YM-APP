@@ -1430,10 +1430,10 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                       )}
 
                       <div
-                        className="min-h-[220px] rounded-[24px] border bg-gradient-to-br from-white to-[#FAF7F1] p-3.5 shadow-[0_12px_28px_rgba(28,31,27,0.045)]"
+                        className="h-[246px] sm:h-[220px] rounded-[24px] border bg-gradient-to-br from-white to-[#FAF7F1] p-3.5 shadow-[0_12px_28px_rgba(28,31,27,0.045)] overflow-hidden"
                         style={{ borderColor: `${statementStatus.color}24` }}
                       >
-                        <div className="flex min-h-[190px] flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex h-full min-h-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                           <div className="flex items-start gap-3 min-w-0">
                             <div
                               className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[18px] border shadow-sm"
@@ -1447,7 +1447,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                                 <Clock weight="fill" className="h-5 w-5" />
                               )}
                             </div>
-                            <div className="min-w-0">
+                            <div className="min-w-0 flex-1">
                               <div className="flex flex-wrap items-center gap-2">
                                 <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#8D8F8A]">Estado de cuenta</p>
                                 <span
@@ -1474,7 +1474,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                           <button
                             type="button"
                             onClick={() => toggleStatementClosed(card)}
-                            className={`shrink-0 rounded-[18px] px-4 py-3 text-[12px] font-extrabold uppercase tracking-[0.10em] transition-all duration-200 hover:-translate-y-0.5 ${
+                            className={`shrink-0 w-full sm:w-[260px] rounded-[18px] px-4 py-3 text-[12px] font-extrabold uppercase tracking-[0.10em] transition-all duration-200 hover:-translate-y-0.5 ${
                               statementStatus.isConfirmed
                                 ? 'border border-[#DDE7DE] bg-white text-[#2A4D3B] hover:bg-[#F4FAF6] hover:shadow-[0_10px_22px_rgba(42,77,59,0.08)]'
                                 : 'border border-[#2A4D3B]/20 bg-gradient-to-r from-[#2A4D3B] to-[#1E3A2B] text-white hover:shadow-[0_14px_28px_rgba(42,77,59,0.18)]'
