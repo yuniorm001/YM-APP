@@ -375,6 +375,8 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
 
     const daysSincePayment = Math.floor((today - lastPaymentDate) / (1000 * 60 * 60 * 24));
     const daysUntilNextPayment = Math.ceil((nextPaymentDate - today) / (1000 * 60 * 60 * 24));
+    const daysUntilPayment = getDaysUntilPayment(card?.paymentDate);
+    const paymentArrived = daysUntilPayment !== null && daysUntilPayment <= 0;
     const statementClosedAt = card?.statementClosedAt ? new Date(card.statementClosedAt) : null;
     const isConfirmed = Boolean(
       statementClosedAt &&
@@ -387,7 +389,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
     const confirmationDateLong = isConfirmed
       ? statementClosedAt.toLocaleDateString('es', { day: 'numeric', month: 'long', year: 'numeric' })
       : null;
-    const needsConfirmation = !isConfirmed && daysSincePayment >= 0;
+    const needsConfirmation = !isConfirmed && paymentArrived;
     const isWatchWindow = needsConfirmation;
 
     if (isConfirmed) {
@@ -427,8 +429,10 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
       daysSincePayment,
       daysUntilNextPayment,
       title: 'Ciclo en preparación',
-      detail: 'Cuando llegue la fecha de pago, la app te pedirá confirmar si ya llegó el estado de cuenta antes de recomendar usarla.',
-      badge: 'En ciclo',
+      detail: daysUntilPayment !== null && daysUntilPayment > 0
+        ? `Todavía faltan ${daysUntilPayment} día${daysUntilPayment === 1 ? '' : 's'} para el pago. Evita aumentar el balance antes del pago para proteger tu utilización.`
+        : 'Cuando llegue la fecha de pago, la app te pedirá confirmar si ya llegó el estado de cuenta antes de recomendar usarla.',
+      badge: daysUntilPayment !== null && daysUntilPayment > 0 ? 'Pago pendiente' : 'En ciclo',
       color: '#737573'
     };
   };
@@ -1471,18 +1475,24 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                               ) : null}
                             </div>
                           </div>
-                          <button
-                            type="button"
-                            onClick={() => toggleStatementClosed(card)}
-                            className={`shrink-0 w-full sm:w-[260px] rounded-[18px] px-4 py-3 text-[12px] font-extrabold uppercase tracking-[0.10em] transition-all duration-200 hover:-translate-y-0.5 ${
-                              statementStatus.isConfirmed
-                                ? 'border border-[#DDE7DE] bg-white text-[#2A4D3B] hover:bg-[#F4FAF6] hover:shadow-[0_10px_22px_rgba(42,77,59,0.08)]'
-                                : 'border border-[#2A4D3B]/20 bg-gradient-to-r from-[#2A4D3B] to-[#1E3A2B] text-white hover:shadow-[0_14px_28px_rgba(42,77,59,0.18)]'
-                            }`}
-                            data-testid={`toggle-statement-${card.id}`}
-                          >
-                            {statementStatus.isConfirmed ? 'Deshacer' : 'Ya llegó mi estado de cuenta'}
-                          </button>
+                          {statementStatus.needsConfirmation || statementStatus.isConfirmed ? (
+                            <button
+                              type="button"
+                              onClick={() => toggleStatementClosed(card)}
+                              className={`shrink-0 w-full sm:w-[260px] rounded-[18px] px-4 py-3 text-[12px] font-extrabold uppercase tracking-[0.10em] transition-all duration-200 hover:-translate-y-0.5 ${
+                                statementStatus.isConfirmed
+                                  ? 'border border-[#DDE7DE] bg-white text-[#2A4D3B] hover:bg-[#F4FAF6] hover:shadow-[0_10px_22px_rgba(42,77,59,0.08)]'
+                                  : 'border border-[#2A4D3B]/20 bg-gradient-to-r from-[#2A4D3B] to-[#1E3A2B] text-white hover:shadow-[0_14px_28px_rgba(42,77,59,0.18)]'
+                              }`}
+                              data-testid={`toggle-statement-${card.id}`}
+                            >
+                              {statementStatus.isConfirmed ? 'Deshacer' : 'Ya llegó mi estado de cuenta'}
+                            </button>
+                          ) : (
+                            <div className="shrink-0 hidden sm:flex w-[260px] rounded-[18px] border border-[#E6DED2] bg-white/50 px-4 py-3 text-center text-[11px] font-bold uppercase tracking-[0.10em] text-[#8D8F8A] items-center justify-center">
+                              Acción disponible al llegar el pago
+                            </div>
+                          )}
                         </div>
                       </div>
 
@@ -1742,17 +1752,19 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                                   ) : null}
                                 </div>
                               </div>
-                              <button
-                                type="button"
-                                onClick={() => toggleStatementClosed(activeRecommendation)}
-                                className={`shrink-0 rounded-2xl px-4 py-3 text-[11px] font-extrabold uppercase tracking-[0.10em] transition-all ${
-                                  activeRecommendation.statementStatus?.isConfirmed
-                                    ? 'border border-[#DDE7DE] bg-white text-[#2A4D3B] hover:bg-[#F4FAF6]'
-                                    : 'border border-[#2A4D3B]/20 bg-[#1E3A2B] text-white hover:bg-[#2A4D3B]'
-                                }`}
-                              >
-                                {activeRecommendation.statementStatus?.isConfirmed ? 'Deshacer' : 'Ya llegó mi estado de cuenta'}
-                              </button>
+                              {activeRecommendation.statementStatus?.needsConfirmation || activeRecommendation.statementStatus?.isConfirmed ? (
+                                <button
+                                  type="button"
+                                  onClick={() => toggleStatementClosed(activeRecommendation)}
+                                  className={`shrink-0 rounded-2xl px-4 py-3 text-[11px] font-extrabold uppercase tracking-[0.10em] transition-all ${
+                                    activeRecommendation.statementStatus?.isConfirmed
+                                      ? 'border border-[#DDE7DE] bg-white text-[#2A4D3B] hover:bg-[#F4FAF6]'
+                                      : 'border border-[#2A4D3B]/20 bg-[#1E3A2B] text-white hover:bg-[#2A4D3B]'
+                                  }`}
+                                >
+                                  {activeRecommendation.statementStatus?.isConfirmed ? 'Deshacer' : 'Ya llegó mi estado de cuenta'}
+                                </button>
+                              ) : null}
                             </div>
                           </div>
 
