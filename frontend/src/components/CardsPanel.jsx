@@ -1460,13 +1460,27 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                         <div className="p-4 sm:p-5">
                           <div className="flex items-start justify-between gap-3">
                             <div>
-                              <div className="flex items-center gap-2">
-                                <span className="w-7 h-7 rounded-full bg-[#F2F0EB] flex items-center justify-center text-xs font-bold text-[#5E605D]">
+                              <div className="flex items-start gap-2.5 min-w-0">
+                                <span className="w-7 h-7 rounded-full bg-[#F2F0EB] flex items-center justify-center text-xs font-bold text-[#5E605D] shrink-0">
                                   {recommendationIndex + 1}
                                 </span>
-                                <h3 className="font-semibold text-[#1A1C1A]">{activeRecommendation.name}</h3>
+                                <div className="min-w-0">
+                                  <h3 className="font-semibold text-[#1A1C1A] leading-tight truncate">{activeRecommendation.name}</h3>
+                                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                                    <span className="inline-flex items-center gap-1.5 rounded-full border border-[#DDE7DE] bg-[#F4FAF6] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[#2A4D3B] shadow-[0_7px_14px_rgba(42,77,59,0.06)]">
+                                      <span className="flex h-4.5 w-4.5 items-center justify-center rounded-full bg-white text-[8px] font-extrabold text-[#2A4D3B]">
+                                        {getCardType(activeRecommendation.type).mark}
+                                      </span>
+                                      {getCardType(activeRecommendation.type).name}
+                                    </span>
+                                    <span className="inline-flex items-center gap-1.5 rounded-full border border-[#E6DED2] bg-[#FCFBF8] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[#6E6254] shadow-[0_7px_14px_rgba(28,31,27,0.04)]">
+                                      <CreditCardIcon weight="fill" className="h-3 w-3 text-[#2A4D3B]" />
+                                      •••• {String(activeRecommendation.number || '').slice(-4) || '0000'}
+                                    </span>
+                                  </div>
+                                </div>
                               </div>
-                              <p className="text-xs text-[#737573] mt-2">
+                              <p className="text-xs text-[#737573] mt-2 pl-9">
                                 Ordenada por pago:
                                 <span className="font-semibold text-[#1A1C1A] ml-1">
                                   {activeRecommendation.nextPaymentDate
