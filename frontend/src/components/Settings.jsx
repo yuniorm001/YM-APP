@@ -360,12 +360,26 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
 
   const monthCardPaymentsTotal = getMonthlyCardPaymentsTotal(cash?.payments, currentDate);
   const savingsEntries = getSavingsEntries(cash);
-  const savingsBalance = Math.max(0, getSavingsBalance(cash));
+  const savingsImpact = getSavingsBalance(cash);
+  const savingsBalance = Math.max(0, savingsImpact);
   const savingsDepositedTotal = getSavingsDepositedTotal(cash);
   const savingsWithdrawnTotal = getSavingsWithdrawnTotal(cash);
-  const recentSavingsMovements = [...savingsEntries]
+  const activeSavingsMovements = savingsEntries.filter((movement) => {
+    const amount = Number(movement?.amount || 0);
+    const labelText = `${movement?.type || ''} ${movement?.purpose || ''} ${movement?.note || ''}`.toLowerCase();
+
+    return (
+      amount > 0
+      && movement?.type !== 'withdraw'
+      && movement?.status !== 'returned'
+      && !labelText.includes('devuelto')
+      && !labelText.includes('devolución')
+      && !labelText.includes('devolucion')
+    );
+  });
+  const recentSavingsMovements = [...activeSavingsMovements]
     .sort((a, b) => new Date(b.date || b.createdAt || currentDate) - new Date(a.date || a.createdAt || currentDate));
-  const selectableSavingsMovements = recentSavingsMovements.filter((movement) => movement.type !== 'withdraw');
+  const selectableSavingsMovements = recentSavingsMovements;
   const selectedSavingMovement = selectableSavingsMovements.find((movement) => movement.id === selectedSavingMovementId) || null;
   const currentMonthEntries = entries.filter((entry) => isSameMonth(getIncomeEntryDate(entry, currentDate), currentDate));
   const previewPrimary = Number(primaryIncome) || 0;
@@ -381,7 +395,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
   const variableCycleInfo = getPendingVariableCycleInfo(primaryEntry || createPrimaryIncomeEntry(previewPrimary, currentDate, 'Ingreso principal', primaryFrequency, primaryPayDate ? new Date(`${primaryPayDate}T12:00:00`).toISOString() : currentDate, primaryIncomeType), entries, currentDate);
   const accruedCashIncome = depositedPrimaryIncome + extraMonthIncome;
   const cashAvailableBeforeSavings = accruedCashIncome - monthCashSpent - monthCardPaymentsTotal;
-  const cashAvailable = cashAvailableBeforeSavings - savingsBalance;
+  const cashAvailable = cashAvailableBeforeSavings - savingsImpact;
 
   useEffect(() => {
     if (!selectedSavingMovementId) return;
@@ -501,6 +515,8 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
       return;
     }
 
+    // Al devolver el dinero, este movimiento deja de ser una reserva activa.
+    // No se guarda como "Devuelto al cash" en Últimos movimientos para evitar confusión visual.
     const updatedSavings = savingsEntries.filter((entry) => entry.id !== selectedSavingMovement.id);
     persistSavingsEntries(updatedSavings);
     setSelectedSavingMovementId('');
