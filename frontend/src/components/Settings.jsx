@@ -155,6 +155,27 @@ const getMonthlyCardPaymentsTotal = (payments = [], currentDate = new Date().toI
     .reduce((sum, payment) => sum + Number(payment.amount || 0), 0)
 );
 
+
+const getSavingsEntries = (cash = {}) => (Array.isArray(cash?.savings?.entries) ? cash.savings.entries : []);
+
+const getSavingsBalance = (cash = {}) => (
+  getSavingsEntries(cash).reduce((sum, entry) => (
+    sum + (entry.type === 'withdraw' ? -Number(entry.amount || 0) : Number(entry.amount || 0))
+  ), 0)
+);
+
+const getSavingsDepositedTotal = (cash = {}) => (
+  getSavingsEntries(cash)
+    .filter((entry) => entry.type !== 'withdraw')
+    .reduce((sum, entry) => sum + Number(entry.amount || 0), 0)
+);
+
+const getSavingsWithdrawnTotal = (cash = {}) => (
+  getSavingsEntries(cash)
+    .filter((entry) => entry.type === 'withdraw')
+    .reduce((sum, entry) => sum + Number(entry.amount || 0), 0)
+);
+
 const createEmptyIncomeForm = (currentDate) => ({
   amount: '',
   source: '',
@@ -227,7 +248,7 @@ const getPendingVariableCycleInfo = (primaryEntry, entries = [], currentDate) =>
 };
 
 export default function Settings({ data, onUpdate, onReset, session = null }) {
-  const { cash, goals, currentDate, expenses = [] } = data;
+  const { cash, goals, currentDate, expenses = [], cards = [] } = data;
 
   const monthEntries = useMemo(
     () => (cash?.entries || []).filter((entry) => isSameMonth(getIncomeEntryDate(entry, currentDate), currentDate)),
@@ -265,6 +286,13 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
   const [showAllAccessModal, setShowAllAccessModal] = useState(false);
   const [accessSearchQuery, setAccessSearchQuery] = useState('');
   const [modalAccessSearchQuery, setModalAccessSearchQuery] = useState('');
+  const [savingAmount, setSavingAmount] = useState('');
+  const [savingWithdrawAmount, setSavingWithdrawAmount] = useState('');
+  const [savingPurpose, setSavingPurpose] = useState('general');
+  const [savingCardId, setSavingCardId] = useState('');
+  const [savingNote, setSavingNote] = useState('');
+  const [savingStatus, setSavingStatus] = useState('');
+  const [savingError, setSavingError] = useState('');
 
   const isAdminSession = ['email-otp', 'email-password'].includes(session?.provider) && Boolean(session?.isAdmin) && Boolean(session?.token);
 
@@ -330,6 +358,13 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
     .reduce((sum, e) => sum + e.amount, 0);
 
   const monthCardPaymentsTotal = getMonthlyCardPaymentsTotal(cash?.payments, currentDate);
+  const savingsEntries = getSavingsEntries(cash);
+  const savingsBalance = Math.max(0, getSavingsBalance(cash));
+  const savingsDepositedTotal = getSavingsDepositedTotal(cash);
+  const savingsWithdrawnTotal = getSavingsWithdrawnTotal(cash);
+  const recentSavingsMovements = [...savingsEntries]
+    .sort((a, b) => new Date(b.date || b.createdAt || currentDate) - new Date(a.date || a.createdAt || currentDate))
+    .slice(0, 4);
   const currentMonthEntries = entries.filter((entry) => isSameMonth(getIncomeEntryDate(entry, currentDate), currentDate));
   const previewPrimary = Number(primaryIncome) || 0;
   const autoDepositsForMonth = getAutoDepositsForMonth(entries, currentDate);
@@ -343,7 +378,8 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
   const primaryFrequencyLabel = frequencyLabels[primaryFrequency] || 'Mensual';
   const variableCycleInfo = getPendingVariableCycleInfo(primaryEntry || createPrimaryIncomeEntry(previewPrimary, currentDate, 'Ingreso principal', primaryFrequency, primaryPayDate ? new Date(`${primaryPayDate}T12:00:00`).toISOString() : currentDate, primaryIncomeType), entries, currentDate);
   const accruedCashIncome = depositedPrimaryIncome + extraMonthIncome;
-  const cashAvailable = accruedCashIncome - monthCashSpent - monthCardPaymentsTotal;
+  const cashAvailableBeforeSavings = accruedCashIncome - monthCashSpent - monthCardPaymentsTotal;
+  const cashAvailable = cashAvailableBeforeSavings - savingsBalance;
   const canUseSmartGoal = cashAvailable > 0;
   const incomeCount = [...autoDepositsForMonth, ...variableCycleEntriesForMonth, ...extrasForMonth].length;
 
@@ -372,6 +408,93 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
   const smartGoalPerDay = smartGoalRemaining / (goalType === 'weekly' ? remainingDaysInWeek : remainingDaysInMonth);
   const smartGoalPerWeek = smartGoalRemaining / remainingWeeksInMonth;
 
+
+
+  const persistSavingsEntries = (updatedSavingsEntries) => {
+    onUpdate({
+      cash: {
+        entries,
+        payments: cash?.payments || [],
+        savings: { entries: updatedSavingsEntries }
+      }
+    });
+  };
+
+  const handleSavingDeposit = () => {
+    const amount = parseFloat(savingAmount) || 0;
+    setSavingError('');
+    setSavingStatus('');
+
+    if (amount <= 0) {
+      setSavingError('Indica un monto válido para apartar.');
+      return;
+    }
+
+    if (amount > cashAvailable) {
+      setSavingError(`No puedes apartar más de tu cash disponible. Disponible actual: $${formatMoney(cashAvailable)}.`);
+      return;
+    }
+
+    const selectedCard = cards.find((card) => card.id === savingCardId);
+    if (savingPurpose === 'card-payment' && !selectedCard) {
+      setSavingError('Selecciona la tarjeta para conectar esta reserva con las tareas de pago.');
+      return;
+    }
+
+    const isCardReserve = savingPurpose === 'card-payment' && selectedCard;
+    const movementDate = new Date().toISOString();
+    const movement = {
+      id: `saving-deposit-${Date.now()}`,
+      type: 'deposit',
+      amount,
+      purpose: isCardReserve ? 'card-payment' : savingPurpose,
+      cardId: isCardReserve ? selectedCard.id : null,
+      cardName: isCardReserve ? `${selectedCard.name || 'Tarjeta'}${selectedCard.number ? ` •${selectedCard.number}` : ''}` : '',
+      note: savingNote.trim(),
+      date: movementDate,
+      createdAt: movementDate
+    };
+
+    const updatedSavings = [...savingsEntries, movement];
+    persistSavingsEntries(updatedSavings);
+    setSavingAmount('');
+    setSavingNote('');
+    setSavingStatus(isCardReserve ? 'Reserva creada para el pago de la tarjeta.' : 'Ahorro apartado correctamente.');
+  };
+
+  const handleSavingWithdraw = () => {
+    const amount = parseFloat(savingWithdrawAmount) || 0;
+    setSavingError('');
+    setSavingStatus('');
+
+    if (amount <= 0) {
+      setSavingError('Indica un monto válido para devolver al cash.');
+      return;
+    }
+
+    if (amount > savingsBalance) {
+      setSavingError(`No puedes retirar más de lo que tienes ahorrado. Ahorro actual: $${formatMoney(savingsBalance)}.`);
+      return;
+    }
+
+    const movementDate = new Date().toISOString();
+    const movement = {
+      id: `saving-withdraw-${Date.now()}`,
+      type: 'withdraw',
+      amount,
+      purpose: 'cash-return',
+      cardId: null,
+      cardName: '',
+      note: 'Devuelto al cash disponible',
+      date: movementDate,
+      createdAt: movementDate
+    };
+
+    const updatedSavings = [...savingsEntries, movement];
+    persistSavingsEntries(updatedSavings);
+    setSavingWithdrawAmount('');
+    setSavingStatus('Dinero devuelto al cash disponible.');
+  };
 
   const openPrimaryIncomeForm = () => {
     setShowAdditionalIncomeForm(false);
@@ -1288,6 +1411,186 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                 ) : (
                   <span>La app medirá tus <b>gastos cash del mes</b> y te recomendará hasta <b>${formatMoney(smartGoalPerDay)}</b> por día o <b>${formatMoney(smartGoalPerWeek)}</b> por semana.</span>
                 )}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="settings-command-card settings-savings-board lg:col-span-2">
+          <div className="settings-card-glow settings-card-glow--green" />
+          <div className="settings-section-head">
+            <div className="settings-section-icon settings-section-icon--green">
+              <Coins weight="fill" className="w-6 h-6" />
+            </div>
+            <div className="min-w-0">
+              <p className="settings-kicker">Reserva de efectivo</p>
+              <h3>Ahorro inteligente</h3>
+              <p>Aparta dinero del cash disponible para emergencias o pagos. Si lo necesitas, lo puedes devolver al cash.</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-5">
+            <div className="rounded-[28px] border border-[#E6DED0] bg-white/75 p-5 shadow-[0_18px_45px_rgba(42,77,59,0.06)]">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+                <div className="rounded-2xl bg-[#F8F5EF] border border-[#E7DED1] p-4">
+                  <span className="block text-[11px] uppercase tracking-[0.18em] text-[#8A8D88] font-bold">Cash libre</span>
+                  <strong className="block mt-2 text-2xl font-heading text-[#2A4D3B]">${formatMoney(cashAvailable)}</strong>
+                </div>
+                <div className="rounded-2xl bg-[#EAF5EF] border border-[#CFE3D8] p-4">
+                  <span className="block text-[11px] uppercase tracking-[0.18em] text-[#557064] font-bold">Ahorrado</span>
+                  <strong className="block mt-2 text-2xl font-heading text-[#2A4D3B]">${formatMoney(savingsBalance)}</strong>
+                </div>
+                <div className="rounded-2xl bg-white border border-[#E7DED1] p-4">
+                  <span className="block text-[11px] uppercase tracking-[0.18em] text-[#8A8D88] font-bold">Movido</span>
+                  <strong className="block mt-2 text-2xl font-heading text-[#1A1C1A]">${formatMoney(savingsDepositedTotal)}</strong>
+                  <small className="text-xs text-[#737573]">Retirado: ${formatMoney(savingsWithdrawnTotal)}</small>
+                </div>
+              </div>
+
+              <label className="settings-field-title">Tipo de ahorro</label>
+              <div className="settings-segment-grid mb-5">
+                <button
+                  type="button"
+                  onClick={() => setSavingPurpose('general')}
+                  className={`settings-segment-btn ${savingPurpose === 'general' ? 'is-active' : ''}`}
+                >
+                  <ShieldCheck weight="fill" className="w-5 h-5" />
+                  <span>General</span>
+                  <small>Emergencia o colchón</small>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSavingPurpose('card-payment')}
+                  className={`settings-segment-btn ${savingPurpose === 'card-payment' ? 'is-active' : ''}`}
+                >
+                  <Bank weight="fill" className="w-5 h-5" />
+                  <span>Pago tarjeta</span>
+                  <small>Reserva para pagar</small>
+                </button>
+              </div>
+
+              {savingPurpose === 'card-payment' ? (
+                <div className="mb-5">
+                  <label className="settings-field-title">Tarjeta relacionada</label>
+                  <select
+                    value={savingCardId}
+                    onChange={(event) => setSavingCardId(event.target.value)}
+                    className="w-full rounded-2xl border border-[#E6DED0] bg-white px-4 py-3 text-sm font-semibold text-[#1A1C1A] outline-none focus:border-[#2A4D3B]"
+                  >
+                    <option value="">Selecciona una tarjeta</option>
+                    {cards.map((card) => (
+                      <option key={card.id} value={card.id}>
+                        {(card.issuer || card.bank || 'Banco/emisor')} · {card.name || 'Tarjeta'}{card.number ? ` •${card.number}` : ''}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ) : null}
+
+              <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr] gap-4">
+                <div>
+                  <label className="settings-field-title">Monto a apartar</label>
+                  <div className="settings-money-input-wrap">
+                    <span>$</span>
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      value={savingAmount}
+                      onChange={handleNumberChange(setSavingAmount)}
+                      className="settings-money-input"
+                      placeholder="0.00"
+                      autoComplete="off"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="settings-field-title">Nota opcional</label>
+                  <input
+                    type="text"
+                    value={savingNote}
+                    onChange={(event) => setSavingNote(event.target.value)}
+                    className="w-full min-h-[58px] rounded-2xl border border-[#E6DED0] bg-white px-4 text-sm font-semibold text-[#1A1C1A] outline-none focus:border-[#2A4D3B]"
+                    placeholder="Ej: emergencia, renta, pago..."
+                  />
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleSavingDeposit}
+                disabled={cashAvailable <= 0}
+                className={`settings-save-goal mt-5 ${cashAvailable <= 0 ? 'is-disabled' : ''}`}
+              >
+                <FloppyDisk weight="fill" className="w-5 h-5" />
+                Apartar del cash
+              </button>
+            </div>
+
+            <div className="rounded-[28px] border border-[#E6DED0] bg-[#FAF8F3]/90 p-5 flex flex-col justify-between gap-5">
+              <div>
+                <div className="settings-intel-title mb-3">
+                  <Sparkle weight="fill" className="w-4 h-4 text-[#2A4D3B]" />
+                  <span>Sincronizado con tareas</span>
+                </div>
+                <div className="settings-recommendation-card">
+                  <p>Cómo trabaja</p>
+                  <span>Cuando apartas dinero aquí, la app lo descuenta del cash libre y las tareas de hoy pueden marcar avance en ahorro semanal o reservas para pagos de tarjeta.</span>
+                </div>
+
+                {savingError ? <div className="settings-alert-soft settings-alert-soft--danger mt-4">{savingError}</div> : null}
+                {savingStatus ? <div className="settings-alert-soft mt-4">{savingStatus}</div> : null}
+              </div>
+
+              <div className="rounded-3xl bg-white border border-[#E6DED0] p-4">
+                <label className="settings-field-title">Devolver ahorro al cash</label>
+                <div className="settings-money-input-wrap mt-2">
+                  <span>$</span>
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    value={savingWithdrawAmount}
+                    onChange={handleNumberChange(setSavingWithdrawAmount)}
+                    className="settings-money-input"
+                    placeholder="0.00"
+                    autoComplete="off"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={handleSavingWithdraw}
+                  disabled={savingsBalance <= 0}
+                  className={`mt-4 w-full rounded-2xl border border-[#D8D2C7] bg-white px-5 py-4 text-sm font-bold tracking-[0.08em] uppercase text-[#2A4D3B] transition-all hover:shadow-[0_12px_30px_rgba(42,77,59,0.10)] ${savingsBalance <= 0 ? 'opacity-45 cursor-not-allowed' : ''}`}
+                >
+                  Pasar a cash nuevamente
+                </button>
+              </div>
+
+              <div className="space-y-2">
+                <p className="settings-field-title">Últimos movimientos</p>
+                {recentSavingsMovements.length === 0 ? (
+                  <div className="settings-empty-pro">
+                    <div className="settings-empty-icon"><Coins weight="fill" className="w-5 h-5" /></div>
+                    <div>
+                      <p>No hay ahorros todavía.</p>
+                      <span>Cuando apartes dinero, aparecerá aquí el historial.</span>
+                    </div>
+                  </div>
+                ) : recentSavingsMovements.map((movement) => (
+                  <div key={movement.id} className="flex items-center justify-between gap-3 rounded-2xl border border-[#E6DED0] bg-white px-4 py-3">
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-[#1A1C1A] truncate">
+                        {movement.type === 'withdraw' ? 'Devuelto al cash' : movement.purpose === 'card-payment' ? `Reserva ${movement.cardName || 'tarjeta'}` : 'Ahorro general'}
+                      </p>
+                      <span className="text-xs text-[#737573]">
+                        {new Date(movement.date || movement.createdAt).toLocaleDateString('es', { day: 'numeric', month: 'short' })}
+                        {movement.note ? ` · ${movement.note}` : ''}
+                      </span>
+                    </div>
+                    <strong className={`text-sm ${movement.type === 'withdraw' ? 'text-[#B65C47]' : 'text-[#2A4D3B]'}`}>
+                      {movement.type === 'withdraw' ? '-' : '+'}${formatMoney(movement.amount)}
+                    </strong>
+                  </div>
+                ))}
               </div>
             </div>
           </div>

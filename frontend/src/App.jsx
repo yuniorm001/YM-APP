@@ -34,7 +34,7 @@ const loadLocalDataForSession = (session = null) => {
     } catch {}
   }
   return normalizeData({
-    cash: { income: 0, entries: [createPrimaryIncomeEntry(0)] },
+    cash: { income: 0, entries: [createPrimaryIncomeEntry(0)], savings: { entries: [] } },
     expenses: [],
     cards: [],
     goals: { type: 'weekly', amount: 0 },
@@ -140,6 +140,29 @@ const getMonthlyCardPaymentsTotal = (payments = [], currentDate = new Date().toI
     .reduce((sum, payment) => sum + Number(payment.amount || 0), 0)
 );
 
+
+const normalizeSavings = (savings = {}) => {
+  const entries = (Array.isArray(savings.entries) ? savings.entries : []).map((entry) => ({
+    id: entry.id || `saving-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    type: entry.type === 'withdraw' ? 'withdraw' : 'deposit',
+    amount: Math.max(0, Number(entry.amount || 0)),
+    purpose: entry.purpose || 'general',
+    cardId: entry.cardId || null,
+    cardName: entry.cardName || '',
+    note: entry.note || '',
+    date: entry.date || entry.createdAt || new Date().toISOString(),
+    createdAt: entry.createdAt || entry.date || new Date().toISOString()
+  })).filter((entry) => entry.amount > 0);
+
+  return { entries };
+};
+
+const getSavingsBalance = (cash = {}) => (
+  (cash?.savings?.entries || []).reduce((sum, entry) => (
+    sum + (entry.type === 'withdraw' ? -Number(entry.amount || 0) : Number(entry.amount || 0))
+  ), 0)
+);
+
 const normalizeCash = (cash = {}, currentDate = new Date().toISOString()) => {
   const entries = (Array.isArray(cash.entries) ? cash.entries : []).map((entry) => {
     const entryDate = getIncomeEntryDate(entry, currentDate);
@@ -186,14 +209,15 @@ const normalizeCash = (cash = {}, currentDate = new Date().toISOString()) => {
   return {
     income,
     entries: normalizedEntries,
-    payments
+    payments,
+    savings: normalizeSavings(cash.savings)
   };
 };
 
 const normalizeData = (rawData) => {
   const baseDate = rawData?.currentDate || new Date().toISOString();
   const baseData = rawData || {
-    cash: { income: 0, entries: [createPrimaryIncomeEntry(0, baseDate)] },
+    cash: { income: 0, entries: [createPrimaryIncomeEntry(0, baseDate)], savings: { entries: [] } },
     expenses: [],
     cards: [],
     goals: { type: 'weekly', amount: 0 },
@@ -769,7 +793,8 @@ function App() {
         ? {
             ...prev.cash,
             ...newSettings.cash,
-            payments: newSettings.cash.payments ?? prev.cash?.payments ?? []
+            payments: newSettings.cash.payments ?? prev.cash?.payments ?? [],
+            savings: newSettings.cash.savings ?? prev.cash?.savings ?? { entries: [] }
           }
         : prev.cash,
       goals: newSettings.goals
@@ -783,7 +808,7 @@ function App() {
 
   const resetData = () => {
     const freshData = {
-      cash: { income: 0, entries: [createPrimaryIncomeEntry(0)] },
+      cash: { income: 0, entries: [createPrimaryIncomeEntry(0)], savings: { entries: [] } },
       expenses: [],
       cards: [],
       goals: { type: 'weekly', amount: 0 },
@@ -920,7 +945,7 @@ function App() {
                     expDate.getFullYear() === current.getFullYear() &&
                     expense.method === 'Cash'
                   );
-                }).reduce((sum, expense) => sum + expense.amount, 0) - getMonthlyCardPaymentsTotal(data.cash.payments, data.currentDate)}
+                }).reduce((sum, expense) => sum + expense.amount, 0) - getMonthlyCardPaymentsTotal(data.cash.payments, data.currentDate) - getSavingsBalance(data.cash)}
                 onAdd={addCard}
                 onEdit={editCard}
                 onDelete={deleteCard}
@@ -1004,7 +1029,8 @@ function App() {
               );
             })
             .reduce((sum, expense) => sum + expense.amount, 0),
-          cardPayments: getMonthlyCardPaymentsTotal(data.cash.payments, data.currentDate)
+          cardPayments: getMonthlyCardPaymentsTotal(data.cash.payments, data.currentDate),
+          reservedSavings: getSavingsBalance(data.cash)
         }}
       />
 

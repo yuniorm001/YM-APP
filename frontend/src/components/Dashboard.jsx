@@ -72,6 +72,30 @@ const getMonthlyCardPaymentsTotal = (payments = [], currentDate = new Date().toI
 );
 
 
+
+const getSavingsBalance = (cash = {}) => (
+  (cash?.savings?.entries || []).reduce((sum, entry) => (
+    sum + (entry.type === 'withdraw' ? -Number(entry.amount || 0) : Number(entry.amount || 0))
+  ), 0)
+);
+
+const getSavingsDeposits = (cash = {}) => (
+  (cash?.savings?.entries || []).filter((entry) => entry.type !== 'withdraw')
+);
+
+const getSavingsDepositsInRange = (cash = {}, startDate, endDate) => (
+  getSavingsDeposits(cash).filter((entry) => {
+    const entryDate = new Date(entry.date || entry.createdAt || new Date().toISOString());
+    return entryDate >= startDate && entryDate <= endDate;
+  })
+);
+
+const getCardSavingsTotal = (cash = {}, cardId = '') => (
+  getSavingsDeposits(cash)
+    .filter((entry) => entry.purpose === 'card-payment' && entry.cardId === cardId)
+    .reduce((sum, entry) => sum + Number(entry.amount || 0), 0)
+);
+
 const getProgressStrokeOffset = (percentage, radius = 56) => {
   const circumference = 2 * Math.PI * radius;
   const safePercentage = Math.max(0, Math.min(percentage, 100));
@@ -321,8 +345,10 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
 
   const monthCardPaymentsTotal = getMonthlyCardPaymentsTotal(cash.payments, currentDate);
 
-  // Cash disponible = ingreso - gastos en cash - pagos simulados de tarjetas
-  const cashAvailable = cash.income - monthCashTotal - monthCardPaymentsTotal;
+  // Cash disponible = ingreso - gastos en cash - pagos simulados de tarjetas - dinero apartado en ahorro
+  const savingsBalance = getSavingsBalance(cash);
+  const savingsThisWeek = getSavingsDepositsInRange(cash, weekStart, weekEnd).reduce((sum, entry) => sum + Number(entry.amount || 0), 0);
+  const cashAvailable = cash.income - monthCashTotal - monthCardPaymentsTotal - savingsBalance;
   const canUseSmartGoal = cashAvailable > 0;
 
   const totalCreditUsed = cards.reduce((sum, c) => sum + c.used, 0);
@@ -846,31 +872,55 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
     });
   } else if (cashAvailable < Math.max(recurringPayAmount * 0.15, 35)) {
     const savingsTarget = Math.max(20, Math.round(Math.max(recurringPayAmount * 0.05, 20)));
+    const savedEnoughThisWeek = savingsThisWeek >= savingsTarget;
     addTask({
       id: 'save-cash',
-      title: 'Guarda algo de efectivo esta semana',
-      help: `Aparta aunque sean ${formatCurrency(savingsTarget)} para emergencias. Te ayuda a no depender solo de la tarjeta.`,
-      done: false,
+      title: savedEnoughThisWeek ? 'Ahorro semanal activado' : 'Guarda algo de efectivo esta semana',
+      help: savedEnoughThisWeek
+        ? `Ya apartaste ${formatCurrency(savingsThisWeek)} esta semana. Ese dinero queda fuera del cash disponible para que no lo gastes sin darte cuenta.`
+        : `Aparta aunque sean ${formatCurrency(savingsTarget)} para emergencias desde Ahorro inteligente. Te ayuda a no depender solo de la tarjeta.`,
+      done: savedEnoughThisWeek,
       tone: 'normal',
-      priority: 70,
+      priority: savedEnoughThisWeek ? 89 : 70,
       chips: [
-        { label: `Meta: ${formatCurrency(savingsTarget)}`, tone: 'green' },
+        { label: savedEnoughThisWeek ? `Ahorrado: ${formatCurrency(savingsThisWeek)}` : `Meta: ${formatCurrency(savingsTarget)}`, tone: savedEnoughThisWeek ? 'green' : 'green' },
         { label: 'Esta semana', tone: 'neutral' }
       ]
     });
   }
 
   if (nearestPaymentCard && nearestPaymentCard.daysLeft !== null && nearestPaymentCard.daysLeft <= 7 && cashAvailable < nearestPaymentCard.used) {
+    const reservedForNearestPayment = getCardSavingsTotal(cash, nearestPaymentCard.id);
+    const paymentReserveCovered = reservedForNearestPayment >= Math.min(nearestPaymentCard.used, Math.max(nearestPaymentCard.used - cashAvailable, 20));
     addTask({
       id: 'cash-cover-payment',
-      title: `Tu cash no cubre bien el pago de ${getCardDisplayName(nearestPaymentCard)}`,
-      help: `Tienes ${formatCurrency(cashAvailable)} disponible y el balance es ${formatCurrency(nearestPaymentCard.used)}. Prioriza apartar dinero antes de gastar más.`,
-      done: false,
-      tone: 'critical',
-      priority: 12,
+      title: paymentReserveCovered
+        ? `Pago de ${getCardDisplayName(nearestPaymentCard)} con reserva activa`
+        : `Tu cash no cubre bien el pago de ${getCardDisplayName(nearestPaymentCard)}`,
+      help: paymentReserveCovered
+        ? `Ya tienes ${formatCurrency(reservedForNearestPayment)} reservado para ese pago. Mantén esa reserva hasta pagar la tarjeta.`
+        : `Tienes ${formatCurrency(cashAvailable)} disponible y el balance es ${formatCurrency(nearestPaymentCard.used)}. Reserva dinero en Ahorro inteligente antes de gastar más.`,
+      done: paymentReserveCovered,
+      tone: paymentReserveCovered ? 'normal' : 'critical',
+      priority: paymentReserveCovered ? 87 : 12,
       chips: [
-        { label: `Cash: ${formatCurrency(cashAvailable)}`, tone: 'red' },
+        { label: paymentReserveCovered ? `Reservado: ${formatCurrency(reservedForNearestPayment)}` : `Cash: ${formatCurrency(cashAvailable)}`, tone: paymentReserveCovered ? 'green' : 'red' },
         { label: `Pago: ${formatCurrency(nearestPaymentCard.used)}`, tone: 'neutral' }
+      ]
+    });
+  }
+
+  if (savingsBalance > 0) {
+    addTask({
+      id: 'protect-savings-balance',
+      title: 'Protege tu ahorro apartado',
+      help: `Tienes ${formatCurrency(savingsBalance)} fuera del cash disponible. Úsalo solo si realmente necesitas devolverlo al efectivo.`,
+      done: true,
+      tone: 'normal',
+      priority: 91,
+      chips: [
+        { label: `Ahorro: ${formatCurrency(savingsBalance)}`, tone: 'green' },
+        { label: 'Reserva activa', tone: 'neutral' }
       ]
     });
   }

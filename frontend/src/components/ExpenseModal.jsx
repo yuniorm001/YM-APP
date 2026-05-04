@@ -108,7 +108,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cards, editingEx
 
   const cashAvailable = useMemo(() => {
     if (!cashData) return 0;
-    return Number(cashData.income || 0) - Number(cashData.spent || 0) - Number(cashData.cardPayments || 0) + editCashRestore;
+    return Number(cashData.income || 0) - Number(cashData.spent || 0) - Number(cashData.cardPayments || 0) - Number(cashData.reservedSavings || 0) + editCashRestore;
   }, [cashData, editCashRestore]);
 
   useEffect(() => {
