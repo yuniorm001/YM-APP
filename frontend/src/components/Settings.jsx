@@ -293,6 +293,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
   const [savingNote, setSavingNote] = useState('');
   const [savingStatus, setSavingStatus] = useState('');
   const [savingError, setSavingError] = useState('');
+  const [selectedSavingMovementId, setSelectedSavingMovementId] = useState('');
 
   const isAdminSession = ['email-otp', 'email-password'].includes(session?.provider) && Boolean(session?.isAdmin) && Boolean(session?.token);
 
@@ -363,8 +364,9 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
   const savingsDepositedTotal = getSavingsDepositedTotal(cash);
   const savingsWithdrawnTotal = getSavingsWithdrawnTotal(cash);
   const recentSavingsMovements = [...savingsEntries]
-    .sort((a, b) => new Date(b.date || b.createdAt || currentDate) - new Date(a.date || a.createdAt || currentDate))
-    .slice(0, 4);
+    .sort((a, b) => new Date(b.date || b.createdAt || currentDate) - new Date(a.date || a.createdAt || currentDate));
+  const selectableSavingsMovements = recentSavingsMovements.filter((movement) => movement.type !== 'withdraw');
+  const selectedSavingMovement = selectableSavingsMovements.find((movement) => movement.id === selectedSavingMovementId) || null;
   const currentMonthEntries = entries.filter((entry) => isSameMonth(getIncomeEntryDate(entry, currentDate), currentDate));
   const previewPrimary = Number(primaryIncome) || 0;
   const autoDepositsForMonth = getAutoDepositsForMonth(entries, currentDate);
@@ -380,6 +382,17 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
   const accruedCashIncome = depositedPrimaryIncome + extraMonthIncome;
   const cashAvailableBeforeSavings = accruedCashIncome - monthCashSpent - monthCardPaymentsTotal;
   const cashAvailable = cashAvailableBeforeSavings - savingsBalance;
+
+  useEffect(() => {
+    if (!selectedSavingMovementId) return;
+    const selected = getSavingsEntries(cash).find((movement) => movement.id === selectedSavingMovementId && movement.type !== 'withdraw');
+    if (!selected) {
+      setSelectedSavingMovementId('');
+      setSavingWithdrawAmount('');
+    } else {
+      setSavingWithdrawAmount(Number(selected.amount || 0).toFixed(2));
+    }
+  }, [cash?.savings?.entries, selectedSavingMovementId]);
   const canUseSmartGoal = cashAvailable > 0;
   const incomeCount = [...autoDepositsForMonth, ...variableCycleEntriesForMonth, ...extrasForMonth].length;
 
@@ -413,6 +426,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
   const persistSavingsEntries = (updatedSavingsEntries) => {
     onUpdate({
       cash: {
+        income: cash?.income || 0,
         entries,
         payments: cash?.payments || [],
         savings: { entries: updatedSavingsEntries }
@@ -459,41 +473,39 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
     persistSavingsEntries(updatedSavings);
     setSavingAmount('');
     setSavingNote('');
+    setSelectedSavingMovementId(movement.id);
+    setSavingWithdrawAmount(amount.toFixed(2));
     setSavingStatus(isCardReserve ? 'Reserva creada para el pago de la tarjeta.' : 'Ahorro apartado correctamente.');
   };
 
+  const handleSelectSavingMovement = (movement) => {
+    if (!movement || movement.type === 'withdraw') return;
+    setSelectedSavingMovementId(movement.id);
+    setSavingWithdrawAmount(Number(movement.amount || 0).toFixed(2));
+    setSavingError('');
+    setSavingStatus(`Movimiento seleccionado: $${formatMoney(movement.amount)} listo para devolver al cash.`);
+  };
+
   const handleSavingWithdraw = () => {
-    const amount = parseFloat(savingWithdrawAmount) || 0;
     setSavingError('');
     setSavingStatus('');
 
+    if (!selectedSavingMovement) {
+      setSavingError('Selecciona primero el movimiento de ahorro que quieres devolver al cash.');
+      return;
+    }
+
+    const amount = Number(selectedSavingMovement.amount || 0);
     if (amount <= 0) {
-      setSavingError('Indica un monto válido para devolver al cash.');
+      setSavingError('El movimiento seleccionado no tiene un monto válido.');
       return;
     }
 
-    if (amount > savingsBalance) {
-      setSavingError(`No puedes retirar más de lo que tienes ahorrado. Ahorro actual: $${formatMoney(savingsBalance)}.`);
-      return;
-    }
-
-    const movementDate = new Date().toISOString();
-    const movement = {
-      id: `saving-withdraw-${Date.now()}`,
-      type: 'withdraw',
-      amount,
-      purpose: 'cash-return',
-      cardId: null,
-      cardName: '',
-      note: 'Devuelto al cash disponible',
-      date: movementDate,
-      createdAt: movementDate
-    };
-
-    const updatedSavings = [...savingsEntries, movement];
+    const updatedSavings = savingsEntries.filter((entry) => entry.id !== selectedSavingMovement.id);
     persistSavingsEntries(updatedSavings);
+    setSelectedSavingMovementId('');
     setSavingWithdrawAmount('');
-    setSavingStatus('Dinero devuelto al cash disponible.');
+    setSavingStatus(`Se devolvieron $${formatMoney(amount)} al cash y se removió ese movimiento del ahorro.`);
   };
 
   const openPrimaryIncomeForm = () => {
@@ -534,7 +546,8 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
       cash: {
         income: updatedMonthIncome,
         entries: updatedEntries,
-        payments: cash?.payments || []
+        payments: cash?.payments || [],
+        savings: cash?.savings || { entries: [] }
       }
     });
   };
@@ -574,6 +587,17 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
     const updatedEntries = entries.filter((entry) => entry.id !== id);
     setEntries(updatedEntries);
     persistIncomeEntries(updatedEntries);
+  };
+
+  const handleRemoveDisplayedIncomeEntry = (entry) => {
+    if (!entry?.id) return;
+    handleRemoveIncomeEntry(entry.id);
+
+    if (entry.type === 'primary' || entry.isPrimaryConfig || entry.autoGenerated || entry.type === 'primary-auto') {
+      setPrimaryIncome('0');
+      setPrimarySaved(false);
+      setVariableCycleAmount('');
+    }
   };
 
   const handleCancelPrimaryIncome = () => {
@@ -620,7 +644,8 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
       cash: {
         income: updatedMonthIncome,
         entries: updatedEntries,
-        payments: cash?.payments || []
+        payments: cash?.payments || [],
+        savings: cash?.savings || { entries: [] }
       },
     });
     setEntries(updatedEntries);
@@ -1429,8 +1454,8 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-5">
-            <div className="rounded-[28px] border border-[#E6DED0] bg-white/75 p-5 shadow-[0_18px_45px_rgba(42,77,59,0.06)]">
+          <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-5 items-start">
+            <div className="rounded-[28px] border border-[#E6DED0] bg-white/75 p-5 shadow-[0_18px_45px_rgba(42,77,59,0.06)] self-start">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
                 <div className="rounded-2xl bg-[#F8F5EF] border border-[#E7DED1] p-4">
                   <span className="block text-[11px] uppercase tracking-[0.18em] text-[#8A8D88] font-bold">Cash libre</span>
@@ -1549,17 +1574,17 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                     type="text"
                     inputMode="decimal"
                     value={savingWithdrawAmount}
-                    onChange={handleNumberChange(setSavingWithdrawAmount)}
-                    className="settings-money-input"
-                    placeholder="0.00"
+                    readOnly
+                    className="settings-money-input cursor-default"
+                    placeholder="Selecciona un movimiento"
                     autoComplete="off"
                   />
                 </div>
                 <button
                   type="button"
                   onClick={handleSavingWithdraw}
-                  disabled={savingsBalance <= 0}
-                  className={`mt-4 w-full rounded-2xl border border-[#D8D2C7] bg-white px-5 py-4 text-sm font-bold tracking-[0.08em] uppercase text-[#2A4D3B] transition-all hover:shadow-[0_12px_30px_rgba(42,77,59,0.10)] ${savingsBalance <= 0 ? 'opacity-45 cursor-not-allowed' : ''}`}
+                  disabled={!selectedSavingMovement}
+                  className={`mt-4 w-full rounded-2xl border border-[#D8D2C7] bg-white px-5 py-4 text-sm font-bold tracking-[0.08em] uppercase text-[#2A4D3B] transition-all hover:shadow-[0_12px_30px_rgba(42,77,59,0.10)] ${!selectedSavingMovement ? 'opacity-45 cursor-not-allowed' : ''}`}
                 >
                   Pasar a cash nuevamente
                 </button>
@@ -1575,22 +1600,39 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                       <span>Cuando apartes dinero, aparecerá aquí el historial.</span>
                     </div>
                   </div>
-                ) : recentSavingsMovements.map((movement) => (
-                  <div key={movement.id} className="flex items-center justify-between gap-3 rounded-2xl border border-[#E6DED0] bg-white px-4 py-3">
-                    <div className="min-w-0">
-                      <p className="text-sm font-bold text-[#1A1C1A] truncate">
-                        {movement.type === 'withdraw' ? 'Devuelto al cash' : movement.purpose === 'card-payment' ? `Reserva ${movement.cardName || 'tarjeta'}` : 'Ahorro general'}
-                      </p>
-                      <span className="text-xs text-[#737573]">
-                        {new Date(movement.date || movement.createdAt).toLocaleDateString('es', { day: 'numeric', month: 'short' })}
-                        {movement.note ? ` · ${movement.note}` : ''}
-                      </span>
-                    </div>
-                    <strong className={`text-sm ${movement.type === 'withdraw' ? 'text-[#B65C47]' : 'text-[#2A4D3B]'}`}>
-                      {movement.type === 'withdraw' ? '-' : '+'}${formatMoney(movement.amount)}
-                    </strong>
+                ) : (
+                  <div className="max-h-[420px] space-y-2 overflow-y-auto pr-1">
+                    {recentSavingsMovements.map((movement) => {
+                      const isWithdraw = movement.type === 'withdraw';
+                      const isSelected = selectedSavingMovementId === movement.id;
+                      const label = isWithdraw ? 'Devuelto al cash' : movement.purpose === 'card-payment' ? `Reserva ${movement.cardName || 'tarjeta'}` : 'Ahorro general';
+
+                      return (
+                        <button
+                          key={movement.id}
+                          type="button"
+                          onClick={() => !isWithdraw && handleSelectSavingMovement(movement)}
+                          disabled={isWithdraw}
+                          className={`w-full flex items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-left transition-all ${isSelected ? 'border-[#2A4D3B] bg-[#EAF5EF] shadow-[0_12px_30px_rgba(42,77,59,0.10)]' : 'border-[#E6DED0] bg-white hover:border-[#CFE3D8]'} ${isWithdraw ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'}`}
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            <span className={`h-4 w-4 rounded-full border flex-shrink-0 ${isSelected ? 'border-[#2A4D3B] bg-[#2A4D3B] shadow-[inset_0_0_0_4px_#EAF5EF]' : 'border-[#D8D2C7] bg-white'}`} />
+                            <div className="min-w-0">
+                              <p className="text-sm font-bold text-[#1A1C1A] truncate">{label}</p>
+                              <span className="text-xs text-[#737573]">
+                                {new Date(movement.date || movement.createdAt).toLocaleDateString('es', { day: 'numeric', month: 'short' })}
+                                {movement.note ? ` · ${movement.note}` : ''}
+                              </span>
+                            </div>
+                          </div>
+                          <strong className={`text-sm ${isWithdraw ? 'text-[#B65C47]' : 'text-[#2A4D3B]'}`}>
+                            {isWithdraw ? '-' : '+'}${formatMoney(movement.amount)}
+                          </strong>
+                        </button>
+                      );
+                    })}
                   </div>
-                ))}
+                )}
               </div>
             </div>
           </div>
@@ -1753,16 +1795,14 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                               </div>
                               <div className="flex items-center gap-3 justify-between lg:justify-end">
                                 <p className="metric-value text-xl text-[#1A1C1A]">${formatMoney(entry.amount)}</p>
-                                {entry.type !== 'primary' && !entry.autoGenerated && entry.type !== 'primary-auto' && (
-                                  <button
+                                <button
                                     type="button"
-                                    onClick={() => handleRemoveIncomeEntry(entry.id)}
+                                    onClick={() => handleRemoveDisplayedIncomeEntry(entry)}
                                     className="w-10 h-10 rounded-xl bg-[#B65C47]/10 hover:bg-[#B65C47]/15 text-[#B65C47] flex items-center justify-center transition-all"
                                     title="Eliminar ingreso"
                                   >
                                     <Trash weight="fill" className="w-4 h-4" />
                                   </button>
-                                )}
                               </div>
                             </div>
                           ))}
