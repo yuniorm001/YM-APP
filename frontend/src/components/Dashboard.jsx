@@ -515,6 +515,8 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
     const lastPaymentDate = getMostRecentPaymentDate(card?.paymentDate);
     const today = new Date(currentDate);
     today.setHours(0, 0, 0, 0);
+    const currentBalance = Number(card?.used || 0);
+    const hasBalanceDue = currentBalance > 0.009;
 
     if (!lastPaymentDate || daysLeft === null) {
       return {
@@ -549,7 +551,7 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
       };
     }
 
-    if (paymentArrived) {
+    if (paymentArrived && hasBalanceDue) {
       return {
         isConfirmed: false,
         needsConfirmation: true,
@@ -564,11 +566,11 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
     return {
       isConfirmed: false,
       needsConfirmation: false,
-      isFuturePayment: true,
+      isFuturePayment: !paymentArrived,
       daysSincePayment,
-      title: 'Ciclo en preparación',
-      badge: 'Pago pendiente',
-      color: '#737573'
+      title: hasBalanceDue ? 'Ciclo en preparación' : 'Ciclo limpio',
+      badge: hasBalanceDue ? 'Pago pendiente' : 'Sin balance',
+      color: hasBalanceDue ? '#737573' : '#2A4D3B'
     };
   };
 
