@@ -898,6 +898,20 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                         Recomendada
                       </span>
                     </div>
+
+                    <div className="mt-2 flex flex-wrap items-center gap-2.5">
+                      <span className="inline-flex items-center gap-2 rounded-full border border-[#DDE7DE] bg-white/78 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-[#2A4D3B] shadow-[0_8px_18px_rgba(42,77,59,0.07)]">
+                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#F3F7F3] text-[9px] font-extrabold text-[#2A4D3B]">
+                          {getCardType(bestCardToUse.type).mark}
+                        </span>
+                        {getCardType(bestCardToUse.type).name}
+                      </span>
+                      <span className="inline-flex items-center gap-2 rounded-full border border-[#E6DED2] bg-[#FCFBF8]/88 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-[#6E6254] shadow-[0_8px_18px_rgba(28,31,27,0.05)]">
+                        <CreditCardIcon weight="fill" className="h-3.5 w-3.5 text-[#2A4D3B]" />
+                        •••• {String(bestCardToUse.number || '').slice(-4) || '0000'}
+                      </span>
+                    </div>
+
                     <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#5E605D]">{bestCardToUse.summary}</p>
                   </div>
                 </div>
