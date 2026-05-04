@@ -38,10 +38,17 @@ const CARD_TYPES = [
   { id: 'comenity', name: 'Comenity / Bread Financial', mark: 'BR', gradient: 'linear-gradient(135deg, #321B4A 0%, #6E3AA7 50%, #F2B84B 100%)', accent: '#6E3AA7', textTone: 'light' },
   { id: 'visa', name: 'Visa', mark: 'VI', gradient: 'linear-gradient(135deg, #172033 0%, #263B69 52%, #0B1220 100%)', accent: '#263B69', textTone: 'light' },
   { id: 'mastercard', name: 'Mastercard', mark: 'MC', gradient: 'linear-gradient(135deg, #251515 0%, #C84E30 50%, #D9902F 100%)', accent: '#C84E30', textTone: 'light' },
-  { id: 'amex', name: 'American Express', mark: 'AX', gradient: 'linear-gradient(135deg, #123D63 0%, #2E77A6 50%, #0D2B45 100%)', accent: '#2E77A6', textTone: 'light' },
-  { id: 'capital', name: 'Capital One', mark: 'CO', gradient: 'linear-gradient(135deg, #14233B 0%, #C8202F 52%, #0A1B33 100%)', accent: '#C8202F', textTone: 'light' },
   { id: 'other', name: 'Otro banco / emisor', mark: 'OT', gradient: 'linear-gradient(135deg, #171917 0%, #2A4D3B 54%, #111411 100%)', accent: '#2A4D3B', textTone: 'light' }
 ];
+
+const LEGACY_CARD_TYPE_ALIASES = {
+  amex: 'american_express',
+  capital: 'capital_one'
+};
+
+const normalizeCardTypeId = (type) => LEGACY_CARD_TYPE_ALIASES[type] || type;
+
+const getCardType = (type) => CARD_TYPES.find(t => t.id === normalizeCardTypeId(type)) || CARD_TYPES[CARD_TYPES.length - 1];
 
 const PAYMENT_GOAL_OPTIONS = [
   { value: 0, label: '$0' },
@@ -105,7 +112,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
   const totalLimit = cards.reduce((sum, c) => sum + c.limit, 0);
   const totalUsed = cards.reduce((sum, c) => sum + c.used, 0);
   const totalUtilization = totalLimit > 0 ? (totalUsed / totalLimit) * 100 : 0;
-  const selectedIssuer = CARD_TYPES.find(t => t.id === formData.type) || CARD_TYPES[0];
+  const selectedIssuer = getCardType(formData.type);
 
 
   // Validación reactiva: mantiene el error sincronizado con lo que el usuario corrige.
@@ -951,7 +958,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
         <AnimatePresence mode="popLayout">
           {cards.map((card, index) => {
             const utilization = card.limit > 0 ? (card.used / card.limit) * 100 : 0;
-            const cardType = CARD_TYPES.find(t => t.id === card.type) || CARD_TYPES[CARD_TYPES.length - 1];
+            const cardType = getCardType(card.type);
             const status = getUtilizationStatus(card.used, card.limit);
             const available = getCardAvailable(card);
             const daysLeft = getDaysUntilPayment(card.paymentDate);
