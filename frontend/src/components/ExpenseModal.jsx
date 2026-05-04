@@ -23,6 +23,37 @@ const CATEGORIES = [
   { id: 'Otros', icon: '📦', color: '#9CA39C' }
 ];
 
+
+const CARD_ISSUER_NAMES = {
+  chase: 'Chase',
+  capital_one: 'Capital One',
+  capital: 'Capital One',
+  bank_of_america: 'Bank of America',
+  wells_fargo: 'Wells Fargo',
+  citi: 'Citi',
+  american_express: 'American Express',
+  amex: 'American Express',
+  discover: 'Discover',
+  us_bank: 'U.S. Bank',
+  td_bank: 'TD Bank',
+  pnc: 'PNC Bank',
+  navy_federal: 'Navy Federal',
+  synchrony: 'Synchrony',
+  barclays: 'Barclays',
+  apple_card: 'Apple Card / Goldman Sachs',
+  credit_one: 'Credit One Bank',
+  comenity: 'Comenity / Bread Financial',
+  visa: 'Visa',
+  mastercard: 'Mastercard',
+  other: 'Otro banco / emisor'
+};
+
+const getCardIssuerName = (card) => {
+  if (!card) return 'Banco no especificado';
+  const rawType = card.type || card.issuer || card.bank || card.cardType || '';
+  return CARD_ISSUER_NAMES[rawType] || card.issuerName || card.bankName || card.typeName || 'Banco no especificado';
+};
+
 const formatTextInput = (value) => {
   if (!value) return '';
   const words = value.split(' ');
@@ -539,6 +570,10 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cards, editingEx
                                     <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                                       <p className="text-xs text-[#737573] font-mono">****{card.number.slice(-4)}</p>
                                       <span className="text-xs text-[#737573]">•</span>
+                                      <span className="inline-flex items-center rounded-full border border-[#E6E6E3] bg-[#FAFAF9] px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.08em] text-[#5F615F]">
+                                        {getCardIssuerName(card)}
+                                      </span>
+                                      <span className="text-xs text-[#737573]">•</span>
                                       <p className={`text-xs font-semibold ${isDisabled ? 'text-[#9C382A]' : exceedsCredit ? 'text-[#D48B3F]' : 'text-[#2A4D3B]'}`}>
                                         Disponible: ${card.available.toLocaleString('es-MX')}
                                       </p>
@@ -612,7 +647,13 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cards, editingEx
                       {method === 'Tarjeta' && selectedCardData && (
                         <div className="mt-3 pt-3 border-t border-[#E6E6E3] space-y-1">
                           <div className="flex items-center justify-between text-xs gap-3">
-                            <span className="text-[#737573]">Tarjeta: <span className="font-semibold">{selectedCardData.name}</span></span>
+                            <span className="text-[#737573]">
+                              Tarjeta: <span className="font-semibold">{selectedCardData.name}</span>
+                              <span className="mx-1">•</span>
+                              <span className="font-semibold">{getCardIssuerName(selectedCardData)}</span>
+                              <span className="mx-1">•</span>
+                              <span className="font-mono">****{selectedCardData.number?.slice(-4)}</span>
+                            </span>
                             <span className={`font-semibold ${hasInsufficientCredit ? 'text-[#9C382A]' : 'text-[#737573]'}`}>
                               Crédito después: ${(cardAvailable - (parseFloat(amount) || 0)).toLocaleString('es-MX')}
                             </span>
