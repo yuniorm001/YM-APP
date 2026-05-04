@@ -398,7 +398,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
         daysSincePayment,
         daysUntilNextPayment,
         title: 'Estado de cuenta confirmado',
-        detail: 'Ya puedes volver a usar esta tarjeta con más seguridad hasta el próximo ciclo.',
+        detail: 'Ya puedes volver a usar esta tarjeta con más seguridad hasta el próximo ciclo. La app volverá a pedir confirmación cuando llegue la próxima fecha de pago.',
         confirmationDate,
         confirmationDateLong,
         badge: 'Confirmado',
@@ -1430,7 +1430,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                       )}
 
                       <div
-                        className="rounded-[24px] border bg-gradient-to-br from-white to-[#FAF7F1] p-3.5 shadow-[0_12px_28px_rgba(28,31,27,0.045)]"
+                        className="min-h-[172px] rounded-[24px] border bg-gradient-to-br from-white to-[#FAF7F1] p-3.5 shadow-[0_12px_28px_rgba(28,31,27,0.045)]"
                         style={{ borderColor: `${statementStatus.color}24` }}
                       >
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
