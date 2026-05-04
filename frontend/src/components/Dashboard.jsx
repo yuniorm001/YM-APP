@@ -272,6 +272,7 @@ function PremiumRadialCard({
 export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
   const { cash, expenses, cards, goals, currentDate } = data;
   const [showDetails, setShowDetails] = useState(false);
+  const [showAllTasks, setShowAllTasks] = useState(false);
   
   const todayExpenses = expenses.filter(e => {
     const expDate = new Date(e.date);
@@ -469,6 +470,82 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
     .filter((e) => e.method === 'Cash')
     .reduce((sum, e) => sum + Number(e.amount || 0), 0);
 
+  const getMostRecentPaymentDate = (paymentDate) => {
+    const nextPaymentDate = getNextPaymentDate(paymentDate, currentDate);
+    if (!nextPaymentDate) return null;
+
+    const today = new Date(currentDate);
+    today.setHours(0, 0, 0, 0);
+
+    const recentPaymentDate = new Date(nextPaymentDate);
+    if (recentPaymentDate > today) {
+      recentPaymentDate.setMonth(recentPaymentDate.getMonth() - 1);
+    }
+    recentPaymentDate.setHours(0, 0, 0, 0);
+    return recentPaymentDate;
+  };
+
+  const getStatementCycleStatus = (card, daysLeft) => {
+    const lastPaymentDate = getMostRecentPaymentDate(card?.paymentDate);
+    const today = new Date(currentDate);
+    today.setHours(0, 0, 0, 0);
+
+    if (!lastPaymentDate || daysLeft === null) {
+      return {
+        isConfirmed: false,
+        needsConfirmation: false,
+        isFuturePayment: false,
+        daysSincePayment: null,
+        title: 'Estado de cuenta no configurado',
+        badge: 'Sin dato',
+        color: '#737573'
+      };
+    }
+
+    const statementClosedAt = card?.statementClosedAt ? new Date(card.statementClosedAt) : null;
+    const isConfirmed = Boolean(
+      statementClosedAt &&
+      !Number.isNaN(statementClosedAt.getTime()) &&
+      statementClosedAt >= lastPaymentDate
+    );
+    const daysSincePayment = Math.floor((today - lastPaymentDate) / (1000 * 60 * 60 * 24));
+    const paymentArrived = daysLeft <= 0;
+
+    if (isConfirmed) {
+      return {
+        isConfirmed: true,
+        needsConfirmation: false,
+        isFuturePayment: false,
+        daysSincePayment,
+        title: 'Estado de cuenta confirmado',
+        badge: 'Confirmado',
+        color: '#2A4D3B'
+      };
+    }
+
+    if (paymentArrived) {
+      return {
+        isConfirmed: false,
+        needsConfirmation: true,
+        isFuturePayment: false,
+        daysSincePayment,
+        title: 'Esperando estado de cuenta',
+        badge: 'No usar aún',
+        color: '#D48B3F'
+      };
+    }
+
+    return {
+      isConfirmed: false,
+      needsConfirmation: false,
+      isFuturePayment: true,
+      daysSincePayment,
+      title: 'Ciclo en preparación',
+      badge: 'Pago pendiente',
+      color: '#737573'
+    };
+  };
+
   const cardInsights = cards.map((card) => {
     const limit = Number(card.limit || 0);
     const used = Number(card.used || 0);
@@ -484,6 +561,8 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
       .filter((expense) => expense.cardId === card.id)
       .reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
 
+    const statementStatus = getStatementCycleStatus(card, daysLeft);
+
     return {
       ...card,
       limit,
@@ -494,7 +573,8 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
       targetTenPercent,
       targetThirtyPercent,
       weeklyCardSpend,
-      monthlyCardSpend
+      monthlyCardSpend,
+      statementStatus
     };
   });
 
@@ -578,81 +658,201 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
   ];
 
   // ============================================================
-  // Tareas diarias — versión simplificada para usuarios sin
-  // conocimientos de crédito. Convierte los datos financieros
-  // en pasos accionables que la persona pueda tachar de su lista.
+  // Tareas diarias — motor más profundo.
+  // La app genera varias tareas internas, prioriza por riesgo y solo
+  // muestra 6 en la pantalla principal para no cargar el inicio.
   // ============================================================
   const dailyTasks = [];
-  const addTask = (task) => dailyTasks.push(task);
+  const taskIds = new Set();
+  const addTask = (task) => {
+    if (!task?.id || taskIds.has(task.id)) return;
+    taskIds.add(task.id);
+    dailyTasks.push({ priority: 50, ...task });
+  };
 
-  // Tarea 1: revisar saldo (siempre presente, se marca hecha si ya hay datos cargados)
+  const cardsByUtilization = [...cardInsights].sort((a, b) => b.utilization - a.utilization);
+  const cardsByPaymentUrgency = [...cardInsights]
+    .filter((card) => card.daysLeft !== null && card.used > 0)
+    .sort((a, b) => a.daysLeft - b.daysLeft);
+  const pendingStatementCards = cardInsights.filter((card) => card.statementStatus?.needsConfirmation);
+  const confirmedStatementCards = cardInsights.filter((card) => card.statementStatus?.isConfirmed);
+  const healthyUseCards = cardInsights
+    .filter((card) => card.limit > 0 && card.used < card.limit * 0.10 && card.daysLeft !== null && card.daysLeft > 3 && !card.statementStatus?.needsConfirmation)
+    .sort((a, b) => (b.limit - b.used) - (a.limit - a.used));
+  const bestUseCard = healthyUseCards[0] || null;
+
+  // Base: revisión general.
   const hasReviewedBalance = cards.length > 0 || cardInsights.length > 0;
   addTask({
     id: 'review-balance',
     title: 'Revisa tu saldo de la tarjeta',
     help: hasReviewedBalance
       ? `Listo. Estás usando ${creditUtilizationEntero}% de tu límite${creditUtilizationEntero <= 19 ? ' — saludable.' : creditUtilizationEntero <= 29 ? ' — moderado.' : ' — alto.'}`
-      : 'Conecta o agrega una tarjeta para empezar.',
+      : 'Agrega una tarjeta para que la app pueda guiarte mejor.',
     done: hasReviewedBalance,
-    tone: 'neutral'
+    tone: 'neutral',
+    priority: 95
   });
 
-  // Tarea 2: pago próximo
-  if (nearestPaymentCard && nearestPaymentCard.daysLeft !== null && nearestPaymentCard.used > 0 && nearestPaymentCard.daysLeft <= 7) {
-    const dl = Math.max(nearestPaymentCard.daysLeft, 0);
+  // 1) Estado de cuenta / corte: conectar la nueva lógica con tareas.
+  pendingStatementCards.slice(0, 3).forEach((card, index) => {
     addTask({
-      id: 'upcoming-payment',
-      title: dl <= 0
-        ? `Paga hoy ${getCardDisplayName(nearestPaymentCard)}`
-        : `Prepara tu pago de ${getCardDisplayName(nearestPaymentCard)}`,
-      help: dl <= 0
-        ? `Vence hoy. Si no pagas, puedes pagar intereses y afectar tu puntaje de crédito.`
-        : `Vence en ${dl} día${dl === 1 ? '' : 's'}. Aparta ${formatCurrency(nearestPaymentCard.used)} antes de esa fecha.`,
+      id: `statement-pending-${card.id || index}`,
+      title: `Confirma si ya llegó el estado de cuenta de ${getCardDisplayName(card)}`,
+      help: 'Ya llegó o pasó la fecha de pago. No uses esta tarjeta hasta confirmar que el banco envió el nuevo estado de cuenta.',
       done: false,
-      tone: dl <= 2 ? 'critical' : 'urgent',
+      tone: 'critical',
+      priority: 5 + index,
       chips: [
-        { label: dl <= 0 ? 'Hoy' : `${dl} día${dl === 1 ? '' : 's'}`, tone: dl <= 2 ? 'red' : 'amber' },
-        { label: formatCurrency(nearestPaymentCard.used), tone: 'neutral' }
+        { label: 'No usar aún', tone: 'red' },
+        { label: card.statementStatus?.daysSincePayment === 0 ? 'Pago hoy' : `${card.statementStatus?.daysSincePayment || 0}d desde pago`, tone: 'amber' }
+      ]
+    });
+  });
+
+  confirmedStatementCards.slice(0, 2).forEach((card, index) => {
+    addTask({
+      id: `statement-confirmed-${card.id || index}`,
+      title: `${getCardDisplayName(card)} ya está liberada para uso controlado`,
+      help: 'El estado de cuenta fue confirmado. Puedes usarla con más seguridad, pero sin pasar la meta recomendada.',
+      done: true,
+      tone: 'normal',
+      priority: 88 + index,
+      chips: [
+        { label: 'Confirmada', tone: 'green' },
+        { label: `Meta 10%: ${formatCurrency(card.limit * 0.10)}`, tone: 'neutral' }
+      ]
+    });
+  });
+
+  // 2) Pagos próximos o vencidos: una tarea por tarjeta urgente, no solo una global.
+  cardsByPaymentUrgency.slice(0, 4).forEach((card, index) => {
+    const dl = Math.max(card.daysLeft, 0);
+    if (card.daysLeft <= 7) {
+      addTask({
+        id: `payment-${card.id || index}`,
+        title: card.daysLeft <= 0
+          ? `Paga hoy ${getCardDisplayName(card)}`
+          : `Prepara tu pago de ${getCardDisplayName(card)}`,
+        help: card.daysLeft <= 0
+          ? 'Vence hoy o ya pasó. Atiéndela antes de asumir más gastos con tarjeta.'
+          : `Vence en ${dl} día${dl === 1 ? '' : 's'}. Aparta ${formatCurrency(card.used)} antes de esa fecha.`,
+        done: false,
+        tone: card.daysLeft <= 2 ? 'critical' : 'urgent',
+        priority: card.daysLeft <= 0 ? 1 : 10 + dl + index,
+        chips: [
+          { label: card.daysLeft <= 0 ? 'Hoy' : `${dl} día${dl === 1 ? '' : 's'}`, tone: card.daysLeft <= 2 ? 'red' : 'amber' },
+          { label: formatCurrency(card.used), tone: 'neutral' }
+        ]
+      });
+    }
+  });
+
+  // 3) Utilización: tareas específicas por tarjeta.
+  cardsByUtilization.slice(0, 4).forEach((card, index) => {
+    const utilization = getUtilizationEntero(card.utilization);
+    if (utilization >= 30) {
+      const paymentToHealthy = Math.ceil(card.targetThirtyPercent || card.targetTenPercent || 0);
+      addTask({
+        id: `high-utilization-${card.id || index}`,
+        title: `Baja el uso de ${getCardDisplayName(card)}`,
+        help: `Está en ${utilization}%. Si pagas ${formatCurrency(paymentToHealthy)}, la acercas a una zona más sana. Evita seguir usándola hoy.`,
+        done: false,
+        tone: 'urgent',
+        priority: 20 + index,
+        chips: [
+          { label: `Ahora: ${utilization}%`, tone: 'red' },
+          { label: `Pago sugerido: ${formatCurrency(paymentToHealthy)}`, tone: 'green' }
+        ]
+      });
+    } else if (utilization >= 20) {
+      addTask({
+        id: `moderate-utilization-${card.id || index}`,
+        title: `No subas más ${getCardDisplayName(card)} por ahora`,
+        help: `Va en ${utilization}%. Todavía no está crítica, pero cualquier compra nueva la puede acercar al 30%.`,
+        done: false,
+        tone: 'urgent',
+        priority: 35 + index,
+        chips: [
+          { label: `Ahora: ${utilization}%`, tone: 'amber' },
+          { label: 'Meta: <30%', tone: 'green' }
+        ]
+      });
+    }
+
+    if (card.targetTenPercent > 0 && card.targetTenPercent <= Math.max(extraCashCapacity, 25)) {
+      addTask({
+        id: `ten-percent-opportunity-${card.id || index}`,
+        title: `Puedes acercar ${getCardDisplayName(card)} al 10% ideal`,
+        help: `Con un pago de ${formatCurrency(card.targetTenPercent)}, esa tarjeta queda cerca de la zona recomendada para proteger mejor tu perfil.`,
+        done: false,
+        tone: 'normal',
+        priority: 45 + index,
+        chips: [
+          { label: `10%: ${formatCurrency(card.limit * 0.10)}`, tone: 'green' },
+          { label: `Pagar: ${formatCurrency(card.targetTenPercent)}`, tone: 'neutral' }
+        ]
+      });
+    }
+  });
+
+  // 4) Tarjeta recomendada / tarjeta a evitar.
+  if (bestUseCard) {
+    addTask({
+      id: `best-card-${bestUseCard.id || 'today'}`,
+      title: `Si necesitas comprar, usa primero ${getCardDisplayName(bestUseCard)}`,
+      help: `Tiene buen margen y menor presión hoy. Mantén el gasto cerca de ${formatCurrency(bestUseCard.limit * 0.10)} o menos.`,
+      done: false,
+      tone: 'normal',
+      priority: 60,
+      chips: [
+        { label: 'Mejor opción hoy', tone: 'green' },
+        { label: `Disponible: ${formatCurrency(bestUseCard.limit - bestUseCard.used)}`, tone: 'neutral' }
       ]
     });
   }
 
-  // Tarea 3: si la utilización está alta, frenar compras grandes
-  if (highestUtilizationCard && getUtilizationEntero(highestUtilizationCard.utilization) >= 30) {
+  const avoidCard = cardsByUtilization.find((card) => getUtilizationEntero(card.utilization) >= 20 || card.statementStatus?.needsConfirmation || (card.daysLeft !== null && card.daysLeft <= 3 && card.used > 0));
+  if (avoidCard) {
     addTask({
-      id: 'high-utilization',
-      title: `Baja el uso de ${getCardDisplayName(highestUtilizationCard)}`,
-      help: `Estás usando ${getUtilizationEntero(highestUtilizationCard.utilization)}% de tu límite. Si pagas ${formatCurrency(highestUtilizationCard.targetThirtyPercent || highestUtilizationCard.targetTenPercent)}, vuelves a una zona sana.`,
+      id: `avoid-card-${avoidCard.id || 'today'}`,
+      title: `Evita usar ${getCardDisplayName(avoidCard)} hoy`,
+      help: avoidCard.statementStatus?.needsConfirmation
+        ? 'Falta confirmar el estado de cuenta. Usarla ahora puede meter consumo nuevo en el ciclo equivocado.'
+        : 'Tiene presión por uso o pago cercano. Usa otra tarjeta más saludable si necesitas comprar.',
       done: false,
       tone: 'urgent',
+      priority: 30,
       chips: [
-        { label: `Ahora: ${getUtilizationEntero(highestUtilizationCard.utilization)}%`, tone: 'red' },
-        { label: `Meta: <30%`, tone: 'green' }
+        { label: avoidCard.statementStatus?.needsConfirmation ? 'Falta estado' : `Uso: ${getUtilizationEntero(avoidCard.utilization)}%`, tone: 'amber' },
+        { label: 'Evitar hoy', tone: 'red' }
       ]
     });
-  } else if (cashAvailable <= 0) {
+  }
+
+  // 5) Cash y flujo de dinero.
+  if (cashAvailable <= 0) {
     addTask({
       id: 'pause-spending',
       title: 'Frena las compras grandes hoy',
-      help: 'No tienes efectivo guardado. Antes de comprar algo de más de $50, espera a tu próximo ingreso.',
+      help: 'Tu efectivo está en cero o negativo. Antes de usar crédito, espera ingreso o baja gastos no esenciales.',
       done: false,
-      tone: 'urgent',
+      tone: 'critical',
+      priority: 8,
       chips: [
-        { label: 'Importante', tone: 'amber' },
-        { label: '2 min', tone: 'neutral' }
+        { label: 'Cash bajo', tone: 'red' },
+        { label: 'Prioridad', tone: 'amber' }
       ]
     });
-  }
-
-  // Tarea 4: guardar efectivo
-  if (cashAvailable < Math.max(recurringPayAmount * 0.15, 35)) {
+  } else if (cashAvailable < Math.max(recurringPayAmount * 0.15, 35)) {
     const savingsTarget = Math.max(20, Math.round(Math.max(recurringPayAmount * 0.05, 20)));
     addTask({
       id: 'save-cash',
       title: 'Guarda algo de efectivo esta semana',
-      help: `Aparta aunque sean ${formatCurrency(savingsTarget)} para emergencias. Te ayudará a no depender solo de la tarjeta.`,
+      help: `Aparta aunque sean ${formatCurrency(savingsTarget)} para emergencias. Te ayuda a no depender solo de la tarjeta.`,
       done: false,
       tone: 'normal',
+      priority: 70,
       chips: [
         { label: `Meta: ${formatCurrency(savingsTarget)}`, tone: 'green' },
         { label: 'Esta semana', tone: 'neutral' }
@@ -660,7 +860,37 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
     });
   }
 
-  // Tarea 5: mantener uso debajo del 30% (educativa, siempre presente)
+  if (nearestPaymentCard && nearestPaymentCard.daysLeft !== null && nearestPaymentCard.daysLeft <= 7 && cashAvailable < nearestPaymentCard.used) {
+    addTask({
+      id: 'cash-cover-payment',
+      title: `Tu cash no cubre bien el pago de ${getCardDisplayName(nearestPaymentCard)}`,
+      help: `Tienes ${formatCurrency(cashAvailable)} disponible y el balance es ${formatCurrency(nearestPaymentCard.used)}. Prioriza apartar dinero antes de gastar más.`,
+      done: false,
+      tone: 'critical',
+      priority: 12,
+      chips: [
+        { label: `Cash: ${formatCurrency(cashAvailable)}`, tone: 'red' },
+        { label: `Pago: ${formatCurrency(nearestPaymentCard.used)}`, tone: 'neutral' }
+      ]
+    });
+  }
+
+  // 6) Hábitos y educación diaria. Se mantienen abajo, para enseñar sin abrumar.
+  if (weekTotal > 0 && previousWeekTotal > 0 && weeklyDelta > 0) {
+    addTask({
+      id: 'weekly-spend-control',
+      title: 'Controla el ritmo de gastos esta semana',
+      help: `Vas ${formatCurrency(weeklyDelta)} por encima de la semana pasada. Baja compras pequeñas para cerrar mejor.`,
+      done: false,
+      tone: 'normal',
+      priority: 75,
+      chips: [
+        { label: `+${formatCurrency(weeklyDelta)}`, tone: 'amber' },
+        { label: 'Esta semana', tone: 'neutral' }
+      ]
+    });
+  }
+
   addTask({
     id: 'utilization-rule',
     title: 'Mantén tus tarjetas por debajo del 30%',
@@ -669,11 +899,30 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
       : 'Mantén el uso por debajo del 30% de tu límite total. Eso ayuda a cuidar tu puntaje de crédito.',
     done: creditUtilizationEntero <= 29 && cards.length > 0,
     tone: 'normal',
+    priority: 90,
     chips: [
       { label: `Vas en ${creditUtilizationEntero}%`, tone: creditUtilizationEntero <= 29 ? 'green' : 'red' },
       { label: 'Todo el mes', tone: 'neutral' }
     ]
   });
+
+  addTask({
+    id: 'payment-vs-statement-lesson',
+    title: 'Recuerda: pago no es lo mismo que estado de cuenta',
+    help: 'Después de pagar, espera el estado de cuenta antes de volver a usar la tarjeta si quieres proteger lo que se reporta.',
+    done: pendingStatementCards.length === 0,
+    tone: 'normal',
+    priority: pendingStatementCards.length > 0 ? 25 : 92,
+    chips: [
+      { label: 'Educación', tone: 'neutral' },
+      { label: 'Ciclo mensual', tone: pendingStatementCards.length > 0 ? 'amber' : 'green' }
+    ]
+  });
+
+  dailyTasks.sort((a, b) => (a.done === b.done ? a.priority - b.priority : a.done ? 1 : -1));
+  const visibleTaskLimit = 6;
+  const displayedDailyTasks = showAllTasks ? dailyTasks : dailyTasks.slice(0, visibleTaskLimit);
+  const hiddenTasksCount = Math.max(dailyTasks.length - displayedDailyTasks.length, 0);
 
   const tasksDone = dailyTasks.filter((t) => t.done).length;
   const tasksTotal = dailyTasks.length;
@@ -983,7 +1232,7 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
             </div>
 
             <div className="smart-tasks-list">
-              {dailyTasks.map((task) => (
+              {displayedDailyTasks.map((task) => (
                 <div
                   key={task.id}
                   className={`smart-task ${task.done ? 'smart-task-done' : ''} ${task.tone === 'urgent' ? 'smart-task-urgent' : ''} ${task.tone === 'critical' ? 'smart-task-critical' : ''}`}
@@ -1007,6 +1256,16 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
                 </div>
               ))}
             </div>
+
+            {dailyTasks.length > visibleTaskLimit && (
+              <button
+                type="button"
+                onClick={() => setShowAllTasks((value) => !value)}
+                className="w-full rounded-2xl border border-[#E6E1D6] bg-white/80 px-4 py-3 text-sm font-semibold text-[#2A4D3B] shadow-[0_8px_24px_rgba(42,77,59,0.06)] transition-all hover:-translate-y-0.5 hover:bg-[#FAF8F2]"
+              >
+                {showAllTasks ? 'Mostrar menos tareas' : `Ver ${hiddenTasksCount} tarea${hiddenTasksCount === 1 ? '' : 's'} más`}
+              </button>
+            )}
 
             {/* Tarjeta educativa "¿Por qué?" */}
             <div className="smart-tasks-why">
