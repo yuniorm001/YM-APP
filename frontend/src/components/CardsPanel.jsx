@@ -377,6 +377,8 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
     const daysUntilNextPayment = Math.ceil((nextPaymentDate - today) / (1000 * 60 * 60 * 24));
     const daysUntilPayment = getDaysUntilPayment(card?.paymentDate);
     const paymentArrived = daysUntilPayment !== null && daysUntilPayment <= 0;
+    const currentBalance = Number(card?.used || 0);
+    const hasBalanceDue = currentBalance > 0.009;
     const statementClosedAt = card?.statementClosedAt ? new Date(card.statementClosedAt) : null;
     const isConfirmed = Boolean(
       statementClosedAt &&
@@ -428,12 +430,14 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
       isWatchWindow: false,
       daysSincePayment,
       daysUntilNextPayment,
-      title: 'Ciclo en preparación',
+      title: hasBalanceDue ? 'Ciclo en preparación' : 'Ciclo limpio',
       detail: daysUntilPayment !== null && daysUntilPayment > 0
-        ? `Todavía faltan ${daysUntilPayment} día${daysUntilPayment === 1 ? '' : 's'} para el pago. Evita aumentar el balance antes del pago para proteger tu utilización.`
+        ? hasBalanceDue
+          ? `Todavía faltan ${daysUntilPayment} día${daysUntilPayment === 1 ? '' : 's'} para el pago. Evita aumentar el balance antes del pago para proteger tu utilización.`
+          : `No tienes balance pendiente. Faltan ${daysUntilPayment} día${daysUntilPayment === 1 ? '' : 's'} para la próxima fecha de pago; mantén el uso controlado para conservar la tarjeta saludable.`
         : 'Cuando llegue la fecha de pago, la app te pedirá confirmar si ya llegó el estado de cuenta antes de recomendar usarla.',
-      badge: daysUntilPayment !== null && daysUntilPayment > 0 ? 'Pago pendiente' : 'En ciclo',
-      color: '#737573'
+      badge: daysUntilPayment !== null && daysUntilPayment > 0 ? (hasBalanceDue ? 'Pago pendiente' : 'Sin balance') : 'En ciclo',
+      color: hasBalanceDue ? '#737573' : '#2A4D3B'
     };
   };
 
@@ -684,7 +688,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
       action = 'Espera el estado';
       summary = 'Falta confirmar que ya llegó el estado de cuenta.';
       detail = 'No recomendada todavía: falta confirmar estado de cuenta. Si el estado no llegó, el consumo nuevo puede reportarse en este ciclo.';
-    } else if (daysLeft !== null && daysLeft <= 3) {
+    } else if (Number(card.used || 0) > 0.009 && daysLeft !== null && daysLeft <= 3) {
       score = -20 + Math.max(0, available / 1000);
       tone = 'danger';
       badge = 'Pago cerca';
@@ -692,7 +696,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
       action = 'Mejor esperar';
       summary = 'Su fecha de pago está demasiado cerca.';
       detail = 'Si la usas ahora, puedes complicar el manejo del pago o subir la utilización antes del corte.';
-    } else if (daysLeft !== null && daysLeft <= 7) {
+    } else if (Number(card.used || 0) > 0.009 && daysLeft !== null && daysLeft <= 7) {
       score = 10 + Math.max(0, available / 1200) - utilization;
       tone = 'warning';
       badge = 'Con cuidado';
