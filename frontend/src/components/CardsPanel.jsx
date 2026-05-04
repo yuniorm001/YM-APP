@@ -338,6 +338,96 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
     return diffDays;
   };
 
+
+  const getMostRecentPaymentDate = (paymentDate) => {
+    const nextPaymentDate = getNextPaymentDate(paymentDate);
+    if (!nextPaymentDate) return null;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const recentPaymentDate = new Date(nextPaymentDate);
+    if (recentPaymentDate > today) {
+      recentPaymentDate.setMonth(recentPaymentDate.getMonth() - 1);
+    }
+    recentPaymentDate.setHours(0, 0, 0, 0);
+    return recentPaymentDate;
+  };
+
+  const getStatementCycleStatus = (card) => {
+    const lastPaymentDate = getMostRecentPaymentDate(card?.paymentDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (!lastPaymentDate) {
+      return {
+        isConfirmed: false,
+        needsConfirmation: false,
+        isWatchWindow: false,
+        daysSincePayment: null,
+        title: 'Corte no registrado',
+        detail: 'Agrega fecha de pago para activar el control de corte.',
+        badge: 'Sin dato',
+        color: '#737573'
+      };
+    }
+
+    const daysSincePayment = Math.floor((today - lastPaymentDate) / (1000 * 60 * 60 * 24));
+    const statementClosedAt = card?.statementClosedAt ? new Date(card.statementClosedAt) : null;
+    const isConfirmed = Boolean(
+      statementClosedAt &&
+      !Number.isNaN(statementClosedAt.getTime()) &&
+      statementClosedAt >= lastPaymentDate
+    );
+    const isWatchWindow = daysSincePayment >= 0 && daysSincePayment <= 10;
+    const needsConfirmation = isWatchWindow && !isConfirmed;
+
+    if (isConfirmed) {
+      return {
+        isConfirmed: true,
+        needsConfirmation: false,
+        isWatchWindow,
+        daysSincePayment,
+        title: 'Corte confirmado',
+        detail: 'El cliente ya recibió el estado de cuenta. El nuevo consumo cae en el próximo ciclo.',
+        badge: 'Ya cortó',
+        color: '#2A4D3B'
+      };
+    }
+
+    if (needsConfirmation) {
+      return {
+        isConfirmed: false,
+        needsConfirmation: true,
+        isWatchWindow: true,
+        daysSincePayment,
+        title: 'Pendiente de corte',
+        detail: 'El pago ya pasó, pero aún falta confirmar si llegó el estado de cuenta. Evita usarla hasta marcar el corte.',
+        badge: 'No usar aún',
+        color: '#D48B3F'
+      };
+    }
+
+    return {
+      isConfirmed: false,
+      needsConfirmation: false,
+      isWatchWindow,
+      daysSincePayment,
+      title: 'Corte en monitoreo',
+      detail: 'Cuando llegue el estado de cuenta, márcalo para liberar la tarjeta con más seguridad.',
+      badge: 'Monitoreo',
+      color: '#737573'
+    };
+  };
+
+  const toggleStatementClosed = (card) => {
+    const statementStatus = getStatementCycleStatus(card);
+    onEdit({
+      ...card,
+      statementClosedAt: statementStatus.isConfirmed ? null : new Date().toISOString()
+    });
+  };
+
   // Mensaje de asesor financiero según días restantes
   const getPaymentAdvice = (daysLeft, cardName, used) => {
     const currentDebt = Number(used || 0);
@@ -546,6 +636,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
     const utilization = card.limit > 0 ? (card.used / card.limit) * 100 : 0;
     const nextPaymentDate = getNextPaymentDate(card.paymentDate);
     const paymentPlan = buildPaymentPlan(card);
+    const statementStatus = getStatementCycleStatus(card);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const daysLeft = nextPaymentDate
@@ -568,6 +659,14 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
       action = 'Evita usarla';
       summary = 'No tiene crédito disponible.';
       detail = 'Ya alcanzó su límite, así que no conviene cargar más consumo.';
+    } else if (statementStatus.needsConfirmation) {
+      score = -45 + Math.max(0, available / 1600) - utilization;
+      tone = 'statementPending';
+      badge = 'Corte pendiente';
+      color = '#D48B3F';
+      action = 'Espera el corte';
+      summary = 'El pago ya pasó, pero falta confirmar el estado de cuenta.';
+      detail = 'No conviene usarla todavía: si el statement no cerró, el consumo nuevo puede reportarse en este ciclo.';
     } else if (daysLeft !== null && daysLeft <= 3) {
       score = -20 + Math.max(0, available / 1000);
       tone = 'danger';
@@ -608,6 +707,12 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
       score += 15;
     }
 
+    if (statementStatus.isConfirmed && available > 0 && tone === 'good') {
+      score += 18;
+      summary = 'Corte confirmado y buen margen disponible.';
+      detail = 'El cliente ya reportó el statement, así que puede usarse con más seguridad y control.';
+    }
+
     return {
       ...card,
       available,
@@ -615,6 +720,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
       daysLeft,
       nextPaymentDate,
       paymentPlan,
+      statementStatus,
       score,
       tone,
       badge,
@@ -886,16 +992,23 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                   <div className="relative shrink-0">
                     <div className="absolute inset-0 rounded-[24px] bg-[#2A4D3B]/25 blur-xl" />
                     <div className="relative flex h-16 w-16 items-center justify-center rounded-[24px] bg-gradient-to-br from-[#2A4D3B] to-[#173324] text-white shadow-[0_18px_30px_rgba(42,77,59,0.24)]">
-                      <CheckCircle weight="fill" className="h-7 w-7" />
+                      {bestCardToUse.statementStatus?.needsConfirmation ? (
+                        <WarningCircle weight="fill" className="h-7 w-7" />
+                      ) : (
+                        <CheckCircle weight="fill" className="h-7 w-7" />
+                      )}
                     </div>
                   </div>
 
                   <div className="min-w-0 pt-1">
-                    <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#2A4D3B]">Opción más saludable hoy</p>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#2A4D3B]">{bestCardToUse.statementStatus?.needsConfirmation ? 'Tarjeta en pausa por corte' : 'Opción más saludable hoy'}</p>
                     <div className="mt-2 flex flex-wrap items-center gap-2">
                       <h3 className="font-heading text-2xl font-semibold leading-tight text-[#171A17] truncate">{bestCardToUse.name}</h3>
-                      <span className="rounded-full border border-[#DDE7DE] bg-[#F4FAF6] px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-[#2A4D3B]">
-                        Recomendada
+                      <span
+                        className="rounded-full border px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.12em]"
+                        style={{ backgroundColor: `${bestCardToUse.color}12`, borderColor: `${bestCardToUse.color}24`, color: bestCardToUse.color }}
+                      >
+                        {bestCardToUse.badge}
                       </span>
                     </div>
 
@@ -909,6 +1022,13 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                       <span className="inline-flex items-center gap-2 rounded-full border border-[#E6DED2] bg-[#FCFBF8]/88 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-[#6E6254] shadow-[0_8px_18px_rgba(28,31,27,0.05)]">
                         <CreditCardIcon weight="fill" className="h-3.5 w-3.5 text-[#2A4D3B]" />
                         •••• {String(bestCardToUse.number || '').slice(-4) || '0000'}
+                      </span>
+                      <span
+                        className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] shadow-[0_8px_18px_rgba(28,31,27,0.05)]"
+                        style={{ backgroundColor: `${bestCardToUse.statementStatus?.color || '#737573'}10`, borderColor: `${bestCardToUse.statementStatus?.color || '#737573'}24`, color: bestCardToUse.statementStatus?.color || '#737573' }}
+                      >
+                        {bestCardToUse.statementStatus?.isConfirmed ? <CheckCircle weight="fill" className="h-3.5 w-3.5" /> : <Clock weight="fill" className="h-3.5 w-3.5" />}
+                        {bestCardToUse.statementStatus?.badge || 'Monitoreo'}
                       </span>
                     </div>
 
@@ -978,6 +1098,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
             const daysLeft = getDaysUntilPayment(card.paymentDate);
             const paymentAdvice = getPaymentAdvice(daysLeft, card.name, card.used);
             const paymentPlan = buildPaymentPlan(card);
+            const statementStatus = getStatementCycleStatus(card);
             const isAlertPreview = pulseOn && autoAlertCardIds.includes(card.id) && !!paymentAdvice;
             const recommendedSpend = card.limit * 0.10;
             const paymentGoalValue = Number(card.paymentGoal ?? 0);
@@ -1289,6 +1410,53 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                         </div>
                       )}
 
+                      <div
+                        className="rounded-[24px] border bg-gradient-to-br from-white to-[#FAF7F1] p-3.5 shadow-[0_12px_28px_rgba(28,31,27,0.045)]"
+                        style={{ borderColor: `${statementStatus.color}24` }}
+                      >
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                          <div className="flex items-start gap-3 min-w-0">
+                            <div
+                              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[18px] border shadow-sm"
+                              style={{ backgroundColor: `${statementStatus.color}12`, borderColor: `${statementStatus.color}22`, color: statementStatus.color }}
+                            >
+                              {statementStatus.isConfirmed ? (
+                                <CheckCircle weight="fill" className="h-5 w-5" />
+                              ) : statementStatus.needsConfirmation ? (
+                                <WarningCircle weight="fill" className="h-5 w-5" />
+                              ) : (
+                                <Clock weight="fill" className="h-5 w-5" />
+                              )}
+                            </div>
+                            <div className="min-w-0">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#8D8F8A]">Estado de corte</p>
+                                <span
+                                  className="rounded-full border px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.12em]"
+                                  style={{ backgroundColor: `${statementStatus.color}10`, borderColor: `${statementStatus.color}26`, color: statementStatus.color }}
+                                >
+                                  {statementStatus.badge}
+                                </span>
+                              </div>
+                              <p className="mt-1 text-sm font-semibold text-[#1A1C1A]">{statementStatus.title}</p>
+                              <p className="mt-1 text-xs leading-relaxed text-[#737573]">{statementStatus.detail}</p>
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => toggleStatementClosed(card)}
+                            className={`shrink-0 rounded-[18px] px-4 py-3 text-[12px] font-extrabold uppercase tracking-[0.10em] transition-all duration-200 hover:-translate-y-0.5 ${
+                              statementStatus.isConfirmed
+                                ? 'border border-[#DDE7DE] bg-white text-[#2A4D3B] hover:bg-[#F4FAF6] hover:shadow-[0_10px_22px_rgba(42,77,59,0.08)]'
+                                : 'border border-[#2A4D3B]/20 bg-gradient-to-r from-[#2A4D3B] to-[#1E3A2B] text-white hover:shadow-[0_14px_28px_rgba(42,77,59,0.18)]'
+                            }`}
+                            data-testid={`toggle-statement-${card.id}`}
+                          >
+                            {statementStatus.isConfirmed ? 'Deshacer corte' : 'Marcar ya cortó'}
+                          </button>
+                        </div>
+                      </div>
+
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                         <button
                           onClick={() => startEdit(card)}
@@ -1518,6 +1686,39 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                               <p className="text-sm font-semibold text-[#2A4D3B] mt-1">
                                 $ {(activeRecommendation.limit * 0.10).toLocaleString('es-MX')}
                               </p>
+                            </div>
+                          </div>
+
+
+                          <div
+                            className="mt-4 rounded-2xl border bg-[#FCFBF8] p-3.5"
+                            style={{ borderColor: `${activeRecommendation.statementStatus?.color || '#737573'}24` }}
+                          >
+                            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                              <div className="flex items-start gap-3">
+                                <div
+                                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border"
+                                  style={{ backgroundColor: `${activeRecommendation.statementStatus?.color || '#737573'}10`, borderColor: `${activeRecommendation.statementStatus?.color || '#737573'}24`, color: activeRecommendation.statementStatus?.color || '#737573' }}
+                                >
+                                  {activeRecommendation.statementStatus?.isConfirmed ? <CheckCircle weight="fill" className="h-5 w-5" /> : <Clock weight="fill" className="h-5 w-5" />}
+                                </div>
+                                <div>
+                                  <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#737573]">Estado de corte</p>
+                                  <p className="mt-1 text-sm font-semibold text-[#1A1C1A]">{activeRecommendation.statementStatus?.title}</p>
+                                  <p className="mt-1 text-xs leading-relaxed text-[#737573]">{activeRecommendation.statementStatus?.detail}</p>
+                                </div>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => toggleStatementClosed(activeRecommendation)}
+                                className={`shrink-0 rounded-2xl px-4 py-3 text-[11px] font-extrabold uppercase tracking-[0.10em] transition-all ${
+                                  activeRecommendation.statementStatus?.isConfirmed
+                                    ? 'border border-[#DDE7DE] bg-white text-[#2A4D3B] hover:bg-[#F4FAF6]'
+                                    : 'border border-[#2A4D3B]/20 bg-[#1E3A2B] text-white hover:bg-[#2A4D3B]'
+                                }`}
+                              >
+                                {activeRecommendation.statementStatus?.isConfirmed ? 'Deshacer corte' : 'Marcar ya cortó'}
+                              </button>
                             </div>
                           </div>
 
