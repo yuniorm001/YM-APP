@@ -707,18 +707,28 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
     .sort((a, b) => (b.limit - b.used) - (a.limit - a.used));
   const bestUseCard = healthyUseCards[0] || null;
 
-  // Base: revisión general.
+  // Base: revisión general. Solo se muestra como pendiente cuando falta información
+  // o cuando el uso requiere atención. No la marcamos como completada automáticamente.
   const hasReviewedBalance = cards.length > 0 || cardInsights.length > 0;
-  addTask({
-    id: 'review-balance',
-    title: 'Revisa tu saldo de la tarjeta',
-    help: hasReviewedBalance
-      ? `Listo. Estás usando ${creditUtilizationEntero}% de tu límite${creditUtilizationEntero <= 19 ? ' — saludable.' : creditUtilizationEntero <= 29 ? ' — moderado.' : ' — alto.'}`
-      : 'Agrega una tarjeta para que la app pueda guiarte mejor.',
-    done: hasReviewedBalance,
-    tone: 'neutral',
-    priority: 95
-  });
+  if (!hasReviewedBalance) {
+    addTask({
+      id: 'review-balance',
+      title: 'Agrega una tarjeta para recibir guía',
+      help: 'Cuando agregues tus tarjetas, la app podrá crear tareas específicas de pago, uso y estado de cuenta.',
+      done: false,
+      tone: 'neutral',
+      priority: 95
+    });
+  } else if (creditUtilizationEntero >= 20) {
+    addTask({
+      id: 'review-balance',
+      title: 'Revisa tu uso total de tarjetas',
+      help: `Estás usando ${creditUtilizationEntero}% de tu límite total. Revisa qué tarjeta está subiendo más y evita nuevas compras innecesarias.`,
+      done: false,
+      tone: creditUtilizationEntero >= 30 ? 'urgent' : 'normal',
+      priority: 32
+    });
+  }
 
   // 1) Estado de cuenta / corte: conectar la nueva lógica con tareas.
   pendingStatementCards.slice(0, 3).forEach((card, index) => {
@@ -736,20 +746,9 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
     });
   });
 
-  confirmedStatementCards.slice(0, 2).forEach((card, index) => {
-    addTask({
-      id: `statement-confirmed-${card.id || index}`,
-      title: `${getCardDisplayName(card)} ya está liberada para uso controlado`,
-      help: 'El estado de cuenta fue confirmado. Puedes usarla con más seguridad, pero sin pasar la meta recomendada.',
-      done: true,
-      tone: 'normal',
-      priority: 88 + index,
-      chips: [
-        { label: 'Confirmada', tone: 'green' },
-        { label: `Meta 10%: ${formatCurrency(card.limit * 0.10)}`, tone: 'neutral' }
-      ]
-    });
-  });
+  // Las tarjetas con estado de cuenta confirmado ya se muestran dentro de cada tarjeta.
+  // No creamos una tarea completada aparte para evitar tareas "fantasma"
+  // que el cliente no vio antes como acción pendiente.
 
   // 2) Pagos próximos o vencidos: una tarea por tarjeta urgente, no solo una global.
   cardsByPaymentUrgency.slice(0, 4).forEach((card, index) => {
@@ -870,18 +869,26 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
         { label: 'Prioridad', tone: 'amber' }
       ]
     });
-  } else if (cashAvailable < Math.max(recurringPayAmount * 0.15, 35)) {
-    const savingsTarget = Math.max(20, Math.round(Math.max(recurringPayAmount * 0.05, 20)));
-    const savedEnoughThisWeek = savingsThisWeek >= savingsTarget;
+  }
+
+  // Ahorro semanal: siempre debe existir como tarea visible/expandible antes de completarse.
+  // Así la app no crea una tarea completada "de la nada" después de apartar dinero.
+  const savingsTarget = Math.max(20, Math.round(Math.max(recurringPayAmount * 0.05, 20)));
+  const savedEnoughThisWeek = savingsThisWeek >= savingsTarget;
+  const shouldShowSavingsTask = totalMonthlyIncomeCapacity > 0 || cashAvailable > 0 || savingsThisWeek > 0 || savingsBalance > 0;
+
+  if (shouldShowSavingsTask) {
     addTask({
       id: 'save-cash',
       title: savedEnoughThisWeek ? 'Ahorro semanal activado' : 'Guarda algo de efectivo esta semana',
       help: savedEnoughThisWeek
         ? `Ya apartaste ${formatCurrency(savingsThisWeek)} esta semana. Ese dinero queda fuera del cash disponible para que no lo gastes sin darte cuenta.`
-        : `Aparta aunque sean ${formatCurrency(savingsTarget)} para emergencias desde Ahorro inteligente. Te ayuda a no depender solo de la tarjeta.`,
+        : cashAvailable <= 0
+          ? `Cuando tengas efectivo disponible, intenta apartar ${formatCurrency(savingsTarget)} en Ahorro inteligente para crear un colchón.`
+          : `Aparta aunque sean ${formatCurrency(savingsTarget)} para emergencias desde Ahorro inteligente. Te ayuda a no depender solo de la tarjeta.`,
       done: savedEnoughThisWeek,
       tone: 'normal',
-      priority: savedEnoughThisWeek ? 89 : 70,
+      priority: savedEnoughThisWeek ? 89 : (cashAvailable <= 0 ? 78 : 65),
       chips: [
         { label: savedEnoughThisWeek ? `Ahorrado: ${formatCurrency(savingsThisWeek)}` : `Meta: ${formatCurrency(savingsTarget)}`, tone: savedEnoughThisWeek ? 'green' : 'green' },
         { label: 'Esta semana', tone: 'neutral' }
@@ -892,38 +899,28 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
   if (nearestPaymentCard && nearestPaymentCard.daysLeft !== null && nearestPaymentCard.daysLeft <= 7 && cashAvailable < nearestPaymentCard.used) {
     const reservedForNearestPayment = getCardSavingsTotal(cash, nearestPaymentCard.id);
     const paymentReserveCovered = reservedForNearestPayment >= Math.min(nearestPaymentCard.used, Math.max(nearestPaymentCard.used - cashAvailable, 20));
-    addTask({
-      id: 'cash-cover-payment',
-      title: paymentReserveCovered
-        ? `Pago de ${getCardDisplayName(nearestPaymentCard)} con reserva activa`
-        : `Tu cash no cubre bien el pago de ${getCardDisplayName(nearestPaymentCard)}`,
-      help: paymentReserveCovered
-        ? `Ya tienes ${formatCurrency(reservedForNearestPayment)} reservado para ese pago. Mantén esa reserva hasta pagar la tarjeta.`
-        : `Tienes ${formatCurrency(cashAvailable)} disponible y el balance es ${formatCurrency(nearestPaymentCard.used)}. Reserva dinero en Ahorro inteligente antes de gastar más.`,
-      done: paymentReserveCovered,
-      tone: paymentReserveCovered ? 'normal' : 'critical',
-      priority: paymentReserveCovered ? 87 : 12,
-      chips: [
-        { label: paymentReserveCovered ? `Reservado: ${formatCurrency(reservedForNearestPayment)}` : `Cash: ${formatCurrency(cashAvailable)}`, tone: paymentReserveCovered ? 'green' : 'red' },
-        { label: `Pago: ${formatCurrency(nearestPaymentCard.used)}`, tone: 'neutral' }
-      ]
-    });
+
+    // Si la reserva ya cubre el pago, no agregamos una tarea completada nueva.
+    // Ese avance ya se refleja en Ahorro inteligente y en la tarea semanal de ahorro.
+    if (!paymentReserveCovered) {
+      addTask({
+        id: 'cash-cover-payment',
+        title: `Tu cash no cubre bien el pago de ${getCardDisplayName(nearestPaymentCard)}`,
+        help: `Tienes ${formatCurrency(cashAvailable)} disponible y el balance es ${formatCurrency(nearestPaymentCard.used)}. Reserva dinero en Ahorro inteligente antes de gastar más.`,
+        done: false,
+        tone: 'critical',
+        priority: 12,
+        chips: [
+          { label: `Cash: ${formatCurrency(cashAvailable)}`, tone: 'red' },
+          { label: `Pago: ${formatCurrency(nearestPaymentCard.used)}`, tone: 'neutral' }
+        ]
+      });
+    }
   }
 
-  if (savingsBalance > 0) {
-    addTask({
-      id: 'protect-savings-balance',
-      title: 'Protege tu ahorro apartado',
-      help: `Tienes ${formatCurrency(savingsBalance)} fuera del cash disponible. Úsalo solo si realmente necesitas devolverlo al efectivo.`,
-      done: true,
-      tone: 'normal',
-      priority: 91,
-      chips: [
-        { label: `Ahorro: ${formatCurrency(savingsBalance)}`, tone: 'green' },
-        { label: 'Reserva activa', tone: 'neutral' }
-      ]
-    });
-  }
+  // Nota: no agregamos una tarea completada aparte por tener ahorro activo.
+  // El progreso de ahorro vive en la tarea 'save-cash', para que el cliente
+  // vea la misma tarea antes y después de apartar dinero.
 
   // 6) Hábitos y educación diaria. Se mantienen abajo, para enseñar sin abrumar.
   if (weekTotal > 0 && previousWeekTotal > 0 && weeklyDelta > 0) {
@@ -941,33 +938,48 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
     });
   }
 
-  addTask({
-    id: 'utilization-rule',
-    title: 'Mantén tus tarjetas por debajo del 30%',
-    help: cards.length > 0 && cards[0].limit
-      ? `Si tu límite es ${formatCurrency(cards[0].limit)}, intenta no pasar de ${formatCurrency(cards[0].limit * 0.3)} al mes. Eso ayuda a cuidar tu puntaje de crédito.`
-      : 'Mantén el uso por debajo del 30% de tu límite total. Eso ayuda a cuidar tu puntaje de crédito.',
-    done: creditUtilizationEntero <= 29 && cards.length > 0,
-    tone: 'normal',
-    priority: 90,
-    chips: [
-      { label: `Vas en ${creditUtilizationEntero}%`, tone: creditUtilizationEntero <= 29 ? 'green' : 'red' },
-      { label: 'Todo el mes', tone: 'neutral' }
-    ]
-  });
+  if (cards.length > 0 && creditUtilizationEntero >= 30) {
+    addTask({
+      id: 'utilization-rule',
+      title: 'Baja tus tarjetas por debajo del 30%',
+      help: cards[0].limit
+        ? `Tu uso total está en ${creditUtilizationEntero}%. Intenta bajarlo por debajo de 30% para proteger mejor tu puntaje.`
+        : 'Mantén el uso por debajo del 30% de tu límite total. Eso ayuda a cuidar tu puntaje de crédito.',
+      done: false,
+      tone: 'urgent',
+      priority: 28,
+      chips: [
+        { label: `Vas en ${creditUtilizationEntero}%`, tone: 'red' },
+        { label: 'Meta: <30%', tone: 'green' }
+      ]
+    });
+  }
 
-  addTask({
-    id: 'payment-vs-statement-lesson',
-    title: 'Recuerda: pago no es lo mismo que estado de cuenta',
-    help: 'Después de pagar, espera el estado de cuenta antes de volver a usar la tarjeta si quieres proteger lo que se reporta.',
-    done: pendingStatementCards.length === 0,
-    tone: 'normal',
-    priority: pendingStatementCards.length > 0 ? 25 : 92,
-    chips: [
-      { label: 'Educación', tone: 'neutral' },
-      { label: 'Ciclo mensual', tone: pendingStatementCards.length > 0 ? 'amber' : 'green' }
-    ]
-  });
+  if (pendingStatementCards.length > 0) {
+    addTask({
+      id: 'payment-vs-statement-lesson',
+      title: 'Recuerda: pago no es lo mismo que estado de cuenta',
+      help: 'Después de pagar, espera el estado de cuenta antes de volver a usar la tarjeta si quieres proteger lo que se reporta.',
+      done: false,
+      tone: 'normal',
+      priority: 25,
+      chips: [
+        { label: 'Educación', tone: 'neutral' },
+        { label: 'Ciclo mensual', tone: 'amber' }
+      ]
+    });
+  }
+
+  // Regla anti-tareas fantasma:
+  // Una tarea marcada como completada solo debe aparecer si es la misma tarea
+  // que el cliente pudo ver antes como acción pendiente. Los estados positivos
+  // detectados por la app se muestran en sus bloques correspondientes, no como tareas.
+  const allowedCompletedTaskIds = new Set(['save-cash']);
+  for (let i = dailyTasks.length - 1; i >= 0; i -= 1) {
+    if (dailyTasks[i]?.done && !allowedCompletedTaskIds.has(dailyTasks[i].id)) {
+      dailyTasks.splice(i, 1);
+    }
+  }
 
   dailyTasks.sort((a, b) => (a.done === b.done ? a.priority - b.priority : a.done ? 1 : -1));
   const visibleTaskLimit = 6;
