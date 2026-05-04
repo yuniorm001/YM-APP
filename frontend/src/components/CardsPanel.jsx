@@ -384,6 +384,9 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
     const confirmationDate = isConfirmed
       ? statementClosedAt.toLocaleDateString('es', { day: 'numeric', month: 'short' })
       : null;
+    const confirmationDateLong = isConfirmed
+      ? statementClosedAt.toLocaleDateString('es', { day: 'numeric', month: 'long', year: 'numeric' })
+      : null;
     const needsConfirmation = !isConfirmed && daysSincePayment >= 0;
     const isWatchWindow = needsConfirmation;
 
@@ -395,7 +398,9 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
         daysSincePayment,
         daysUntilNextPayment,
         title: 'Estado de cuenta confirmado',
-        detail: `Confirmado el ${confirmationDate}. Puedes volver a usar esta tarjeta con más seguridad hasta el próximo ciclo.`,
+        detail: 'Ya puedes volver a usar esta tarjeta con más seguridad hasta el próximo ciclo.',
+        confirmationDate,
+        confirmationDateLong,
         badge: 'Confirmado',
         color: '#2A4D3B'
       };
@@ -409,7 +414,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
         daysSincePayment,
         daysUntilNextPayment,
         title: 'Esperando estado de cuenta',
-        detail: 'No uses esta tarjeta todavía si quieres proteger el crédito. Presiona el botón cuando el banco envíe el nuevo estado de cuenta.',
+        detail: 'Aunque ya pagaste, espera el estado de cuenta antes de usarla. Presiona el botón cuando el banco te envíe el nuevo estado de cuenta.',
         badge: 'No usar aún',
         color: '#D48B3F'
       };
@@ -674,7 +679,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
       color = '#D48B3F';
       action = 'Espera el estado';
       summary = 'Falta confirmar que ya llegó el estado de cuenta.';
-      detail = 'No conviene usarla todavía: si el estado de cuenta no llegó, el consumo nuevo puede reportarse en este ciclo.';
+      detail = 'No recomendada todavía: falta confirmar estado de cuenta. Si el estado no llegó, el consumo nuevo puede reportarse en este ciclo.';
     } else if (daysLeft !== null && daysLeft <= 3) {
       score = -20 + Math.max(0, available / 1000);
       tone = 'danger';
@@ -1041,6 +1046,12 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                     </div>
 
                     <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#5E605D]">{bestCardToUse.summary}</p>
+                    {bestCardToUse.statementStatus?.needsConfirmation ? (
+                      <div className="mt-3 inline-flex max-w-2xl items-center gap-2 rounded-2xl border border-[#E8D4B8] bg-[#FFF7EA] px-3 py-2 text-[12px] font-semibold leading-relaxed text-[#8A5D26] shadow-[0_8px_18px_rgba(212,139,63,0.08)]">
+                        <WarningCircle weight="fill" className="h-4 w-4 shrink-0" />
+                        No recomendada todavía: falta confirmar estado de cuenta.
+                      </div>
+                    ) : null}
                   </div>
                 </div>
 
@@ -1448,6 +1459,16 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                               </div>
                               <p className="mt-1 text-sm font-semibold text-[#1A1C1A]">{statementStatus.title}</p>
                               <p className="mt-1 text-xs leading-relaxed text-[#737573]">{statementStatus.detail}</p>
+                              {statementStatus.confirmationDateLong ? (
+                                <p className="mt-2 inline-flex rounded-full border border-[#DDE7DE] bg-white/75 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.10em] text-[#2A4D3B]">
+                                  Confirmado el {statementStatus.confirmationDateLong}
+                                </p>
+                              ) : null}
+                              {statementStatus.needsConfirmation ? (
+                                <p className="mt-2 text-[11px] font-semibold leading-relaxed text-[#9A6B2D]">
+                                  Esto evita usarla antes de tiempo y proteger mejor la utilización reportada.
+                                </p>
+                              ) : null}
                             </div>
                           </div>
                           <button
@@ -1460,7 +1481,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                             }`}
                             data-testid={`toggle-statement-${card.id}`}
                           >
-                            {statementStatus.isConfirmed ? 'Deshacer confirmación' : 'Ya llegó mi estado de cuenta'}
+                            {statementStatus.isConfirmed ? 'Deshacer' : 'Ya llegó mi estado de cuenta'}
                           </button>
                         </div>
                       </div>
@@ -1714,6 +1735,11 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                                   <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#737573]">Estado de cuenta</p>
                                   <p className="mt-1 text-sm font-semibold text-[#1A1C1A]">{activeRecommendation.statementStatus?.title}</p>
                                   <p className="mt-1 text-xs leading-relaxed text-[#737573]">{activeRecommendation.statementStatus?.detail}</p>
+                                  {activeRecommendation.statementStatus?.confirmationDateLong ? (
+                                    <p className="mt-2 inline-flex rounded-full border border-[#DDE7DE] bg-white/75 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.10em] text-[#2A4D3B]">
+                                      Confirmado el {activeRecommendation.statementStatus.confirmationDateLong}
+                                    </p>
+                                  ) : null}
                                 </div>
                               </div>
                               <button
@@ -1725,7 +1751,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                                     : 'border border-[#2A4D3B]/20 bg-[#1E3A2B] text-white hover:bg-[#2A4D3B]'
                                 }`}
                               >
-                                {activeRecommendation.statementStatus?.isConfirmed ? 'Deshacer confirmación' : 'Ya llegó mi estado de cuenta'}
+                                {activeRecommendation.statementStatus?.isConfirmed ? 'Deshacer' : 'Ya llegó mi estado de cuenta'}
                               </button>
                             </div>
                           </div>
