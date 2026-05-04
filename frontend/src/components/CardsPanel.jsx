@@ -1430,10 +1430,10 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                       )}
 
                       <div
-                        className="min-h-[172px] rounded-[24px] border bg-gradient-to-br from-white to-[#FAF7F1] p-3.5 shadow-[0_12px_28px_rgba(28,31,27,0.045)]"
+                        className="min-h-[220px] rounded-[24px] border bg-gradient-to-br from-white to-[#FAF7F1] p-3.5 shadow-[0_12px_28px_rgba(28,31,27,0.045)]"
                         style={{ borderColor: `${statementStatus.color}24` }}
                       >
-                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex min-h-[190px] flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                           <div className="flex items-start gap-3 min-w-0">
                             <div
                               className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[18px] border shadow-sm"
