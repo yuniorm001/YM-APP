@@ -71,14 +71,21 @@ export default function ExpensesList({ expenses, cards = [], onEdit, onDelete })
 
   const getCardLabel = (expense) => {
     if (expense.method === 'Cash') return 'Efectivo';
-    const card = cards.find((item) => item.id === expense.cardId);
-    if (!card) return 'Tarjeta';
 
-    const cardName = card.name || 'Tarjeta';
-    const rawLastFour = card.lastFour || card.last4 || card.lastDigits || card.number || '';
+    const card = cards.find((item) => item.id === expense.cardId);
+    const rawLastFour =
+      expense.cardLastFour ||
+      expense.lastFour ||
+      expense.last4 ||
+      expense.cardNumber ||
+      card?.lastFour ||
+      card?.last4 ||
+      card?.lastDigits ||
+      card?.number ||
+      '';
     const lastFour = String(rawLastFour).replace(/\D/g, '').slice(-4);
 
-    return lastFour ? `${cardName} • ${lastFour}` : cardName;
+    return lastFour ? `Tarjeta • ${lastFour}` : 'Tarjeta';
   };
 
   return (
