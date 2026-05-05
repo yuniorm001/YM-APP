@@ -2272,3 +2272,77 @@
     margin-right: auto;
   }
 }
+
+
+/* QA Configuración desktop: cerrar espacios muertos y evitar bloques con aire lateral */
+.settings-savings-board {
+  padding-bottom: clamp(1.2rem, 1.7vw, 1.55rem);
+}
+
+.settings-savings-layout {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.03fr) minmax(360px, 0.97fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.settings-savings-form-panel,
+.settings-savings-side-panel {
+  min-width: 0;
+  height: auto;
+}
+
+.settings-savings-side-panel {
+  align-self: start;
+}
+
+.settings-savings-side-panel .settings-recommendation-card {
+  flex: initial;
+  margin-top: 0;
+}
+
+.settings-savings-scroll {
+  max-height: 182px;
+}
+
+.settings-savings-scroll:empty {
+  display: none;
+}
+
+.settings-savings-board .space-y-2 {
+  min-height: 0;
+}
+
+@media (min-width: 1181px) {
+  .settings-savings-board .settings-section-head {
+    margin-bottom: 0.9rem;
+  }
+
+  .settings-savings-layout > * {
+    width: 100%;
+  }
+}
+
+@media (max-width: 1180px) {
+  .settings-savings-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .settings-savings-layout {
+    gap: 0.85rem;
+  }
+
+  .settings-savings-form-panel,
+  .settings-savings-side-panel {
+    padding: 0.95rem !important;
+    border-radius: 22px !important;
+  }
+
+  .settings-savings-scroll {
+    max-height: 240px;
+  }
+}

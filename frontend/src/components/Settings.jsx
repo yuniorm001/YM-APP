@@ -1526,8 +1526,8 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-5 items-start">
-            <div className="rounded-[28px] border border-[#E6DED0] bg-white/75 p-5 shadow-[0_18px_45px_rgba(42,77,59,0.06)] flex flex-col">
+          <div className="settings-savings-layout">
+            <div className="settings-savings-form-panel rounded-[28px] border border-[#E6DED0] bg-white/75 p-5 shadow-[0_18px_45px_rgba(42,77,59,0.06)] flex flex-col">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
                 <div className="rounded-2xl bg-[#F8F5EF] border border-[#E7DED1] p-4">
                   <span className="block text-[11px] uppercase tracking-[0.18em] text-[#8A8D88] font-bold">Cash libre</span>
@@ -1650,7 +1650,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
               </button>
             </div>
 
-            <div className="rounded-[28px] border border-[#E6DED0] bg-[#FAF8F3]/90 p-5 flex flex-col gap-5">
+            <div className="settings-savings-side-panel rounded-[28px] border border-[#E6DED0] bg-[#FAF8F3]/90 p-5 flex flex-col gap-4">
               <div>
                 <div className="settings-intel-title mb-3">
                   <Sparkle weight="fill" className="w-4 h-4 text-[#2A4D3B]" />
@@ -1700,7 +1700,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                     </div>
                   </div>
                 ) : (
-                  <div className="max-h-[220px] lg:h-[220px] space-y-2 overflow-y-auto pr-1 settings-savings-scroll">
+                  <div className="settings-savings-scroll space-y-2 overflow-y-auto pr-1">
                     {recentSavingsMovements.map((movement) => {
                       const isWithdraw = movement.type === 'withdraw';
                       const isSelected = selectedSavingMovementId === movement.id;
