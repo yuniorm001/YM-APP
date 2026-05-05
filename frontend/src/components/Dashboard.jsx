@@ -882,10 +882,14 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
     });
   }
 
-  // Ahorro semanal: siempre debe existir como tarea visible/expandible antes de completarse.
-  // Así la app no crea una tarea completada "de la nada" después de apartar dinero.
-  const savingsTarget = Math.max(20, Math.round(Math.max(recurringPayAmount * 0.05, 20)));
-  const savedEnoughThisWeek = savingsThisWeek >= savingsTarget;
+  // Ahorro semanal: meta fija de $20 para que el copy siempre coincida con el chip.
+  // La tarea se cumple si el usuario tiene un colchón activo de al menos $20
+  // (balance actual de Ahorro Inteligente) O si depositó esa cantidad en los
+  // últimos 7 días. Esto evita que la tarea quede atascada por temas de fecha,
+  // zona horaria o porque el depósito quedó justo fuera de la ventana.
+  const savingsTarget = 20;
+  const savingsTowardsTask = Math.max(savingsThisWeek, savingsBalance);
+  const savedEnoughThisWeek = savingsTowardsTask >= savingsTarget;
   const shouldShowSavingsTask = totalMonthlyIncomeCapacity > 0 || cashAvailable > 0 || savingsThisWeek > 0 || savingsBalance > 0;
 
   if (shouldShowSavingsTask) {
@@ -893,7 +897,7 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
       id: 'save-cash',
       title: savedEnoughThisWeek ? 'Ahorro semanal activado' : 'Guarda algo de efectivo esta semana',
       help: savedEnoughThisWeek
-        ? `Ya apartaste ${formatCurrency(savingsThisWeek)} en los últimos 7 días. Ese dinero queda fuera del cash disponible para que no lo gastes sin darte cuenta.`
+        ? `Ya tienes ${formatCurrency(savingsTowardsTask)} apartados en Ahorro inteligente. Ese dinero queda fuera del cash disponible para que no lo gastes sin darte cuenta.`
         : cashAvailable <= 0
           ? `Cuando tengas efectivo disponible, intenta apartar ${formatCurrency(savingsTarget)} en Ahorro inteligente para crear un colchón.`
           : `Aparta aunque sean ${formatCurrency(savingsTarget)} para emergencias desde Ahorro inteligente. Te ayuda a no depender solo de la tarjeta.`,
@@ -901,8 +905,8 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
       tone: 'normal',
       priority: savedEnoughThisWeek ? 89 : (cashAvailable <= 0 ? 78 : 65),
       chips: [
-        { label: savedEnoughThisWeek ? `Ahorrado: ${formatCurrency(savingsThisWeek)}` : `Meta: ${formatCurrency(savingsTarget)}`, tone: 'green' },
-        { label: 'Últimos 7 días', tone: 'neutral' }
+        { label: savedEnoughThisWeek ? `Ahorrado: ${formatCurrency(savingsTowardsTask)}` : `Meta: ${formatCurrency(savingsTarget)}`, tone: 'green' },
+        { label: 'Ahorro activo', tone: 'neutral' }
       ]
     });
   }
