@@ -96,6 +96,34 @@ const getDaysUntilCardPayment = (paymentDate) => {
   return Math.ceil((nextPaymentDate - today) / (1000 * 60 * 60 * 24));
 };
 
+const getMostRecentPaymentDate = (paymentDate) => {
+  const original = parseDateOnly(paymentDate);
+  if (!original) return null;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const recentPaymentDate = new Date(today.getFullYear(), original.getMonth(), original.getDate());
+  recentPaymentDate.setHours(0, 0, 0, 0);
+
+  if (recentPaymentDate > today) {
+    recentPaymentDate.setMonth(recentPaymentDate.getMonth() - 1);
+  }
+
+  return recentPaymentDate;
+};
+
+const getDaysSinceLastPayment = (paymentDate) => {
+  const lastPaymentDate = getMostRecentPaymentDate(paymentDate);
+  if (!lastPaymentDate) return null;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return Math.floor((today - lastPaymentDate) / (1000 * 60 * 60 * 24));
+};
+
+
 // Devuelve true si el cliente ya confirmó haber recibido el estado de cuenta
 // del ciclo actual (botón "Ya llegó mi estado de cuenta" en CardsPanel).
 // Cuando esto es true, las alertas y tareas del modal/Dashboard relacionadas
@@ -183,12 +211,11 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cards, editingEx
     if (method !== 'Tarjeta' || !selectedCardData?.paymentDate) return null;
 
     // Si el cliente ya confirmó que recibió el estado de cuenta del ciclo
-    // actual, la tarjeta ya está liberada y NO debemos mostrar la alerta de
-    // "Hoy es la fecha de pago" ni la de "fecha de pago cercana".
+    // actual, la tarjeta ya está liberada.
     if (isStatementConfirmedForCurrentCycle(selectedCardData)) return null;
 
     const daysUntilPayment = getDaysUntilCardPayment(selectedCardData.paymentDate);
-    if (daysUntilPayment === null || daysUntilPayment > 5) return null;
+    const daysSinceLastPayment = getDaysSinceLastPayment(selectedCardData.paymentDate);
 
     if (daysUntilPayment === 0) {
       return {
@@ -199,12 +226,25 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cards, editingEx
       };
     }
 
-    return {
-      type: 'near-payment',
-      color: daysUntilPayment <= 2 ? '#9C382A' : '#D48B3F',
-      title: '📅 Fecha de pago cercana',
-      message: `A ${selectedCardData.name} le faltan ${daysUntilPayment} día${daysUntilPayment > 1 ? 's' : ''} para su pago. Si generas este gasto ahora, puedes llegar más cargado al corte o al pago.`
-    };
+    if (daysUntilPayment !== null && daysUntilPayment > 0 && daysUntilPayment <= 5) {
+      return {
+        type: 'near-payment',
+        color: daysUntilPayment <= 2 ? '#9C382A' : '#D48B3F',
+        title: '📅 Fecha de pago cercana',
+        message: `A ${selectedCardData.name} le faltan ${daysUntilPayment} día${daysUntilPayment > 1 ? 's' : ''} para su pago. Si generas este gasto ahora, puedes llegar más cargado al corte o al pago.`
+      };
+    }
+
+    if (daysSinceLastPayment !== null && daysSinceLastPayment >= 0 && daysSinceLastPayment < 32) {
+      return {
+        type: 'statement-pending',
+        color: '#D48B3F',
+        title: '⚠️ Falta confirmar el estado de cuenta',
+        message: `Antes de usar ${selectedCardData.name}, confirma que ya llegó el nuevo estado de cuenta. Hasta entonces, la app no debe tratar esta tarjeta como opción segura para nuevos gastos.`
+      };
+    }
+
+    return null;
   }, [method, selectedCardData]);
 
   const cardAvailable = selectedCardData?.available || 0;

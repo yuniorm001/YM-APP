@@ -549,7 +549,7 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
       statementClosedAt >= lastPaymentDate
     );
     const daysSincePayment = Math.floor((today - lastPaymentDate) / (1000 * 60 * 60 * 24));
-    const paymentArrived = daysLeft <= 0;
+    const paymentArrivedOrPassed = daysSincePayment >= 0 && daysSincePayment < 32;
 
     if (isConfirmed) {
       return {
@@ -563,7 +563,10 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
       };
     }
 
-    if (paymentArrived && hasBalanceDue) {
+    // Regla de seguridad: si la fecha de pago ya llegó o pasó y el usuario
+    // todavía no confirmó el nuevo estado de cuenta, la tarjeta NO debe salir
+    // como recomendada para comprar, aunque el balance esté en $0.
+    if (paymentArrivedOrPassed) {
       return {
         isConfirmed: false,
         needsConfirmation: true,
@@ -578,7 +581,7 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
     return {
       isConfirmed: false,
       needsConfirmation: false,
-      isFuturePayment: !paymentArrived,
+      isFuturePayment: true,
       daysSincePayment,
       title: hasBalanceDue ? 'Ciclo en preparación' : 'Ciclo limpio',
       badge: hasBalanceDue ? 'Pago pendiente' : 'Sin balance',
@@ -745,7 +748,14 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
   const pendingStatementCards = cardInsights.filter((card) => card.statementStatus?.needsConfirmation);
   const confirmedStatementCards = cardInsights.filter((card) => card.statementStatus?.isConfirmed);
   const healthyUseCards = cardInsights
-    .filter((card) => card.limit > 0 && card.used < card.limit * 0.10 && card.daysLeft !== null && card.daysLeft > 3 && !card.statementStatus?.needsConfirmation)
+    .filter((card) => (
+      card.limit > 0 &&
+      card.used < card.limit * 0.10 &&
+      card.daysLeft !== null &&
+      card.daysLeft > 3 &&
+      !card.statementStatus?.needsConfirmation &&
+      card.statementStatus?.isConfirmed
+    ))
     .sort((a, b) => (b.limit - b.used) - (a.limit - a.used));
   const bestUseCard = healthyUseCards[0] || null;
 
