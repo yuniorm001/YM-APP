@@ -93,6 +93,34 @@ const getDaysUntilCardPayment = (paymentDate) => {
   return Math.ceil((nextPaymentDate - today) / (1000 * 60 * 60 * 24));
 };
 
+// Devuelve true si el cliente ya confirmó haber recibido el estado de cuenta
+// del ciclo actual (botón "Ya llegó mi estado de cuenta" en CardsPanel).
+// Cuando esto es true, las alertas y tareas del modal/Dashboard relacionadas
+// con la fecha de pago de la tarjeta deben silenciarse, porque la tarjeta
+// ya está liberada para el siguiente ciclo.
+const isStatementConfirmedForCurrentCycle = (card) => {
+  if (!card?.statementClosedAt || !card?.paymentDate) return false;
+
+  const statementClosedAt = new Date(card.statementClosedAt);
+  if (Number.isNaN(statementClosedAt.getTime())) return false;
+
+  // Última fecha de pago: el "ancla" del ciclo. Si paymentDate es 5 de cada mes,
+  // y hoy es 5 de mayo, lastPaymentDate = 5 de mayo (mismo). Si hoy es 3 de mayo,
+  // lastPaymentDate = 5 de abril.
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const original = new Date(card.paymentDate);
+  if (Number.isNaN(original.getTime())) return false;
+
+  const lastPaymentDate = new Date(today.getFullYear(), original.getMonth(), original.getDate());
+  lastPaymentDate.setHours(0, 0, 0, 0);
+  if (lastPaymentDate > today) {
+    lastPaymentDate.setMonth(lastPaymentDate.getMonth() - 1);
+  }
+
+  return statementClosedAt >= lastPaymentDate;
+};
+
 export default function ExpenseModal({ isOpen, onClose, onSave, cards, editingExpense, cashData }) {
   const [name, setName] = useState('');
   const [amount, setAmount] = useState('');
@@ -147,6 +175,11 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cards, editingEx
 
   const selectedCardPaymentAlert = useMemo(() => {
     if (method !== 'Tarjeta' || !selectedCardData?.paymentDate) return null;
+
+    // Si el cliente ya confirmó que recibió el estado de cuenta del ciclo
+    // actual, la tarjeta ya está liberada y NO debemos mostrar la alerta de
+    // "Hoy es la fecha de pago" ni la de "fecha de pago cercana".
+    if (isStatementConfirmedForCurrentCycle(selectedCardData)) return null;
 
     const daysUntilPayment = getDaysUntilCardPayment(selectedCardData.paymentDate);
     if (daysUntilPayment === null || daysUntilPayment > 5) return null;
@@ -577,7 +610,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cards, editingEx
                                       <p className={`text-xs font-semibold ${isDisabled ? 'text-[#9C382A]' : exceedsCredit ? 'text-[#D48B3F]' : 'text-[#2A4D3B]'}`}>
                                         Disponible: ${card.available.toLocaleString('es-MX')}
                                       </p>
-                                      {getDaysUntilCardPayment(card.paymentDate) !== null && getDaysUntilCardPayment(card.paymentDate) <= 5 && (
+                                      {!isStatementConfirmedForCurrentCycle(card) && getDaysUntilCardPayment(card.paymentDate) !== null && getDaysUntilCardPayment(card.paymentDate) <= 5 && (
                                         <>
                                           <span className="text-xs text-[#737573]">•</span>
                                           <p className={`text-xs font-bold ${getDaysUntilCardPayment(card.paymentDate) === 0 ? 'text-[#9C382A]' : 'text-[#D48B3F]'}`}>

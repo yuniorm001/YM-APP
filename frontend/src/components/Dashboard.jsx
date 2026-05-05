@@ -762,7 +762,13 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
   // que el cliente no vio antes como acción pendiente.
 
   // 2) Pagos próximos o vencidos: una tarea por tarjeta urgente, no solo una global.
-  cardsByPaymentUrgency.slice(0, 4).forEach((card, index) => {
+  // Si el cliente ya confirmó que recibió el estado de cuenta del ciclo actual,
+  // la tarjeta queda fuera de esta lista: ya no tiene sentido decirle "Paga hoy"
+  // ni "Prepara tu pago" porque el ciclo ya cerró desde el punto de vista del usuario.
+  cardsByPaymentUrgency
+    .filter((card) => !card.statementStatus?.isConfirmed)
+    .slice(0, 4)
+    .forEach((card, index) => {
     const dl = Math.max(card.daysLeft, 0);
     if (card.daysLeft <= 7) {
       addTask({
@@ -848,7 +854,17 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
     });
   }
 
-  const avoidCard = cardsByUtilization.find((card) => getUtilizationEntero(card.utilization) >= 20 || card.statementStatus?.needsConfirmation || (card.daysLeft !== null && card.daysLeft <= 3 && card.used > 0));
+  // Si el cliente ya confirmó el estado de cuenta del ciclo actual, esa tarjeta
+  // no debe entrar a "Evita usar" por motivos de ciclo (needsConfirmation o
+  // daysLeft<=3). Sí puede entrar todavía por utilización alta, porque la
+  // utilización es independiente del ciclo.
+  const avoidCard = cardsByUtilization.find((card) => {
+    if (getUtilizationEntero(card.utilization) >= 20) return true;
+    if (card.statementStatus?.isConfirmed) return false;
+    if (card.statementStatus?.needsConfirmation) return true;
+    if (card.daysLeft !== null && card.daysLeft <= 3 && card.used > 0) return true;
+    return false;
+  });
   if (avoidCard) {
     addTask({
       id: `avoid-card-${avoidCard.id || 'today'}`,
