@@ -2422,3 +2422,36 @@
   min-height: 0 !important;
   max-height: 260px !important;
 }
+
+/* FIX Ahorro inteligente: el panel izquierdo no debe estirarse cuando crecen los movimientos del lado derecho. */
+[data-testid="settings-view"] .settings-savings-layout {
+  align-items: start !important;
+}
+
+[data-testid="settings-view"] .settings-savings-form-panel,
+[data-testid="settings-view"] .settings-savings-side-panel {
+  align-self: start !important;
+  height: auto !important;
+  min-height: 0 !important;
+}
+
+[data-testid="settings-view"] .settings-savings-form-panel {
+  display: block !important;
+}
+
+[data-testid="settings-view"] .settings-savings-scroll {
+  max-height: 220px !important;
+  overflow-y: auto !important;
+}
+
+@media (min-width: 1024px) {
+  [data-testid="settings-view"] .settings-savings-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  }
+}
+
+@media (max-width: 1023px) {
+  [data-testid="settings-view"] .settings-savings-scroll {
+    max-height: 260px !important;
+  }
+}
