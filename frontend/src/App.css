@@ -2455,3 +2455,54 @@
     max-height: 260px !important;
   }
 }
+
+/* Ajuste final Configuración: Sincronizado con tareas debajo del encabezado de Ahorro inteligente */
+.settings-savings-board > .settings-savings-sync-card {
+  margin-top: 22px;
+  margin-bottom: 18px;
+  width: 100%;
+  border: 1px solid rgba(230, 222, 208, 0.95);
+  background: rgba(250, 248, 243, 0.92);
+  border-radius: 28px;
+  padding: 18px;
+  box-shadow: 0 16px 38px rgba(42, 77, 59, 0.05);
+}
+
+.settings-savings-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.settings-savings-form-card,
+.settings-savings-actions-card {
+  align-self: start;
+  height: auto !important;
+  min-height: 0 !important;
+}
+
+.settings-savings-actions-card .settings-savings-scroll {
+  max-height: 260px;
+  height: auto !important;
+  overflow-y: auto;
+}
+
+@media (max-width: 1180px) {
+  .settings-savings-split {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .settings-savings-board > .settings-savings-sync-card {
+    margin-top: 16px;
+    margin-bottom: 16px;
+    border-radius: 24px;
+    padding: 14px;
+  }
+
+  .settings-savings-split {
+    gap: 16px;
+  }
+}
