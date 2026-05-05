@@ -10,6 +10,7 @@ import {
   WarningCircle,
   Bank
 } from '@phosphor-icons/react';
+import { toDateOnlyString, parseDateOnly, formatDayMonthShort } from '../lib/dateUtils';
 
 const CATEGORIES = [
   { id: 'Comida', icon: '🍽️', color: '#2A4D3B' },
@@ -67,8 +68,10 @@ const formatTextInput = (value) => {
 
 const getNextPaymentDate = (paymentDate) => {
   if (!paymentDate) return null;
-  const originalDate = new Date(paymentDate);
-  if (Number.isNaN(originalDate.getTime())) return null;
+  // Usamos parseDateOnly para interpretar el día calendario sin sufrir
+  // del bug de zona horaria. originalDate cae siempre a 00:00 hora local.
+  const originalDate = parseDateOnly(paymentDate);
+  if (!originalDate) return null;
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -101,16 +104,19 @@ const getDaysUntilCardPayment = (paymentDate) => {
 const isStatementConfirmedForCurrentCycle = (card) => {
   if (!card?.statementClosedAt || !card?.paymentDate) return false;
 
+  // statementClosedAt sí es un instante exacto (timestamp de cuando el
+  // usuario presionó "Ya llegó mi estado de cuenta"), así que se parsea
+  // con new Date normal.
   const statementClosedAt = new Date(card.statementClosedAt);
   if (Number.isNaN(statementClosedAt.getTime())) return false;
 
-  // Última fecha de pago: el "ancla" del ciclo. Si paymentDate es 5 de cada mes,
-  // y hoy es 5 de mayo, lastPaymentDate = 5 de mayo (mismo). Si hoy es 3 de mayo,
-  // lastPaymentDate = 5 de abril.
+  // Última fecha de pago: el "ancla" del ciclo. Si paymentDate es 5 de cada
+  // mes, y hoy es 5 de mayo, lastPaymentDate = 5 de mayo (mismo). Si hoy
+  // es 3 de mayo, lastPaymentDate = 5 de abril.
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const original = new Date(card.paymentDate);
-  if (Number.isNaN(original.getTime())) return false;
+  const original = parseDateOnly(card.paymentDate);
+  if (!original) return false;
 
   const lastPaymentDate = new Date(today.getFullYear(), original.getMonth(), original.getDate());
   lastPaymentDate.setHours(0, 0, 0, 0);
@@ -261,7 +267,11 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cards, editingEx
       category,
       method,
       cardId: method === 'Tarjeta' ? selectedCard : null,
-      date: editingExpense?.date || new Date().toISOString()
+      // Día calendario en hora local del usuario, formato "YYYY-MM-DD".
+      // Antes se usaba new Date().toISOString() que serializa en UTC y
+      // movía gastos al día siguiente cuando se registraban de noche en
+      // zonas horarias negativas (Caribe, América continental).
+      date: editingExpense?.date || toDateOnlyString(new Date())
     });
     resetForm();
     onClose();

@@ -19,6 +19,7 @@ import {
   CreditCard,
   Coins
 } from '@phosphor-icons/react';
+import { parseDateOnly } from '../lib/dateUtils';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -164,10 +165,10 @@ const getCashTone = (value) => {
 const getNextPaymentDate = (paymentDate, currentDate = new Date().toISOString()) => {
   if (!paymentDate) return null;
 
-  const base = new Date(paymentDate);
+  const base = parseDateOnly(paymentDate);
   const current = new Date(currentDate);
 
-  if (Number.isNaN(base.getTime()) || Number.isNaN(current.getTime())) return null;
+  if (!base || Number.isNaN(current.getTime())) return null;
 
   const next = new Date(current);
   next.setHours(0, 0, 0, 0);
@@ -299,7 +300,8 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
   const [showAllTasks, setShowAllTasks] = useState(false);
   
   const todayExpenses = expenses.filter(e => {
-    const expDate = new Date(e.date);
+    const expDate = parseDateOnly(e.date);
+    if (!expDate) return false;
     const today = new Date(currentDate);
     return expDate.toDateString() === today.toDateString();
   });
@@ -323,7 +325,8 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
   savingsWindowStart.setHours(0, 0, 0, 0);
   
   const weekExpenses = expenses.filter(e => {
-    const expDate = new Date(e.date);
+    const expDate = parseDateOnly(e.date);
+    if (!expDate) return false;
     return expDate >= weekStart && expDate <= weekEnd;
   });
   const weekTotal = weekExpenses.reduce((sum, e) => sum + e.amount, 0);
@@ -333,7 +336,8 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
   const weekCashTotal = weekCashExpenses.reduce((sum, e) => sum + e.amount, 0);
   
   const monthExpenses = expenses.filter(e => {
-    const expDate = new Date(e.date);
+    const expDate = parseDateOnly(e.date);
+    if (!expDate) return false;
     const current = new Date(currentDate);
     return expDate.getMonth() === current.getMonth() && expDate.getFullYear() === current.getFullYear();
   });
@@ -427,7 +431,7 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
   const last7Days = Array.from({ length: 7 }, (_, i) => {
     const date = new Date(currentDate);
     date.setDate(date.getDate() - (6 - i));
-    const dayExpenses = expenses.filter(e => new Date(e.date).toDateString() === date.toDateString());
+    const dayExpenses = expenses.filter(e => parseDateOnly(e.date)?.toDateString() === date.toDateString());
     const total = dayExpenses.reduce((sum, e) => sum + e.amount, 0);
     return {
       day: date.toLocaleDateString('es', { weekday: 'short' }),
@@ -487,7 +491,8 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
   previousWeekEnd.setMilliseconds(previousWeekEnd.getMilliseconds() - 1);
 
   const previousWeekExpenses = expenses.filter((e) => {
-    const expDate = new Date(e.date);
+    const expDate = parseDateOnly(e.date);
+    if (!expDate) return false;
     return expDate >= previousWeekStart && expDate <= previousWeekEnd;
   });
   const previousWeekTotal = previousWeekExpenses.reduce((sum, e) => sum + Number(e.amount || 0), 0);
@@ -498,7 +503,8 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
   const previousMonthDate = new Date(current);
   previousMonthDate.setMonth(previousMonthDate.getMonth() - 1);
   const previousMonthExpenses = expenses.filter((e) => {
-    const expDate = new Date(e.date);
+    const expDate = parseDateOnly(e.date);
+    if (!expDate) return false;
     return expDate.getMonth() === previousMonthDate.getMonth() && expDate.getFullYear() === previousMonthDate.getFullYear();
   });
   const previousMonthCashTotal = previousMonthExpenses
@@ -630,7 +636,9 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
     : null;
 
   const weekdayTotals = monthExpenses.reduce((acc, expense) => {
-    const weekday = new Date(expense.date).getDay();
+    const parsed = parseDateOnly(expense.date);
+    if (!parsed) return acc;
+    const weekday = parsed.getDay();
     acc[weekday] = (acc[weekday] || 0) + Number(expense.amount || 0);
     return acc;
   }, {});

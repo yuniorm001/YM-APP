@@ -14,6 +14,7 @@ import IncomeModal from './components/IncomeModal';
 import './App.css';
 import { isFirebaseConfigured, loadCloudData, saveCloudData, signInWithProvider, signOutUser, subscribeToAuth } from './lib/firebase';
 import { getEmailSession, verifyEmailCode, loginWithPassword, loadUserCloudData, saveUserCloudData } from './lib/emailAuth';
+import { migrateLegacyDates, toDateOnlyString, parseDateOnly } from './lib/dateUtils';
 
 const STORAGE_KEY = 'gastospro-data';
 
@@ -215,8 +216,14 @@ const normalizeCash = (cash = {}, currentDate = new Date().toISOString()) => {
 };
 
 const normalizeData = (rawData) => {
-  const baseDate = rawData?.currentDate || new Date().toISOString();
-  const baseData = rawData || {
+  // Migración de fechas legacy: convierte cualquier paymentDate o expense.date
+  // que esté guardado como ISO con timezone a "YYYY-MM-DD" puro.
+  // Es idempotente — los datos ya correctos no se tocan. Corre en cada
+  // carga (local y cloud) para que la corrección llegue a todos los datos.
+  const migrated = migrateLegacyDates(rawData);
+
+  const baseDate = migrated?.currentDate || new Date().toISOString();
+  const baseData = migrated || {
     cash: { income: 0, entries: [createPrimaryIncomeEntry(0, baseDate)], savings: { entries: [] } },
     expenses: [],
     cards: [],
@@ -938,8 +945,9 @@ function App() {
               <CardsPanel
                 cards={data.cards}
                 cashAvailable={data.cash.income - data.expenses.filter((expense) => {
-                  const expDate = new Date(expense.date);
+                  const expDate = parseDateOnly(expense.date);
                   const current = new Date(data.currentDate);
+                  if (!expDate) return false;
                   return (
                     expDate.getMonth() === current.getMonth() &&
                     expDate.getFullYear() === current.getFullYear() &&
@@ -1020,8 +1028,9 @@ function App() {
           income: data.cash.income,
           spent: data.expenses
             .filter((expense) => {
-              const expDate = new Date(expense.date);
+              const expDate = parseDateOnly(expense.date);
               const current = new Date(data.currentDate);
+              if (!expDate) return false;
               return (
                 expDate.getMonth() === current.getMonth() &&
                 expDate.getFullYear() === current.getFullYear() &&

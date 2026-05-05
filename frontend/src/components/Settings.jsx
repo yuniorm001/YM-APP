@@ -26,6 +26,7 @@ import {
   CaretDown,
   MagnifyingGlass,
 } from '@phosphor-icons/react';
+import { parseDateOnly } from '../lib/dateUtils';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { listAllowedEmails, addAllowedEmail, updateAllowedEmail, deleteAllowedEmail } from '../lib/emailAuth';
@@ -368,7 +369,8 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
 
   const monthCashSpent = (expenses || [])
     .filter((e) => {
-      const expDate = new Date(e.date);
+      const expDate = parseDateOnly(e.date);
+      if (!expDate) return false;
       const current = new Date(currentDate);
       return expDate.getMonth() === current.getMonth() && expDate.getFullYear() === current.getFullYear() && e.method === 'Cash';
     })
@@ -458,7 +460,8 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
   const canSaveSmartGoal = canUseSmartGoal && hasEnoughCashForGoal;
   const currentGoalSpent = goalType === 'weekly'
     ? (expenses || []).filter((e) => {
-        const expDate = new Date(e.date);
+        const expDate = parseDateOnly(e.date);
+        if (!expDate) return false;
         return expDate >= goalWeekStart && expDate <= goalWeekEnd && e.method === 'Cash';
       }).reduce((sum, e) => sum + e.amount, 0)
     : monthCashSpent;
@@ -900,14 +903,15 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
       yPos += 8;
 
       const monthExpenses = expenses.filter((e) => {
-        const expDate = new Date(e.date);
+        const expDate = parseDateOnly(e.date);
+        if (!expDate) return false;
         const current = new Date(data.currentDate);
         return expDate.getMonth() === current.getMonth() && expDate.getFullYear() === current.getFullYear();
       });
 
       if (monthExpenses.length > 0) {
         const expenseData = monthExpenses.map((exp) => [
-          new Date(exp.date).toLocaleDateString('es-MX', { day: '2-digit', month: 'short' }),
+          parseDateOnly(exp.date)?.toLocaleDateString('es-MX', { day: '2-digit', month: 'short' }) || '',
           exp.name,
           exp.category,
           exp.method === 'Cash' ? 'Efectivo' : 'Tarjeta',

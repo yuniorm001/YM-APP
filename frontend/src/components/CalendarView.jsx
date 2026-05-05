@@ -5,6 +5,7 @@ import {
   CaretRight,
   Circle
 } from '@phosphor-icons/react';
+import { parseDateOnly } from '../lib/dateUtils';
 
 const CATEGORY_COLORS = {
   Comida: '#2A4D3B',
@@ -50,7 +51,8 @@ export default function CalendarView({ expenses, currentDate }) {
     }
 
     const monthExpenses = expenses.filter(e => {
-      const expDate = new Date(e.date);
+      const expDate = parseDateOnly(e.date);
+      if (!expDate) return false;
       return expDate.getMonth() === month && expDate.getFullYear() === year;
     });
 
@@ -61,7 +63,8 @@ export default function CalendarView({ expenses, currentDate }) {
 
   const getExpensesForDate = (date) => {
     return expenses.filter(e => {
-      const expDate = new Date(e.date);
+      const expDate = parseDateOnly(e.date);
+      if (!expDate) return false;
       return expDate.toDateString() === date.toDateString();
     });
   };

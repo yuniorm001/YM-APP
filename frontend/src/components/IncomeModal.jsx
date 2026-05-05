@@ -10,6 +10,7 @@ import {
   Info,
   Check,
 } from '@phosphor-icons/react';
+import { parseDateOnly } from '../lib/dateUtils';
 
 const getIncomeEntryDate = (entry, fallbackDate) => entry?.date || entry?.createdAt || fallbackDate;
 
@@ -203,7 +204,8 @@ export default function IncomeModal({ isOpen, onClose, data, onUpdate }) {
 
   const monthCashSpent = (expenses || [])
     .filter((e) => {
-      const expDate = new Date(e.date);
+      const expDate = parseDateOnly(e.date);
+      if (!expDate) return false;
       const current = new Date(currentDate);
       return expDate.getMonth() === current.getMonth() && expDate.getFullYear() === current.getFullYear() && e.method === 'Cash';
     })

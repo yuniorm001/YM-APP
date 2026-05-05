@@ -10,6 +10,7 @@ import {
   ClockCounterClockwise,
   ArrowRight
 } from '@phosphor-icons/react';
+import { parseDateOnly, formatDayMonthShort } from '../lib/dateUtils';
 
 const CATEGORIES = ['Comida', 'Transporte', 'Hogar', 'Servicios', 'Salud', 'Trabajo', 'Ocio', 'Compras', 'Otros'];
 
@@ -55,8 +56,8 @@ export default function ExpensesList({ expenses, cards = [], onEdit, onDelete })
     })
     .sort((a, b) => {
       switch (sortBy) {
-        case 'recent': return new Date(b.date) - new Date(a.date);
-        case 'oldest': return new Date(a.date) - new Date(b.date);
+        case 'recent': return parseDateOnly(b.date) - parseDateOnly(a.date);
+        case 'oldest': return parseDateOnly(a.date) - parseDateOnly(b.date);
         case 'highest': return b.amount - a.amount;
         case 'lowest': return a.amount - b.amount;
         case 'name': return a.name.localeCompare(b.name);
@@ -252,7 +253,7 @@ export default function ExpensesList({ expenses, cards = [], onEdit, onDelete })
                             {getCardLabel(expense)}
                           </span>
                           <span className="inline-flex px-2.5 py-1 rounded-full text-xs font-medium text-[#737573] bg-white border border-[#ECE9E2]">
-                            {new Date(expense.date).toLocaleDateString('es', { day: 'numeric', month: 'short' })}
+                            {formatDayMonthShort(expense.date)}
                           </span>
                         </div>
                       </div>

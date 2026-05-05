@@ -18,6 +18,7 @@ import {
   Wallet,
   X
 } from '@phosphor-icons/react';
+import { parseDateOnly, formatDayMonthShort, toDateOnlyString } from '../lib/dateUtils';
 
 const CARD_TYPES = [
   { id: 'chase', name: 'Chase', mark: 'CH', gradient: 'linear-gradient(135deg, #0B2E69 0%, #0A5DB8 46%, #071D3F 100%)', accent: '#2B76D2', textTone: 'light' },
@@ -331,7 +332,8 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
     if (!paymentDate) return null;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const payment = new Date(paymentDate);
+    const payment = parseDateOnly(paymentDate);
+    if (!payment) return null;
     payment.setHours(0, 0, 0, 0);
     const diffTime = payment - today;
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -509,8 +511,8 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
 
   const getNextPaymentDate = (paymentDate) => {
     if (!paymentDate) return null;
-    const originalDate = new Date(paymentDate);
-    if (Number.isNaN(originalDate.getTime())) return null;
+    const originalDate = parseDateOnly(paymentDate);
+    if (!originalDate) return null;
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -1433,7 +1435,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                       {card.paymentDate && (
                         <div className="inline-flex items-center gap-2 rounded-2xl border border-[#E6DED2] bg-white/80 px-3 py-2 text-[13px] text-[#737573] shadow-sm">
                           <CalendarBlank weight="fill" className="w-4 h-4 text-[#D48B3F]" />
-                          <span>Próximo pago: <span className="font-semibold text-[#3F423F]">{new Date(card.paymentDate).toLocaleDateString('es', { day: 'numeric', month: 'short' })}</span></span>
+                          <span>Próximo pago: <span className="font-semibold text-[#3F423F]">{formatDayMonthShort(card.paymentDate)}</span></span>
                         </div>
                       )}
 
@@ -1945,7 +1947,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                     </div>
                     <div className="rounded-2xl border border-[#EAE4DA] bg-white p-4">
                       <p className="text-[10px] uppercase tracking-[0.14em] text-[#737573]">Próximo pago</p>
-                      <p className="text-2xl font-semibold text-[#1A1C1A] mt-2">{goalModalCard.paymentDate ? new Date(goalModalCard.paymentDate).toLocaleDateString('es', { day: 'numeric', month: 'short' }) : 'Sin fecha'}</p>
+                      <p className="text-2xl font-semibold text-[#1A1C1A] mt-2">{goalModalCard.paymentDate ? formatDayMonthShort(goalModalCard.paymentDate) : 'Sin fecha'}</p>
                     </div>
                     <div className="rounded-2xl border border-[#EAE4DA] bg-white p-4">
                       <p className="text-[10px] uppercase tracking-[0.14em] text-[#737573]">Meta actual</p>

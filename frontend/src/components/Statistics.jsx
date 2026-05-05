@@ -8,6 +8,7 @@ import {
   Target
 } from '@phosphor-icons/react';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, LineChart, Line, Legend } from 'recharts';
+import { parseDateOnly } from '../lib/dateUtils';
 
 const CATEGORY_COLORS = {
   Comida: '#2A4D3B',
@@ -49,7 +50,8 @@ export default function Statistics({ data }) {
   // Current month expenses
   const currentMonth = new Date(currentDate);
   const monthExpenses = expenses.filter(e => {
-    const d = new Date(e.date);
+    const d = parseDateOnly(e.date);
+    if (!d) return false;
     return d.getMonth() === currentMonth.getMonth() && d.getFullYear() === currentMonth.getFullYear();
   });
   const monthTotal = monthExpenses.reduce((sum, e) => sum + e.amount, 0);
@@ -79,7 +81,7 @@ export default function Statistics({ data }) {
   const dailyTrend7 = Array.from({ length: 7 }, (_, i) => {
     const date = new Date(currentDate);
     date.setDate(date.getDate() - (6 - i));
-    const dayExpenses = expenses.filter(e => new Date(e.date).toDateString() === date.toDateString());
+    const dayExpenses = expenses.filter(e => parseDateOnly(e.date)?.toDateString() === date.toDateString());
     return {
       date: date.toLocaleDateString('es', { day: 'numeric', month: 'short' }),
       amount: dayExpenses.reduce((sum, e) => sum + e.amount, 0)
@@ -90,7 +92,7 @@ export default function Statistics({ data }) {
   const dailyTrend = Array.from({ length: 30 }, (_, i) => {
     const date = new Date(currentDate);
     date.setDate(date.getDate() - (29 - i));
-    const dayExpenses = expenses.filter(e => new Date(e.date).toDateString() === date.toDateString());
+    const dayExpenses = expenses.filter(e => parseDateOnly(e.date)?.toDateString() === date.toDateString());
     return {
       date: date.toLocaleDateString('es', { day: 'numeric', month: 'short' }),
       amount: dayExpenses.reduce((sum, e) => sum + e.amount, 0)
@@ -105,7 +107,8 @@ export default function Statistics({ data }) {
     weekStart.setDate(weekStart.getDate() - 6);
     
     const weekExpenses = expenses.filter(e => {
-      const d = new Date(e.date);
+      const d = parseDateOnly(e.date);
+      if (!d) return false;
       return d >= weekStart && d <= weekEnd;
     });
     
@@ -116,7 +119,7 @@ export default function Statistics({ data }) {
   }).reverse();
 
   // Average daily spending
-  const daysWithExpenses = new Set(monthExpenses.map(e => new Date(e.date).toDateString())).size;
+  const daysWithExpenses = new Set(monthExpenses.map(e => parseDateOnly(e.date)?.toDateString()).filter(Boolean)).size;
   const avgDaily = daysWithExpenses > 0 ? monthTotal / daysWithExpenses : 0;
 
   // Projection
