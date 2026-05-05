@@ -1124,7 +1124,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
             </div>
           </div>
 
-          <div className="admin-access-layout admin-access-layout--stacked mt-5 grid grid-cols-1 gap-5">
+          <div className="admin-access-layout mt-5 grid grid-cols-1 gap-5 xl:grid-cols-[minmax(320px,0.86fr)_minmax(0,1.14fr)]">
             <div className="admin-create-panel">
               <div className="flex items-start justify-between gap-4">
                 <div>
@@ -1330,7 +1330,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
               <Wallet weight="fill" className="w-6 h-6" />
             </div>
             <div className="min-w-0">
-              <p className="settings-kicker">Dinero que entra</p>
+              <p className="settings-kicker">01 · Dinero que entra</p>
               <h3>Ingresos del mes</h3>
               <p>Todo lo que has cobrado este mes y cuánto te queda disponible para gastos o pagos de tarjeta.</p>
             </div>
@@ -1402,7 +1402,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
               <Target weight="fill" className="w-6 h-6" />
             </div>
             <div className="min-w-0">
-              <p className="settings-kicker">Límite de gasto</p>
+              <p className="settings-kicker">02 · Límite de gasto</p>
               <h3>Meta inteligente</h3>
               <p>Define cuánto puedes gastar para cuidar tu efectivo y tener margen para pagar tarjetas.</p>
             </div>
@@ -1520,7 +1520,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
               <Coins weight="fill" className="w-6 h-6" />
             </div>
             <div className="min-w-0">
-              <p className="settings-kicker">Reserva de efectivo</p>
+              <p className="settings-kicker">03 · Reserva de efectivo</p>
               <h3>Ahorro inteligente</h3>
               <p>Aparta dinero del cash disponible para emergencias o pagos. Si lo necesitas, lo puedes devolver al cash.</p>
             </div>
@@ -1745,7 +1745,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
               <CalendarBlank weight="fill" className="w-6 h-6" />
             </div>
             <div>
-              <p className="settings-kicker">Calendario activo</p>
+              <p className="settings-kicker">04 · Calendario activo</p>
               <h3>Período Actual</h3>
               <p>Ubica la lectura financiera dentro del mes, semana y día en curso.</p>
             </div>
@@ -1773,7 +1773,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
               <Export weight="fill" className="w-6 h-6" />
             </div>
             <div>
-              <p className="settings-kicker">Herramientas</p>
+              <p className="settings-kicker">05 · Herramientas</p>
               <h3>Acciones</h3>
               <p>Exporta información o reinicia datos cuando necesites limpiar el perfil.</p>
             </div>

@@ -2098,3 +2098,177 @@
     min-height: 3rem;
   }
 }
+
+/* Configuración desktop refinada: compacta, ordenada y sin bloques inflados */
+@media (min-width: 1024px) {
+  [data-testid="settings-view"] {
+    gap: 1.05rem;
+  }
+
+  [data-testid="settings-view"] .hero-surface {
+    padding: 1.35rem 1.5rem;
+    border-radius: 30px;
+  }
+
+  [data-testid="settings-view"] .hero-surface h1 {
+    font-size: clamp(2rem, 2.6vw, 2.65rem);
+    line-height: 0.98;
+  }
+
+  .settings-finance-grid {
+    grid-template-columns: minmax(0, 1.03fr) minmax(0, 0.97fr) !important;
+    gap: 1rem;
+    align-items: start;
+  }
+
+  .settings-bottom-grid {
+    grid-template-columns: minmax(0, 0.98fr) minmax(0, 1.02fr) !important;
+    gap: 1rem;
+    align-items: start;
+  }
+
+  .settings-command-card {
+    border-radius: 28px;
+    padding: 1.25rem;
+    min-height: 0 !important;
+    height: auto !important;
+    box-shadow: 0 18px 48px rgba(36, 41, 36, 0.065), inset 0 1px 0 rgba(255,255,255,0.92);
+  }
+
+  .settings-income-board,
+  .settings-goal-board,
+  .settings-period-card,
+  .settings-actions-card {
+    align-self: start;
+  }
+
+  .settings-savings-board {
+    grid-column: 1 / -1;
+  }
+
+  .settings-section-head {
+    gap: 0.85rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.95rem;
+    border-bottom: 1px solid rgba(226, 222, 214, 0.72);
+  }
+
+  .settings-section-head.compact {
+    margin-bottom: 0.9rem;
+  }
+
+  .settings-section-icon {
+    width: 2.8rem;
+    height: 2.8rem;
+    border-radius: 1rem;
+  }
+
+  .settings-section-head h3 {
+    font-size: 1.25rem;
+  }
+
+  .settings-section-head p:not(.settings-kicker) {
+    max-width: 58ch;
+    font-size: 0.84rem;
+  }
+
+  .settings-kicker {
+    color: #3e5d49;
+    letter-spacing: 0.18em;
+  }
+
+  .settings-income-hero {
+    grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .settings-income-total,
+  .settings-income-radar {
+    min-height: 112px;
+    border-radius: 20px;
+    padding: 0.95rem;
+  }
+
+  .settings-income-total strong {
+    font-size: clamp(2rem, 3vw, 2.55rem);
+  }
+
+  .settings-metric-strip {
+    gap: 0.6rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .settings-metric-strip > div,
+  .settings-inner-panel,
+  .settings-goal-panel,
+  .settings-goal-intel {
+    border-radius: 20px;
+  }
+
+  .settings-goal-layout {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 0.85rem;
+  }
+
+  .settings-segment-btn {
+    min-height: 96px;
+    border-radius: 18px;
+    padding: 0.8rem;
+  }
+
+  .settings-money-input-wrap {
+    min-height: 3.35rem;
+    border-radius: 18px;
+  }
+
+  .settings-save-goal,
+  .settings-action-primary {
+    min-height: 2.85rem;
+  }
+
+  .settings-savings-board .settings-goal-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(340px, 0.88fr);
+    align-items: start;
+  }
+
+  .settings-savings-board .rounded-\[28px\] {
+    border-radius: 22px !important;
+  }
+
+  .settings-period-timeline {
+    gap: 0.7rem;
+  }
+
+  .settings-period-card .settings-period-timeline > div {
+    min-height: 108px;
+    height: auto;
+  }
+
+  .settings-action-stack {
+    gap: 0.72rem;
+  }
+
+  .settings-action-row {
+    min-height: 86px;
+    border-radius: 20px;
+  }
+
+  .admin-access-layout {
+    align-items: start;
+  }
+
+  .admin-create-panel,
+  .admin-list-panel {
+    min-height: 0 !important;
+  }
+}
+
+@media (min-width: 1280px) {
+  .settings-finance-grid,
+  .settings-bottom-grid {
+    max-width: 1480px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
