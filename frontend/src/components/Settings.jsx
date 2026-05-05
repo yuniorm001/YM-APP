@@ -1322,15 +1322,23 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
           </div>
         </div>
       ) : null}
-      <div className="settings-finance-grid">
-        <section className="settings-command-card settings-income-board">
+      <div className="settings-area-header settings-area-header--primary">
+        <div>
+          <span>Prioridad principal</span>
+          <h2>Control financiero</h2>
+          <p>Primero se organizan ingresos, límite de gasto y ahorro porque son los bloques que alimentan las decisiones del Inicio.</p>
+        </div>
+      </div>
+
+      <div className="settings-priority-grid">
+        <section className="settings-command-card settings-income-board settings-priority-card settings-priority-card--income">
           <div className="settings-card-glow settings-card-glow--green" />
           <div className="settings-section-head">
             <div className="settings-section-icon settings-section-icon--green">
               <Wallet weight="fill" className="w-6 h-6" />
             </div>
             <div className="min-w-0">
-              <p className="settings-kicker">Dinero que entra</p>
+              <p className="settings-kicker">01 · Dinero que entra</p>
               <h3>Ingresos del mes</h3>
               <p>Todo lo que has cobrado este mes y cuánto te queda disponible para gastos o pagos de tarjeta.</p>
             </div>
@@ -1395,14 +1403,14 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
           </div>
         </section>
 
-        <section className="settings-command-card settings-goal-board">
+        <section className="settings-command-card settings-goal-board settings-priority-card settings-priority-card--goal">
           <div className="settings-card-glow settings-card-glow--amber" />
           <div className="settings-section-head">
             <div className="settings-section-icon settings-section-icon--amber">
               <Target weight="fill" className="w-6 h-6" />
             </div>
             <div className="min-w-0">
-              <p className="settings-kicker">Límite de gasto</p>
+              <p className="settings-kicker">02 · Límite de gasto</p>
               <h3>Meta inteligente</h3>
               <p>Define cuánto puedes gastar para cuidar tu efectivo y tener margen para pagar tarjetas.</p>
             </div>
@@ -1513,21 +1521,21 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
           </div>
         </section>
 
-        <section className="settings-command-card settings-savings-board lg:col-span-2">
+        <section className="settings-command-card settings-savings-board settings-priority-card settings-priority-card--savings">
           <div className="settings-card-glow settings-card-glow--green" />
           <div className="settings-section-head">
             <div className="settings-section-icon settings-section-icon--green">
               <Coins weight="fill" className="w-6 h-6" />
             </div>
             <div className="min-w-0">
-              <p className="settings-kicker">Reserva de efectivo</p>
+              <p className="settings-kicker">03 · Reserva de efectivo</p>
               <h3>Ahorro inteligente</h3>
               <p>Aparta dinero del cash disponible para emergencias o pagos. Si lo necesitas, lo puedes devolver al cash.</p>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-5 items-start">
-            <div className="rounded-[28px] border border-[#E6DED0] bg-white/75 p-5 shadow-[0_18px_45px_rgba(42,77,59,0.06)] flex flex-col">
+          <div className="settings-savings-layout">
+            <div className="settings-savings-main-panel">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
                 <div className="rounded-2xl bg-[#F8F5EF] border border-[#E7DED1] p-4">
                   <span className="block text-[11px] uppercase tracking-[0.18em] text-[#8A8D88] font-bold">Cash libre</span>
@@ -1650,7 +1658,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
               </button>
             </div>
 
-            <div className="rounded-[28px] border border-[#E6DED0] bg-[#FAF8F3]/90 p-5 flex flex-col gap-5">
+            <div className="settings-savings-side-panel">
               <div>
                 <div className="settings-intel-title mb-3">
                   <Sparkle weight="fill" className="w-4 h-4 text-[#2A4D3B]" />
@@ -1738,14 +1746,22 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
         </section>
       </div>
 
-      <div className="settings-bottom-grid">
+      <div className="settings-area-header settings-area-header--secondary">
+        <div>
+          <span>Soporte y mantenimiento</span>
+          <h2>Sistema</h2>
+          <p>Información de calendario y herramientas administrativas quedan abajo para no competir con las decisiones financieras.</p>
+        </div>
+      </div>
+
+      <div className="settings-support-grid">
         <section className="settings-command-card settings-period-card">
           <div className="settings-section-head compact">
             <div className="settings-section-icon settings-section-icon--gold">
               <CalendarBlank weight="fill" className="w-6 h-6" />
             </div>
             <div>
-              <p className="settings-kicker">Calendario activo</p>
+              <p className="settings-kicker">04 · Calendario activo</p>
               <h3>Período Actual</h3>
               <p>Ubica la lectura financiera dentro del mes, semana y día en curso.</p>
             </div>
@@ -1773,7 +1789,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
               <Export weight="fill" className="w-6 h-6" />
             </div>
             <div>
-              <p className="settings-kicker">Herramientas</p>
+              <p className="settings-kicker">05 · Herramientas</p>
               <h3>Acciones</h3>
               <p>Exporta información o reinicia datos cuando necesites limpiar el perfil.</p>
             </div>
