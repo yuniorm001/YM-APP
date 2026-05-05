@@ -882,12 +882,17 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
     });
   }
 
-  // Ahorro semanal: meta fija de $20 para que el copy siempre coincida con el chip.
-  // La tarea se cumple si el usuario tiene un colchón activo de al menos $20
-  // (balance actual de Ahorro Inteligente) O si depositó esa cantidad en los
-  // últimos 7 días. Esto evita que la tarea quede atascada por temas de fecha,
-  // zona horaria o porque el depósito quedó justo fuera de la ventana.
-  const savingsTarget = 20;
+  // Ahorro semanal: meta dinámica basada en el 5% del ingreso mensual del cliente,
+  // prorrateada por semana (~4.33 semanas/mes). Piso de $20 para usuarios con
+  // ingreso bajo o no configurado, y tope de $200 para que no sea irreal en
+  // ingresos muy altos. La tarea se cumple si el usuario tiene un colchón
+  // activo (balance) o si depositó esa cantidad en los últimos 7 días, lo
+  // que evita que la tarea quede atascada por temas de fecha o zona horaria.
+  const monthlyIncomeForSavings = getMonthlyIncomeContribution(primaryIncomeEntry);
+  const weeklyTargetFromIncome = monthlyIncomeForSavings > 0
+    ? Math.round((monthlyIncomeForSavings * 0.05) / 4.33)
+    : 0;
+  const savingsTarget = Math.max(20, Math.min(200, weeklyTargetFromIncome || 20));
   const savingsTowardsTask = Math.max(savingsThisWeek, savingsBalance);
   const savedEnoughThisWeek = savingsTowardsTask >= savingsTarget;
   const shouldShowSavingsTask = totalMonthlyIncomeCapacity > 0 || cashAvailable > 0 || savingsThisWeek > 0 || savingsBalance > 0;

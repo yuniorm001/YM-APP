@@ -381,10 +381,15 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
   const savingsDepositedTotal = getSavingsDepositedTotal(cash);
   const savingsWithdrawnTotal = getSavingsWithdrawnTotal(cash);
   const savingsLast7Days = getSavingsDepositedLast7Days(cash, currentDate);
-  // La tarea cuenta como cumplida si tienes ahorro activo de $20+ (balance) o
-  // si depositaste $20+ en los últimos 7 días. La meta es fija para que coincida
-  // con el chip de la tarjeta de tarea.
-  const weeklySavingsTarget = 20;
+  // Meta semanal dinámica: 5% del ingreso mensual ÷ 4.33 semanas.
+  // Piso $20 (ingresos bajos o no configurados), tope $200 (evita metas irreales).
+  // La tarea cuenta como cumplida si tienes ahorro activo (balance) o si
+  // depositaste lo suficiente en los últimos 7 días.
+  const monthlyIncomeForSavings = primaryEntry ? getMonthlyIncomeContribution(primaryEntry) : 0;
+  const weeklyTargetFromIncome = monthlyIncomeForSavings > 0
+    ? Math.round((monthlyIncomeForSavings * 0.05) / 4.33)
+    : 0;
+  const weeklySavingsTarget = Math.max(20, Math.min(200, weeklyTargetFromIncome || 20));
   const weeklySavingsCount = Math.max(savingsLast7Days, savingsBalance);
   const weeklySavingsPct = weeklySavingsTarget > 0
     ? Math.min(100, Math.round((weeklySavingsCount / weeklySavingsTarget) * 100))
@@ -1539,7 +1544,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                 <div className="flex items-center justify-between gap-3 flex-wrap">
                   <div className="min-w-0">
                     <span className={`block text-[11px] uppercase tracking-[0.18em] font-bold ${weeklySavingsMet ? 'text-[#557064]' : 'text-[#8A8D88]'}`}>
-                      Tarea de ahorro · activa con $20 ahorrados
+                      Tarea de ahorro semanal · 5% de tu ingreso
                     </span>
                     <strong className={`block mt-1 text-lg font-heading ${weeklySavingsMet ? 'text-[#2A4D3B]' : 'text-[#1A1C1A]'}`}>
                       ${formatMoney(weeklySavingsCount)} <span className="text-sm font-normal text-[#737573]">de ${formatMoney(weeklySavingsTarget)}</span>
@@ -1557,7 +1562,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                 </div>
                 <p className="mt-2 text-xs text-[#737573]">
                   {weeklySavingsMet
-                    ? 'La tarea de ahorro queda activada en el inicio. Mantén al menos $20 apartados para seguir cumpliendo.'
+                    ? `La tarea de ahorro queda activada en el inicio. Mantén al menos $${formatMoney(weeklySavingsTarget)} apartados para seguir cumpliendo.`
                     : `Aparta $${formatMoney(weeklySavingsTarget - weeklySavingsCount)} más para activar la tarea de ahorro.`}
                 </p>
               </div>
