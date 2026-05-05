@@ -222,7 +222,8 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cards, editingEx
         type: 'same-day',
         color: '#9C382A',
         title: '⚠️ Hoy es la fecha de pago de esta tarjeta',
-        message: `Si registras este gasto hoy en ${selectedCardData.name}, ese consumo puede seguir afectando tu utilización o llegar al próximo corte aunque creas que la tarjeta está paga.`
+        message: `Si registras este gasto hoy en ${selectedCardData.name}, ese consumo puede seguir afectando tu utilización o llegar al próximo corte aunque creas que la tarjeta está paga.`,
+        summary: 'Hoy es fecha de pago. Evita nuevos consumos hasta pagar o confirmar que el banco ya generó el nuevo estado de cuenta.'
       };
     }
 
@@ -231,16 +232,21 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cards, editingEx
         type: 'near-payment',
         color: daysUntilPayment <= 2 ? '#9C382A' : '#D48B3F',
         title: '📅 Fecha de pago cercana',
-        message: `A ${selectedCardData.name} le faltan ${daysUntilPayment} día${daysUntilPayment > 1 ? 's' : ''} para su pago. Si generas este gasto ahora, puedes llegar más cargado al corte o al pago.`
+        message: `A ${selectedCardData.name} le faltan ${daysUntilPayment} día${daysUntilPayment > 1 ? 's' : ''} para su pago. Si generas este gasto ahora, puedes llegar más cargado al corte o al pago.`,
+        summary: `Faltan ${daysUntilPayment} día${daysUntilPayment > 1 ? 's' : ''} para el pago. Úsala solo si aceptas llegar más cargado al pago o al próximo corte.`
       };
     }
 
     if (daysSinceLastPayment !== null && daysSinceLastPayment >= 0 && daysSinceLastPayment < 32) {
+      const daysSinceText = daysSinceLastPayment === 0
+        ? 'La fecha de pago es hoy.'
+        : `La fecha de pago pasó hace ${daysSinceLastPayment} día${daysSinceLastPayment > 1 ? 's' : ''}.`;
       return {
         type: 'statement-pending',
         color: '#D48B3F',
         title: '⚠️ Falta confirmar el estado de cuenta',
-        message: `Antes de usar ${selectedCardData.name}, confirma que ya llegó el nuevo estado de cuenta. Hasta entonces, la app no debe tratar esta tarjeta como opción segura para nuevos gastos.`
+        message: `Antes de usar ${selectedCardData.name}, confirma que ya llegó el nuevo estado de cuenta. Hasta entonces, la app no debe tratar esta tarjeta como opción segura para nuevos gastos.`,
+        summary: `${daysSinceText} Confirma si llegó el nuevo estado de cuenta antes de volver a usar esta tarjeta.`
       };
     }
 
@@ -746,9 +752,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cards, editingEx
                           )}
                           {selectedCardPaymentAlert && (
                             <p className="text-[11px] font-medium mt-1" style={{ color: selectedCardPaymentAlert.color }}>
-                              {selectedCardPaymentAlert.type === 'same-day'
-                                ? 'Usar esta tarjeta hoy puede impactar el próximo corte aunque esté paga.'
-                                : 'Esta tarjeta está demasiado cerca de su pago; úsala con mucha cautela.'}
+                              {selectedCardPaymentAlert.summary}
                             </p>
                           )}
                         </div>
