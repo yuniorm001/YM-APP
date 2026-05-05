@@ -198,9 +198,15 @@ const formatCurrency = (value = 0) => new Intl.NumberFormat('es-MX', {
   maximumFractionDigits: 0
 }).format(Number(value || 0));
 
+const getCardLastFour = (card) => {
+  const rawNumber = String(card?.last4 || card?.number || '').replace(/\D/g, '');
+  return rawNumber ? rawNumber.slice(-4) : '';
+};
+
 const getCardDisplayName = (card) => {
   if (!card) return 'Tu tarjeta';
-  const suffix = card.number ? ` •${card.number}` : '';
+  const lastFour = getCardLastFour(card);
+  const suffix = lastFour ? ` • ${lastFour}` : '';
   return `${card.name || 'Tarjeta'}${suffix}`;
 };
 
@@ -623,10 +629,12 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
 
   const highestUtilizationCard = [...cardInsights].sort((a, b) => b.utilization - a.utilization)[0] || null;
   const nearestPaymentCard = [...cardInsights]
-    .filter((card) => card.daysLeft !== null)
+    .filter((card) => card.daysLeft !== null && Number(card.used || 0) > 0)
     .sort((a, b) => a.daysLeft - b.daysLeft)[0] || null;
   const mostUsedCard = [...cardInsights].sort((a, b) => b.used - a.used)[0] || null;
-  const mostDangerousCard = [...cardInsights].sort((a, b) => (b.utilization + (b.daysLeft !== null && b.daysLeft <= 5 ? 8 : 0)) - (a.utilization + (a.daysLeft !== null && a.daysLeft <= 5 ? 8 : 0)))[0] || null;
+  const mostDangerousCard = [...cardInsights]
+    .filter((card) => Number(card.used || 0) > 0)
+    .sort((a, b) => (b.utilization + (b.daysLeft !== null && b.daysLeft <= 5 ? 8 : 0)) - (a.utilization + (a.daysLeft !== null && a.daysLeft <= 5 ? 8 : 0)))[0] || null;
 
   const topCategory = categoryData.length > 0
     ? [...categoryData].sort((a, b) => b.value - a.value)[0]
