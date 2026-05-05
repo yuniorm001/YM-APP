@@ -1440,10 +1440,10 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                       )}
 
                       <div
-                        className="h-[246px] sm:h-[220px] rounded-[24px] border bg-gradient-to-br from-white to-[#FAF7F1] p-3.5 shadow-[0_12px_28px_rgba(28,31,27,0.045)] overflow-hidden"
+                        className="min-h-[220px] sm:min-h-[220px] rounded-[24px] border bg-gradient-to-br from-white to-[#FAF7F1] p-3.5 sm:p-4 shadow-[0_12px_28px_rgba(28,31,27,0.045)] overflow-visible"
                         style={{ borderColor: `${statementStatus.color}24` }}
                       >
-                        <div className="flex h-full min-h-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex min-h-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                           <div className="flex items-start gap-3 min-w-0">
                             <div
                               className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[18px] border shadow-sm"
@@ -1485,7 +1485,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                             <button
                               type="button"
                               onClick={() => toggleStatementClosed(card)}
-                              className={`shrink-0 w-full sm:w-[260px] rounded-[18px] px-4 py-3 text-[12px] font-extrabold uppercase tracking-[0.10em] transition-all duration-200 hover:-translate-y-0.5 ${
+                              className={`shrink-0 w-full sm:w-[260px] min-h-[54px] rounded-[18px] px-4 py-3 text-[11px] sm:text-[12px] leading-tight font-extrabold uppercase tracking-[0.08em] sm:tracking-[0.10em] whitespace-normal sm:whitespace-nowrap transition-all duration-200 hover:-translate-y-0.5 ${
                                 statementStatus.isConfirmed
                                   ? 'border border-[#DDE7DE] bg-white text-[#2A4D3B] hover:bg-[#F4FAF6] hover:shadow-[0_10px_22px_rgba(42,77,59,0.08)]'
                                   : 'border border-[#2A4D3B]/20 bg-gradient-to-r from-[#2A4D3B] to-[#1E3A2B] text-white hover:shadow-[0_14px_28px_rgba(42,77,59,0.18)]'
@@ -1762,7 +1762,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                                 <button
                                   type="button"
                                   onClick={() => toggleStatementClosed(activeRecommendation)}
-                                  className={`shrink-0 rounded-2xl px-4 py-3 text-[11px] font-extrabold uppercase tracking-[0.10em] transition-all ${
+                                  className={`shrink-0 w-full sm:w-auto min-h-[52px] rounded-2xl px-4 py-3 text-[11px] leading-tight font-extrabold uppercase tracking-[0.08em] sm:tracking-[0.10em] whitespace-normal sm:whitespace-nowrap transition-all ${
                                     activeRecommendation.statementStatus?.isConfirmed
                                       ? 'border border-[#DDE7DE] bg-white text-[#2A4D3B] hover:bg-[#F4FAF6]'
                                       : 'border border-[#2A4D3B]/20 bg-[#1E3A2B] text-white hover:bg-[#2A4D3B]'
