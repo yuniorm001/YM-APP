@@ -2346,3 +2346,79 @@
     max-height: 240px;
   }
 }
+
+/* FIX FINAL Configuración: bloques principales en una sola columna desktop/mobile.
+   Evita espacios muertos laterales y mantiene la numeración 01-05 en orden. */
+[data-testid="settings-view"] .settings-finance-grid,
+[data-testid="settings-view"] .settings-bottom-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 1rem !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  max-width: 1480px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+[data-testid="settings-view"] .settings-income-board,
+[data-testid="settings-view"] .settings-goal-board,
+[data-testid="settings-view"] .settings-savings-board,
+[data-testid="settings-view"] .settings-period-card,
+[data-testid="settings-view"] .settings-actions-card {
+  grid-column: 1 / -1 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  height: auto !important;
+  align-self: stretch !important;
+}
+
+@media (min-width: 1024px) {
+  [data-testid="settings-view"] {
+    gap: 1rem !important;
+  }
+
+  [data-testid="settings-view"] .settings-command-card {
+    padding: clamp(1.15rem, 1.65vw, 1.55rem) !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  /* Mantiene contenido cómodo dentro de cada bloque, pero sin inflar el bloque completo. */
+  [data-testid="settings-view"] .settings-income-hero,
+  [data-testid="settings-view"] .settings-goal-layout,
+  [data-testid="settings-view"] .settings-period-timeline {
+    align-items: stretch !important;
+  }
+
+  [data-testid="settings-view"] .settings-savings-board .settings-goal-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    align-items: start !important;
+  }
+
+  [data-testid="settings-view"] .settings-period-timeline > div {
+    height: auto !important;
+    min-height: 92px !important;
+  }
+
+  [data-testid="settings-view"] .settings-action-row {
+    min-height: 0 !important;
+  }
+}
+
+@media (max-width: 1023px) {
+  [data-testid="settings-view"] .settings-savings-board .settings-goal-layout,
+  [data-testid="settings-view"] .settings-income-hero,
+  [data-testid="settings-view"] .settings-goal-layout,
+  [data-testid="settings-view"] .settings-period-timeline {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+/* Quita alturas fijas que causaban espacios blancos cuando había pocos movimientos. */
+[data-testid="settings-view"] .settings-savings-scroll {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: 260px !important;
+}
