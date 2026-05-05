@@ -381,12 +381,15 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
   const savingsDepositedTotal = getSavingsDepositedTotal(cash);
   const savingsWithdrawnTotal = getSavingsWithdrawnTotal(cash);
   const savingsLast7Days = getSavingsDepositedLast7Days(cash, currentDate);
-  const recurringPayAmountSettings = Number((cash?.entries || []).find((entry) => entry.type === 'primary')?.amount || 0);
-  const weeklySavingsTarget = Math.max(20, Math.round(Math.max(recurringPayAmountSettings * 0.05, 20)));
+  // La tarea cuenta como cumplida si tienes ahorro activo de $20+ (balance) o
+  // si depositaste $20+ en los últimos 7 días. La meta es fija para que coincida
+  // con el chip de la tarjeta de tarea.
+  const weeklySavingsTarget = 20;
+  const weeklySavingsCount = Math.max(savingsLast7Days, savingsBalance);
   const weeklySavingsPct = weeklySavingsTarget > 0
-    ? Math.min(100, Math.round((savingsLast7Days / weeklySavingsTarget) * 100))
+    ? Math.min(100, Math.round((weeklySavingsCount / weeklySavingsTarget) * 100))
     : 0;
-  const weeklySavingsMet = savingsLast7Days >= weeklySavingsTarget;
+  const weeklySavingsMet = weeklySavingsCount >= weeklySavingsTarget;
   const activeSavingsMovements = savingsEntries.filter((movement) => {
     const amount = Number(movement?.amount || 0);
     const labelText = `${movement?.type || ''} ${movement?.purpose || ''} ${movement?.note || ''}`.toLowerCase();
@@ -1536,10 +1539,10 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                 <div className="flex items-center justify-between gap-3 flex-wrap">
                   <div className="min-w-0">
                     <span className={`block text-[11px] uppercase tracking-[0.18em] font-bold ${weeklySavingsMet ? 'text-[#557064]' : 'text-[#8A8D88]'}`}>
-                      Tarea semanal · últimos 7 días
+                      Tarea de ahorro · activa con $20 ahorrados
                     </span>
                     <strong className={`block mt-1 text-lg font-heading ${weeklySavingsMet ? 'text-[#2A4D3B]' : 'text-[#1A1C1A]'}`}>
-                      ${formatMoney(savingsLast7Days)} <span className="text-sm font-normal text-[#737573]">de ${formatMoney(weeklySavingsTarget)}</span>
+                      ${formatMoney(weeklySavingsCount)} <span className="text-sm font-normal text-[#737573]">de ${formatMoney(weeklySavingsTarget)}</span>
                     </strong>
                   </div>
                   <span className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold ${weeklySavingsMet ? 'bg-[#2A4D3B] text-white' : 'bg-white text-[#557064] border border-[#CFE3D8]'}`}>
@@ -1554,8 +1557,8 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                 </div>
                 <p className="mt-2 text-xs text-[#737573]">
                   {weeklySavingsMet
-                    ? 'La tarea de ahorro queda activada en el inicio. Cuenta los depósitos hechos en los últimos 7 días.'
-                    : `Aparta $${formatMoney(weeklySavingsTarget - savingsLast7Days)} más para activar la tarea de ahorro semanal.`}
+                    ? 'La tarea de ahorro queda activada en el inicio. Mantén al menos $20 apartados para seguir cumpliendo.'
+                    : `Aparta $${formatMoney(weeklySavingsTarget - weeklySavingsCount)} más para activar la tarea de ahorro.`}
                 </p>
               </div>
 
