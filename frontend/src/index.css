@@ -5022,34 +5022,3 @@ textarea.premium-input:focus {
   display: none !important;
   content: none !important;
 }
-
-/* Ajuste final Configuración admin: en desktop formulario y lista quedan ordenados por importancia */
-@media (min-width: 1181px) {
-  .admin-access-layout--stacked {
-    display: grid !important;
-    grid-template-columns: minmax(340px, 0.82fr) minmax(0, 1.18fr) !important;
-    gap: 1.05rem !important;
-    align-items: start !important;
-  }
-
-  .admin-access-layout--stacked .admin-create-panel,
-  .admin-access-layout--stacked .admin-list-panel {
-    min-height: 100%;
-  }
-
-  .admin-access-layout--stacked .admin-list-panel {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .admin-access-layout--stacked .admin-access-list {
-    flex: 1 1 auto;
-    max-height: 620px;
-  }
-}
-
-@media (max-width: 720px) {
-  .admin-access-layout--stacked {
-    gap: 0.85rem !important;
-  }
-}
