@@ -2506,3 +2506,53 @@
     gap: 16px;
   }
 }
+
+/* FIX FINAL AHORRO: el panel de devolver/movimientos va debajo del formulario, nunca al lado */
+[data-testid="settings-view"] .settings-savings-board .settings-savings-split,
+.settings-savings-board .settings-savings-split {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 22px !important;
+  align-items: start !important;
+}
+
+[data-testid="settings-view"] .settings-savings-board .settings-savings-form-card,
+[data-testid="settings-view"] .settings-savings-board .settings-savings-actions-card,
+.settings-savings-board .settings-savings-form-card,
+.settings-savings-board .settings-savings-actions-card {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  align-self: start !important;
+}
+
+[data-testid="settings-view"] .settings-savings-board .settings-savings-actions-card,
+.settings-savings-board .settings-savings-actions-card {
+  margin-top: 0 !important;
+}
+
+[data-testid="settings-view"] .settings-savings-board .settings-savings-scroll,
+.settings-savings-board .settings-savings-scroll {
+  max-height: 320px !important;
+  overflow-y: auto !important;
+}
+
+@media (min-width: 1024px) {
+  [data-testid="settings-view"] .settings-savings-board .settings-savings-split,
+  .settings-savings-board .settings-savings-split {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  [data-testid="settings-view"] .settings-savings-board .settings-savings-split,
+  .settings-savings-board .settings-savings-split {
+    gap: 16px !important;
+  }
+
+  [data-testid="settings-view"] .settings-savings-board .settings-savings-scroll,
+  .settings-savings-board .settings-savings-scroll {
+    max-height: 280px !important;
+  }
+}
