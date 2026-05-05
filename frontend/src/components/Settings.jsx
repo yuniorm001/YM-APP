@@ -176,6 +176,22 @@ const getSavingsWithdrawnTotal = (cash = {}) => (
     .reduce((sum, entry) => sum + Number(entry.amount || 0), 0)
 );
 
+// Total apartado en los últimos 7 días — alineado con la tarea "Guarda algo de efectivo".
+const getSavingsDepositedLast7Days = (cash = {}, currentDate) => {
+  const end = new Date(currentDate || new Date());
+  end.setHours(23, 59, 59, 999);
+  const start = new Date(end);
+  start.setDate(start.getDate() - 6);
+  start.setHours(0, 0, 0, 0);
+  return getSavingsEntries(cash)
+    .filter((entry) => entry.type !== 'withdraw')
+    .filter((entry) => {
+      const entryDate = new Date(entry.date || entry.createdAt || new Date().toISOString());
+      return entryDate >= start && entryDate <= end;
+    })
+    .reduce((sum, entry) => sum + Number(entry.amount || 0), 0);
+};
+
 const createEmptyIncomeForm = (currentDate) => ({
   amount: '',
   source: '',
@@ -364,6 +380,13 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
   const savingsBalance = Math.max(0, savingsImpact);
   const savingsDepositedTotal = getSavingsDepositedTotal(cash);
   const savingsWithdrawnTotal = getSavingsWithdrawnTotal(cash);
+  const savingsLast7Days = getSavingsDepositedLast7Days(cash, currentDate);
+  const recurringPayAmountSettings = Number((cash?.entries || []).find((entry) => entry.type === 'primary')?.amount || 0);
+  const weeklySavingsTarget = Math.max(20, Math.round(Math.max(recurringPayAmountSettings * 0.05, 20)));
+  const weeklySavingsPct = weeklySavingsTarget > 0
+    ? Math.min(100, Math.round((savingsLast7Days / weeklySavingsTarget) * 100))
+    : 0;
+  const weeklySavingsMet = savingsLast7Days >= weeklySavingsTarget;
   const activeSavingsMovements = savingsEntries.filter((movement) => {
     const amount = Number(movement?.amount || 0);
     const labelText = `${movement?.type || ''} ${movement?.purpose || ''} ${movement?.note || ''}`.toLowerCase();
@@ -1507,6 +1530,33 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                   <strong className="block mt-2 text-2xl font-heading text-[#1A1C1A]">${formatMoney(savingsDepositedTotal)}</strong>
                   <small className="text-xs text-[#737573]">Retirado: ${formatMoney(savingsWithdrawnTotal)}</small>
                 </div>
+              </div>
+
+              <div className={`rounded-2xl border p-4 mb-5 ${weeklySavingsMet ? 'bg-[#EAF5EF] border-[#CFE3D8]' : 'bg-[#F8F5EF] border-[#E7DED1]'}`}>
+                <div className="flex items-center justify-between gap-3 flex-wrap">
+                  <div className="min-w-0">
+                    <span className={`block text-[11px] uppercase tracking-[0.18em] font-bold ${weeklySavingsMet ? 'text-[#557064]' : 'text-[#8A8D88]'}`}>
+                      Tarea semanal · últimos 7 días
+                    </span>
+                    <strong className={`block mt-1 text-lg font-heading ${weeklySavingsMet ? 'text-[#2A4D3B]' : 'text-[#1A1C1A]'}`}>
+                      ${formatMoney(savingsLast7Days)} <span className="text-sm font-normal text-[#737573]">de ${formatMoney(weeklySavingsTarget)}</span>
+                    </strong>
+                  </div>
+                  <span className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold ${weeklySavingsMet ? 'bg-[#2A4D3B] text-white' : 'bg-white text-[#557064] border border-[#CFE3D8]'}`}>
+                    {weeklySavingsMet ? '✓ Completada' : `${weeklySavingsPct}%`}
+                  </span>
+                </div>
+                <div className="mt-3 h-2 rounded-full bg-[#E7DED1] overflow-hidden">
+                  <div
+                    className={`h-full transition-all ${weeklySavingsMet ? 'bg-[#2A4D3B]' : 'bg-[#557064]'}`}
+                    style={{ width: `${weeklySavingsPct}%` }}
+                  />
+                </div>
+                <p className="mt-2 text-xs text-[#737573]">
+                  {weeklySavingsMet
+                    ? 'La tarea de ahorro queda activada en el inicio. Cuenta los depósitos hechos en los últimos 7 días.'
+                    : `Aparta $${formatMoney(weeklySavingsTarget - savingsLast7Days)} más para activar la tarea de ahorro semanal.`}
+                </p>
               </div>
 
               <label className="settings-field-title">Tipo de ahorro</label>

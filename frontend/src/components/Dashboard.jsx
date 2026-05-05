@@ -312,6 +312,15 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
   
   const weekEnd = new Date(currentDate);
   weekEnd.setHours(23, 59, 59, 999);
+
+  // Ventana móvil de últimos 7 días (para la tarea de ahorro semanal).
+  // No depende del día calendario, así evita el bug de domingo (getDay()=0)
+  // y el "reset" injusto al lunes para usuarios que ahorran fin de semana.
+  const savingsWindowEnd = new Date(currentDate);
+  savingsWindowEnd.setHours(23, 59, 59, 999);
+  const savingsWindowStart = new Date(savingsWindowEnd);
+  savingsWindowStart.setDate(savingsWindowStart.getDate() - 6);
+  savingsWindowStart.setHours(0, 0, 0, 0);
   
   const weekExpenses = expenses.filter(e => {
     const expDate = new Date(e.date);
@@ -347,7 +356,7 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
 
   // Cash disponible = ingreso - gastos en cash - pagos simulados de tarjetas - dinero apartado en ahorro
   const savingsBalance = getSavingsBalance(cash);
-  const savingsThisWeek = getSavingsDepositsInRange(cash, weekStart, weekEnd).reduce((sum, entry) => sum + Number(entry.amount || 0), 0);
+  const savingsThisWeek = getSavingsDepositsInRange(cash, savingsWindowStart, savingsWindowEnd).reduce((sum, entry) => sum + Number(entry.amount || 0), 0);
   const cashAvailable = cash.income - monthCashTotal - monthCardPaymentsTotal - savingsBalance;
   const canUseSmartGoal = cashAvailable > 0;
 
@@ -884,7 +893,7 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
       id: 'save-cash',
       title: savedEnoughThisWeek ? 'Ahorro semanal activado' : 'Guarda algo de efectivo esta semana',
       help: savedEnoughThisWeek
-        ? `Ya apartaste ${formatCurrency(savingsThisWeek)} esta semana. Ese dinero queda fuera del cash disponible para que no lo gastes sin darte cuenta.`
+        ? `Ya apartaste ${formatCurrency(savingsThisWeek)} en los últimos 7 días. Ese dinero queda fuera del cash disponible para que no lo gastes sin darte cuenta.`
         : cashAvailable <= 0
           ? `Cuando tengas efectivo disponible, intenta apartar ${formatCurrency(savingsTarget)} en Ahorro inteligente para crear un colchón.`
           : `Aparta aunque sean ${formatCurrency(savingsTarget)} para emergencias desde Ahorro inteligente. Te ayuda a no depender solo de la tarjeta.`,
@@ -892,8 +901,8 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
       tone: 'normal',
       priority: savedEnoughThisWeek ? 89 : (cashAvailable <= 0 ? 78 : 65),
       chips: [
-        { label: savedEnoughThisWeek ? `Ahorrado: ${formatCurrency(savingsThisWeek)}` : `Meta: ${formatCurrency(savingsTarget)}`, tone: savedEnoughThisWeek ? 'green' : 'green' },
-        { label: 'Esta semana', tone: 'neutral' }
+        { label: savedEnoughThisWeek ? `Ahorrado: ${formatCurrency(savingsThisWeek)}` : `Meta: ${formatCurrency(savingsTarget)}`, tone: 'green' },
+        { label: 'Últimos 7 días', tone: 'neutral' }
       ]
     });
   }
