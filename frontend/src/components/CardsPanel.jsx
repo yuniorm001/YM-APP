@@ -757,7 +757,8 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
   const autoAlertCardIds = cards
     .filter((card) => {
       const daysLeft = getDaysUntilPayment(card.paymentDate);
-      return daysLeft !== null && daysLeft <= 2;
+      const hasBalanceDue = Number(card?.used || 0) > 0.009;
+      return hasBalanceDue && daysLeft !== null && daysLeft <= 2;
     })
     .map((card) => card.id);
 
@@ -1128,6 +1129,9 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
             const paymentAdvice = getPaymentAdvice(daysLeft, card.name, card.used);
             const paymentPlan = buildPaymentPlan(card);
             const statementStatus = getStatementCycleStatus(card);
+            const hasBalanceDue = Number(card.used || 0) > 0.009;
+            const showPaymentBadge = !status.isFull && hasBalanceDue && daysLeft !== null && daysLeft <= 5;
+            const showStatementBadge = !status.isFull && !showPaymentBadge && statementStatus.needsConfirmation;
             const isAlertPreview = pulseOn && autoAlertCardIds.includes(card.id) && !!paymentAdvice;
             const recommendedSpend = card.limit * 0.10;
             const paymentGoalValue = Number(card.paymentGoal ?? 0);
@@ -1309,22 +1313,22 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                               •••• •••• •••• {card.number.slice(-4) || '0000'}
                             </p>
                           </div>
-                          {!status.isFull && daysLeft !== null && daysLeft <= 5 && (
+                          {(showPaymentBadge || showStatementBadge) && (
                             <div className="flex flex-col items-end gap-2 shrink-0">
                               <div
                                 className="px-2 py-1 rounded-full shadow-lg border border-white/10 backdrop-blur-sm"
-                                style={{ backgroundColor: daysLeft <= 2 ? '#9C382A' : '#D48B3F' }}
+                                style={{ backgroundColor: showStatementBadge ? '#D48B3F' : (daysLeft <= 2 ? '#9C382A' : '#D48B3F') }}
                               >
                                 <span className="text-[10px] font-bold text-white uppercase tracking-wide">
-                                  {daysLeft <= 0 ? 'Vencida' : `${daysLeft}d pago`}
+                                  {showStatementBadge ? 'No usar aún' : (daysLeft <= 0 ? 'Vencida' : `${daysLeft}d pago`)}
                                 </span>
                               </div>
                               <div
                                 className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide text-white border border-white/10 shadow-lg backdrop-blur-sm opacity-80"
-                                style={{ backgroundColor: paymentAdvice?.color || '#9C382A', pointerEvents: 'none' }}
+                                style={{ backgroundColor: showStatementBadge ? statementStatus.color : (paymentAdvice?.color || '#9C382A'), pointerEvents: 'none' }}
                                 aria-hidden="true"
                               >
-                                alerta
+                                {showStatementBadge ? 'estado' : 'alerta'}
                               </div>
                             </div>
                           )}
