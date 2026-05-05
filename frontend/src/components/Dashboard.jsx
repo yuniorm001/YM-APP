@@ -20,6 +20,7 @@ import {
   Coins
 } from '@phosphor-icons/react';
 import { parseDateOnly } from '../lib/dateUtils';
+import { buildDashboardIntelligence, getSafeCardLabel } from '../lib/dashboardIntelligence';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -198,21 +199,7 @@ const formatCurrency = (value = 0) => new Intl.NumberFormat('es-MX', {
   maximumFractionDigits: 0
 }).format(Number(value || 0));
 
-const getCardLastFour = (card) => {
-  const rawNumber = String(card?.number || card?.last4 || '').replace(/\D/g, '');
-  return rawNumber ? rawNumber.slice(-4) : '';
-};
-
-const getCardDisplayName = (card) => {
-  if (!card) return 'Tu tarjeta';
-  const lastFour = getCardLastFour(card);
-  const suffix = lastFour ? ` •${lastFour}` : '';
-  return `${card.name || 'Tarjeta'}${suffix}`;
-};
-
-const hasRealBalance = (card) => Number(card?.used || 0) > 0.009;
-const hasValidLimit = (card) => Number(card?.limit || 0) > 0;
-const hasUsableCardData = (card) => hasValidLimit(card) || hasRealBalance(card);
+const getCardDisplayName = (card) => getSafeCardLabel(card);
 
 function PremiumRadialCard({
   title,
@@ -368,20 +355,14 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
 
   const monthCardPaymentsTotal = getMonthlyCardPaymentsTotal(cash.payments, currentDate);
 
-  // Cash disponible centralizado: todas las decisiones del inicio usan esta misma base.
+  // Cash disponible = ingreso - gastos en cash - pagos simulados de tarjetas - dinero apartado en ahorro
   const savingsBalance = getSavingsBalance(cash);
   const savingsThisWeek = getSavingsDepositsInRange(cash, savingsWindowStart, savingsWindowEnd).reduce((sum, entry) => sum + Number(entry.amount || 0), 0);
-  const cashFlow = {
-    income: Number(cash.income || 0),
-    cashExpenses: monthCashTotal,
-    cardPayments: monthCardPaymentsTotal,
-    savingsReserved: savingsBalance,
-  };
-  const cashAvailable = cashFlow.income - cashFlow.cashExpenses - cashFlow.cardPayments - cashFlow.savingsReserved;
+  const cashAvailable = cash.income - monthCashTotal - monthCardPaymentsTotal - savingsBalance;
   const canUseSmartGoal = cashAvailable > 0;
 
-  const totalCreditUsed = cards.reduce((sum, c) => sum + Number(c.used || 0), 0);
-  const totalCreditLimit = cards.reduce((sum, c) => sum + Number(c.limit || 0), 0);
+  const totalCreditUsed = cards.reduce((sum, c) => sum + c.used, 0);
+  const totalCreditLimit = cards.reduce((sum, c) => sum + c.limit, 0);
   const creditUtilization = totalCreditLimit > 0 ? (totalCreditUsed / totalCreditLimit) * 100 : 0;
   const creditUtilizationEntero = Math.floor(creditUtilization || 0);
   const getUtilizationEntero = (value) => Math.floor(value || 0);
@@ -637,20 +618,26 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
     };
   });
 
-  const cardsWithRealData = cardInsights.filter(hasUsableCardData);
-  const cardsWithBalance = cardInsights.filter(hasRealBalance);
-  const cardsWithLimit = cardInsights.filter(hasValidLimit);
-  const highestUtilizationCard = [...cardsWithLimit]
-    .filter(hasRealBalance)
-    .sort((a, b) => b.utilization - a.utilization)[0] || null;
-  const nearestPaymentCard = [...cardsWithBalance]
-    .filter((card) => card.daysLeft !== null)
-    .sort((a, b) => (a.daysLeft - b.daysLeft) || (b.utilization - a.utilization))[0] || null;
-  const mostUsedCard = [...cardsWithBalance].sort((a, b) => b.used - a.used)[0] || null;
-  const mostDangerousCard = [...cardsWithLimit]
-    .filter(hasRealBalance)
-    .sort((a, b) => (b.utilization + (b.daysLeft !== null && b.daysLeft <= 5 ? 8 : 0)) - (a.utilization + (a.daysLeft !== null && a.daysLeft <= 5 ? 8 : 0)))[0] || null;
-  const hasMissingCardInfo = cards.some((card) => hasRealBalance(card) && !hasValidLimit(card));
+  const dashboardIntelligence = buildDashboardIntelligence({
+    cash,
+    cards: cardInsights,
+    expenses,
+    monthExpenses,
+    weekExpenses,
+    goals,
+    cashAvailable,
+    cashHealthPercentage,
+    creditUtilization,
+    currentDate,
+  });
+
+  const highestUtilizationCard = dashboardIntelligence.highestUtilizationCard;
+  const nearestPaymentCard = dashboardIntelligence.nearestPaymentCard;
+  const mostUsedCard = [...cardInsights].filter((card) => card.used > 0).sort((a, b) => b.used - a.used)[0] || null;
+  const mostDangerousCard = dashboardIntelligence.mostDangerousCard;
+  const predictionConfidence = dashboardIntelligence.predictionConfidence;
+  const onboardingSteps = dashboardIntelligence.onboardingSteps;
+  const isOnboardingMode = dashboardIntelligence.isOnboardingMode;
 
   const topCategory = categoryData.length > 0
     ? [...categoryData].sort((a, b) => b.value - a.value)[0]
@@ -682,7 +669,6 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
   const weekDaysRemaining = Math.max(7 - currentWeekDayIndex, 0);
   const weeklySpendRate = weekTotal / Math.max(currentWeekDayIndex, 1);
   const projectedWeekSpend = weekTotal + (weeklySpendRate * weekDaysRemaining);
-  const hasEnoughWeeklyData = weekExpenses.length >= 3 && currentWeekDayIndex >= 3;
   const extraCashCapacity = Math.max(cashAvailable - Math.max(recurringPayAmount * 0.15, 35), 0);
   const opportunityPayment = highestUtilizationCard ? Math.min(extraCashCapacity, highestUtilizationCard.targetTenPercent) : 0;
   const projectedRiskCardUtilization = highestUtilizationCard && highestUtilizationCard.limit > 0
@@ -706,25 +692,18 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
     pulseTodayLine = 'Hoy conviene frenar compras y proteger tu cash.';
   }
 
-  const pulseCritical = getUtilizationEntero(highestUtilizationCard?.utilization) >= 30 || cashAvailable < 0 || (nearestPaymentCard?.daysLeft !== null && nearestPaymentCard?.daysLeft <= 0 && nearestPaymentCard?.used > 0);
-  const pulseAttention = !pulseCritical && (getUtilizationEntero(highestUtilizationCard?.utilization) >= 20 || cashHealthPercentage < 40 || (nearestPaymentCard?.daysLeft !== null && nearestPaymentCard?.daysLeft <= 5 && nearestPaymentCard?.used > 0));
-  const pulseStatusLabel = pulseCritical ? 'Actúa hoy' : pulseAttention ? 'Revisa esto' : 'Vas bien';
+  const pulseCritical = dashboardIntelligence.priority.level === 'red';
+  const pulseAttention = dashboardIntelligence.priority.level === 'amber';
+  const pulseStatusLabel = dashboardIntelligence.priority.label;
   const pulseStatusClass = pulseCritical ? 'critical' : pulseAttention ? 'attention' : 'stable';
-  const pulseActionTitle = pulseCritical ? 'Lo primero que debes hacer' : pulseAttention ? 'Próximo paso' : 'Mantén este ritmo';
-  const pulseActionText = pulseCritical
-    ? (getUtilizationEntero(highestUtilizationCard?.utilization) >= 30
-      ? `Baja ${getCardDisplayName(highestUtilizationCard)} por debajo de 30% antes de seguir usando crédito.`
-      : 'Pausa compras variables y protege efectivo antes de asumir más pagos.')
-    : pulseAttention
-      ? (nearestPaymentCard?.daysLeft !== null && nearestPaymentCard?.daysLeft <= 5 && nearestPaymentCard?.used > 0
-        ? `Prepara el pago de ${getCardDisplayName(nearestPaymentCard)} en los próximos ${Math.max(nearestPaymentCard.daysLeft, 0)} días.`
-        : 'Mantén el uso de tarjetas debajo de 30% y revisa tu dinero disponible antes de comprar.')
-      : 'Puedes seguir operando, pero conserva margen antes de usar crédito.';
+  const pulseActionTitle = dashboardIntelligence.priority.actionTitle;
+  const pulseActionText = dashboardIntelligence.priority.actionText;
   const commandMetrics = [
     { label: 'Estado', value: pulseStatusLabel, tone: pulseStatusClass },
     { label: 'Uso de tarjetas', value: `${creditUtilizationEntero}%`, tone: creditUtilizationEntero <= 19 ? 'stable' : creditUtilizationEntero <= 29 ? 'attention' : 'critical' },
     { label: 'Dinero disponible', value: new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(cashAvailable), tone: cashAvailable > 0 ? 'stable' : 'critical' },
-    { label: 'Pago próximo', value: nearestPaymentCard?.daysLeft !== null && nearestPaymentCard ? `${Math.max(nearestPaymentCard.daysLeft, 0)} día${Math.max(nearestPaymentCard.daysLeft, 0) === 1 ? '' : 's'}` : 'Sin alerta', tone: nearestPaymentCard?.daysLeft !== null && nearestPaymentCard?.daysLeft <= 5 ? 'attention' : 'neutral' }
+    { label: 'Pago próximo', value: nearestPaymentCard?.daysLeft !== null && nearestPaymentCard ? `${Math.max(nearestPaymentCard.daysLeft, 0)} día${Math.max(nearestPaymentCard.daysLeft, 0) === 1 ? '' : 's'}` : 'Sin alerta', tone: nearestPaymentCard?.daysLeft !== null && nearestPaymentCard?.daysLeft <= 5 ? 'attention' : 'neutral' },
+    { label: 'Predicción', value: predictionConfidence.label, tone: predictionConfidence.level === 'high' ? 'stable' : predictionConfidence.level === 'medium' ? 'attention' : 'neutral' }
   ];
 
   // ============================================================
@@ -734,59 +713,45 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
   // ============================================================
   const dailyTasks = [];
   const taskIds = new Set();
-  const taskScopes = new Set();
+  const primaryTaskByCard = new Map();
   const addTask = (task) => {
     if (!task?.id || taskIds.has(task.id)) return;
-    if (task.scope && taskScopes.has(task.scope)) return;
-    taskIds.add(task.id);
-    if (task.scope) taskScopes.add(task.scope);
-    dailyTasks.push({ priority: 50, category: 'action', ...task });
+
+    const normalizedTask = { priority: 50, ...task };
+    if (normalizedTask.cardId && normalizedTask.primaryCardAction) {
+      const existingIndex = primaryTaskByCard.get(normalizedTask.cardId);
+      if (existingIndex !== undefined) {
+        if ((dailyTasks[existingIndex]?.priority || 50) <= normalizedTask.priority) return;
+        taskIds.delete(dailyTasks[existingIndex].id);
+        dailyTasks.splice(existingIndex, 1, normalizedTask);
+        taskIds.add(normalizedTask.id);
+        return;
+      }
+      primaryTaskByCard.set(normalizedTask.cardId, dailyTasks.length);
+    }
+
+    taskIds.add(normalizedTask.id);
+    dailyTasks.push(normalizedTask);
   };
 
-  const cardsByUtilization = [...cardsWithLimit].filter(hasRealBalance).sort((a, b) => b.utilization - a.utilization);
-  const cardsByPaymentUrgency = [...cardsWithBalance]
-    .filter((card) => card.daysLeft !== null)
-    .sort((a, b) => (a.daysLeft - b.daysLeft) || (b.utilization - a.utilization));
-  const pendingStatementCards = cardInsights.filter((card) => card.statementStatus?.needsConfirmation && hasRealBalance(card));
+  onboardingSteps.forEach((step) => {
+    addTask({ ...step, done: false, tone: 'normal', setupTask: true });
+  });
+
+  const cardsByUtilization = [...cardInsights].sort((a, b) => b.utilization - a.utilization);
+  const cardsByPaymentUrgency = [...cardInsights]
+    .filter((card) => card.daysLeft !== null && card.used > 0)
+    .sort((a, b) => a.daysLeft - b.daysLeft);
+  const pendingStatementCards = cardInsights.filter((card) => card.statementStatus?.needsConfirmation);
   const confirmedStatementCards = cardInsights.filter((card) => card.statementStatus?.isConfirmed);
-  const healthyUseCards = cardsWithLimit
-    .filter((card) => card.used < card.limit * 0.10 && (card.daysLeft === null || card.daysLeft > 3) && !card.statementStatus?.needsConfirmation)
+  const healthyUseCards = cardInsights
+    .filter((card) => card.limit > 0 && card.used < card.limit * 0.10 && card.daysLeft !== null && card.daysLeft > 3 && !card.statementStatus?.needsConfirmation)
     .sort((a, b) => (b.limit - b.used) - (a.limit - a.used));
   const bestUseCard = healthyUseCards[0] || null;
 
   // Base: revisión general. Solo se muestra como pendiente cuando falta información
   // o cuando el uso requiere atención. No la marcamos como completada automáticamente.
   const hasReviewedBalance = cards.length > 0 || cardInsights.length > 0;
-  if (totalMonthlyIncomeCapacity <= 0) {
-    addTask({
-      id: 'configure-income',
-      title: 'Configura tu ingreso mensual',
-      help: 'Sin ingreso registrado, la app no puede medir con precisión tu cash disponible ni la cobertura de pagos.',
-      done: false,
-      tone: 'neutral',
-      priority: 3,
-      chips: [
-        { label: 'Dato requerido', tone: 'amber' },
-        { label: 'Mejora la guía', tone: 'neutral' }
-      ]
-    });
-  }
-
-  if (hasMissingCardInfo) {
-    addTask({
-      id: 'complete-card-limits',
-      title: 'Completa el límite de tus tarjetas activas',
-      help: 'Hay tarjetas con balance pero sin límite. Completar ese dato evita recomendaciones incompletas sobre utilización.',
-      done: false,
-      tone: 'urgent',
-      priority: 4,
-      chips: [
-        { label: 'Falta límite', tone: 'red' },
-        { label: 'Utilización', tone: 'amber' }
-      ]
-    });
-  }
-
   if (!hasReviewedBalance) {
     addTask({
       id: 'review-balance',
@@ -811,7 +776,8 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
   pendingStatementCards.slice(0, 3).forEach((card, index) => {
     addTask({
       id: `statement-pending-${card.id || index}`,
-      scope: `card-${card.id || index}`,
+      cardId: card.id,
+      primaryCardAction: true,
       title: `Confirma si ya llegó el estado de cuenta de ${getCardDisplayName(card)}`,
       help: 'Ya llegó o pasó la fecha de pago. No uses esta tarjeta hasta confirmar que el banco envió el nuevo estado de cuenta.',
       done: false,
@@ -840,7 +806,8 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
     if (card.daysLeft <= 7) {
       addTask({
         id: `payment-${card.id || index}`,
-        scope: `card-${card.id || index}`,
+        cardId: card.id,
+        primaryCardAction: true,
         title: card.daysLeft <= 0
           ? `Paga hoy ${getCardDisplayName(card)}`
           : `Prepara tu pago de ${getCardDisplayName(card)}`,
@@ -865,7 +832,8 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
       const paymentToHealthy = Math.ceil(card.targetThirtyPercent || card.targetTenPercent || 0);
       addTask({
         id: `high-utilization-${card.id || index}`,
-        scope: `card-${card.id || index}`,
+        cardId: card.id,
+        primaryCardAction: true,
         title: `Baja el uso de ${getCardDisplayName(card)}`,
         help: `Está en ${utilization}%. Si pagas ${formatCurrency(paymentToHealthy)}, la acercas a una zona más sana. Evita seguir usándola hoy.`,
         done: false,
@@ -879,7 +847,8 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
     } else if (utilization >= 20) {
       addTask({
         id: `moderate-utilization-${card.id || index}`,
-        scope: `card-${card.id || index}`,
+        cardId: card.id,
+        primaryCardAction: true,
         title: `No subas más ${getCardDisplayName(card)} por ahora`,
         help: `Va en ${utilization}%. Todavía no está crítica, pero cualquier compra nueva la puede acercar al 30%.`,
         done: false,
@@ -895,7 +864,8 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
     if (card.targetTenPercent > 0 && card.targetTenPercent <= Math.max(extraCashCapacity, 25)) {
       addTask({
         id: `ten-percent-opportunity-${card.id || index}`,
-        scope: `card-${card.id || index}`,
+        cardId: card.id,
+        primaryCardAction: true,
         title: `Puedes acercar ${getCardDisplayName(card)} al 10% ideal`,
         help: `Con un pago de ${formatCurrency(card.targetTenPercent)}, esa tarjeta queda cerca de la zona recomendada para proteger mejor tu perfil.`,
         done: false,
@@ -913,6 +883,8 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
   if (bestUseCard) {
     addTask({
       id: `best-card-${bestUseCard.id || 'today'}`,
+      cardId: bestUseCard.id,
+      primaryCardAction: true,
       title: `Si necesitas comprar, usa primero ${getCardDisplayName(bestUseCard)}`,
       help: `Tiene buen margen y menor presión hoy. Mantén el gasto cerca de ${formatCurrency(bestUseCard.limit * 0.10)} o menos.`,
       done: false,
@@ -939,7 +911,8 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
   if (avoidCard) {
     addTask({
       id: `avoid-card-${avoidCard.id || 'today'}`,
-      scope: `card-${avoidCard.id || 'today'}`,
+      cardId: avoidCard.id,
+      primaryCardAction: true,
       title: `Evita usar ${getCardDisplayName(avoidCard)} hoy`,
       help: avoidCard.statementStatus?.needsConfirmation
         ? 'Falta confirmar el estado de cuenta. Usarla ahora puede meter consumo nuevo en el ciclo equivocado.'
@@ -981,27 +954,25 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
     ? Math.round((monthlyIncomeForSavings * 0.05) / 4.33)
     : 0;
   const savingsTarget = Math.max(20, Math.min(200, weeklyTargetFromIncome || 20));
-  const savedEnoughThisWeek = savingsThisWeek >= savingsTarget;
-  const hasActiveSavingsCushion = savingsBalance >= savingsTarget;
+  const savingsTowardsTask = Math.max(savingsThisWeek, savingsBalance);
+  const savedEnoughThisWeek = savingsTowardsTask >= savingsTarget;
   const shouldShowSavingsTask = totalMonthlyIncomeCapacity > 0 || cashAvailable > 0 || savingsThisWeek > 0 || savingsBalance > 0;
 
   if (shouldShowSavingsTask) {
     addTask({
       id: 'save-cash',
-      title: savedEnoughThisWeek ? 'Ahorro semanal activado' : hasActiveSavingsCushion ? 'Refuerza tu ahorro esta semana' : 'Guarda algo de efectivo esta semana',
+      title: savedEnoughThisWeek ? 'Ahorro semanal activado' : 'Guarda algo de efectivo esta semana',
       help: savedEnoughThisWeek
-        ? `Esta semana ya apartaste ${formatCurrency(savingsThisWeek)} en Ahorro inteligente. Ese dinero queda fuera del cash disponible para que no lo gastes sin darte cuenta.`
-        : hasActiveSavingsCushion
-          ? `Tienes ${formatCurrency(savingsBalance)} apartados. Para que la tarea sea semanal, intenta agregar ${formatCurrency(savingsTarget)} nuevos cuando tu cash lo permita.`
-          : cashAvailable <= 0
-            ? `Cuando tengas efectivo disponible, intenta apartar ${formatCurrency(savingsTarget)} en Ahorro inteligente para crear un colchón.`
-            : `Aparta aunque sean ${formatCurrency(savingsTarget)} esta semana para emergencias. Te ayuda a no depender solo de la tarjeta.`,
+        ? `Ya tienes ${formatCurrency(savingsTowardsTask)} apartados en Ahorro inteligente. Ese dinero queda fuera del cash disponible para que no lo gastes sin darte cuenta.`
+        : cashAvailable <= 0
+          ? `Cuando tengas efectivo disponible, intenta apartar ${formatCurrency(savingsTarget)} en Ahorro inteligente para crear un colchón.`
+          : `Aparta aunque sean ${formatCurrency(savingsTarget)} para emergencias desde Ahorro inteligente. Te ayuda a no depender solo de la tarjeta.`,
       done: savedEnoughThisWeek,
       tone: 'normal',
       priority: savedEnoughThisWeek ? 89 : (cashAvailable <= 0 ? 78 : 65),
       chips: [
-        { label: savedEnoughThisWeek ? `Semana: ${formatCurrency(savingsThisWeek)}` : `Meta semanal: ${formatCurrency(savingsTarget)}`, tone: 'green' },
-        { label: hasActiveSavingsCushion ? `Colchón: ${formatCurrency(savingsBalance)}` : 'Ahorro activo', tone: 'neutral' }
+        { label: savedEnoughThisWeek ? `Ahorrado: ${formatCurrency(savingsTowardsTask)}` : `Meta: ${formatCurrency(savingsTarget)}`, tone: 'green' },
+        { label: 'Ahorro activo', tone: 'neutral' }
       ]
     });
   }
@@ -1015,7 +986,6 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
     if (!paymentReserveCovered) {
       addTask({
         id: 'cash-cover-payment',
-        scope: `card-${nearestPaymentCard.id || 'nearest-payment'}`,
         title: `Tu cash no cubre bien el pago de ${getCardDisplayName(nearestPaymentCard)}`,
         help: `Tienes ${formatCurrency(cashAvailable)} disponible y el balance es ${formatCurrency(nearestPaymentCard.used)}. Reserva dinero en Ahorro inteligente antes de gastar más.`,
         done: false,
@@ -1069,7 +1039,6 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
   if (pendingStatementCards.length > 0) {
     addTask({
       id: 'payment-vs-statement-lesson',
-      category: 'education',
       title: 'Recuerda: pago no es lo mismo que estado de cuenta',
       help: 'Después de pagar, espera el estado de cuenta antes de volver a usar la tarjeta si quieres proteger lo que se reporta.',
       done: false,
@@ -1098,9 +1067,8 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
   const displayedDailyTasks = showAllTasks ? dailyTasks : dailyTasks.slice(0, visibleTaskLimit);
   const hiddenTasksCount = Math.max(dailyTasks.length - displayedDailyTasks.length, 0);
 
-  const actionableTasks = dailyTasks.filter((task) => task.category !== 'education');
-  const tasksDone = actionableTasks.filter((t) => t.done).length;
-  const tasksTotal = actionableTasks.length;
+  const tasksDone = dailyTasks.filter((t) => t.done).length;
+  const tasksTotal = dailyTasks.length;
   const tasksProgressPct = tasksTotal > 0 ? Math.round((tasksDone / tasksTotal) * 100) : 0;
   const tasksProgressLabel = tasksProgressPct === 100
     ? '¡Día completado!'
@@ -1143,11 +1111,7 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
   let semaforoLevel = 'green'; // green | amber | red
   let semaforoEmoji = '🟢';
   let semaforoTitle = 'Vas bien';
-  let semaforoMessage = creditUtilization === 0 && cards.length > 0
-    ? 'Tus tarjetas están en cero. Mantén margen y evita compras innecesarias.'
-    : savingsBalance > 0
-      ? 'Tu dinero, tarjetas y ahorro se ven bajo control. Mantén este ritmo.'
-      : 'Tu dinero y tus tarjetas se ven bajo control. Mantén este ritmo.';
+  let semaforoMessage = 'Tu dinero y tus tarjetas se ven bajo control. Mantén este ritmo.';
 
   if (getUtilizationEntero(highestUtilizationCard?.utilization) >= 30 || cashAvailable < 0 || (nearestPaymentCard?.daysLeft !== null && nearestPaymentCard?.daysLeft <= 0 && nearestPaymentCard?.used > 0)) {
     semaforoLevel = 'red';
@@ -1167,13 +1131,11 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
       : nearestPaymentCard?.daysLeft !== null && nearestPaymentCard?.daysLeft <= 5
         ? `Tienes un pago en ${Math.max(nearestPaymentCard.daysLeft, 0)} día${Math.max(nearestPaymentCard.daysLeft, 0) === 1 ? '' : 's'}. Aparta el dinero esta semana.`
         : 'Tu efectivo está bajo. Cuida los gastos no esenciales esta semana.';
-  } else if (totalMonthlyIncomeCapacity <= 0 || hasMissingCardInfo || (cards.length === 0 && cashAvailable === 0)) {
+  } else if (isOnboardingMode) {
     semaforoLevel = 'amber';
     semaforoEmoji = '🟡';
     semaforoTitle = 'Configura tu guía';
-    semaforoMessage = hasMissingCardInfo
-      ? 'Completa el límite de tus tarjetas activas para que la app calcule mejor tu utilización.'
-      : 'Agrega tus tarjetas e ingresos para que la app te diga qué hacer primero.';
+    semaforoMessage = onboardingSteps[0]?.help || 'Completa tus datos para que la app te diga qué hacer primero.';
   }
 
   // ============================================================
@@ -1264,9 +1226,12 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
   }
 
   if (projectedWeekSpend > weekTotal && weekTotal > 0) {
-    addTickerMessage(hasEnoughWeeklyData
-      ? `Predicción · Si sigues este ritmo, cerrarás la semana en ${formatCurrency(projectedWeekSpend)}.`
-      : `Predicción · Con los datos actuales, podrías cerrar la semana cerca de ${formatCurrency(projectedWeekSpend)}.`, 'info');
+    addTickerMessage(
+      predictionConfidence.canShowStrongPrediction
+        ? `Predicción · ${predictionConfidence.weekPrefix}, cerrarías la semana en ${formatCurrency(projectedWeekSpend)}.`
+        : `Predicción · ${predictionConfidence.weekPrefix}; registra más gastos para calcular un cierre semanal confiable.`,
+      'info'
+    );
   }
 
   if (getUtilizationEntero(projectedRiskCardUtilization) >= 30 && highestUtilizationCard) {
@@ -1274,7 +1239,12 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
   }
 
   if (totalMonthlyIncomeCapacity > 0 && projectedMonthSpend + monthCardPaymentsTotal > totalMonthlyIncomeCapacity) {
-    addTickerMessage('Predicción · A este paso, tu cash disponible no cubrirá todo antes del cierre del mes.', 'danger');
+    addTickerMessage(
+      predictionConfidence.canShowStrongPrediction
+        ? 'Predicción · A este paso, tu cash disponible no cubrirá todo antes del cierre del mes.'
+        : 'Predicción · Todavía hay pocos datos, pero tu margen de cash se ve ajustado. Registra más movimientos para afinarlo.',
+      predictionConfidence.canShowStrongPrediction ? 'danger' : 'warning'
+    );
   }
 
   if (topCategory) {
