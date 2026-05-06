@@ -792,6 +792,21 @@ function App() {
     });
   };
 
+  const goToCard = (cardId) => {
+    if (!cardId) return;
+    setActiveTab('cards');
+    // Esperar a que CardsPanel se monte antes de buscar y desplazarse al elemento.
+    setTimeout(() => {
+      const el = document.querySelector(`[data-testid="card-item-${cardId}"]`);
+      if (!el) return;
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.classList.add('card-highlight-pulse');
+      setTimeout(() => {
+        el.classList.remove('card-highlight-pulse');
+      }, 2400);
+    }, 250);
+  };
+
   const updateSettings = (newSettings) => {
     setData((prev) => normalizeData({
       ...prev,
@@ -931,6 +946,7 @@ function App() {
                 cardPayments={data.cash?.payments || []}
                 onEdit={handleOpenExpenseModal}
                 onDelete={deleteExpense}
+                onGoToCard={goToCard}
               />
             </motion.div>
           )}
