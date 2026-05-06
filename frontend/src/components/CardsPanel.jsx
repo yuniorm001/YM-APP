@@ -1623,7 +1623,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                     className="relative h-[100dvh] min-h-screen w-screen max-w-none bg-white rounded-none shadow-none overflow-hidden flex flex-col min-h-0"
                   >
               <div className="sticky top-0 z-10 w-full border-b border-[#E6E6E3] bg-gradient-to-r from-[#FCFBF8] to-[#F7FBF8] px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex-shrink-0">
-                <div className="mx-auto flex w-full max-w-[1600px] items-start justify-between gap-4">
+                <div className="mx-auto flex w-full max-w-[1080px] items-start justify-between gap-4">
                   <div className="flex items-start gap-3">
                     <div className="mt-0.5 flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#2A4D3B] to-[#1E3A2B] text-white shadow-md">
                       <Clock weight="fill" className="w-5 h-5" />
@@ -1647,7 +1647,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
               </div>
 
               <div className="flex-1 min-h-0 overflow-y-auto bg-[#FAFAF9] overscroll-contain px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
-                <div className="mx-auto w-full max-w-[1600px]">
+                <div className="mx-auto w-full max-w-[1080px]">
                 {activeRecommendation ? (
                   <div className="rounded-[26px] border border-[#EAE4DA] bg-white p-4 sm:p-5 shadow-sm overflow-hidden">
                     <div className="flex items-center justify-between gap-3 mb-4">
@@ -1944,7 +1944,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                       className="relative h-[100dvh] min-h-screen w-screen max-w-none bg-white rounded-none shadow-none overflow-hidden flex flex-col min-h-0"
                     >
                 <div className="sticky top-0 z-10 w-full border-b border-[#E6E6E3] bg-gradient-to-r from-[#FFF8EA] to-[#FCFBF8] px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex-shrink-0">
-                  <div className="mx-auto flex w-full max-w-[1600px] items-start justify-between gap-4">
+                  <div className="mx-auto flex w-full max-w-[1080px] items-start justify-between gap-4">
                     <div className="flex items-start gap-3">
                       <div className="mt-0.5 flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#D48B3F] to-[#B67A2E] text-white shadow-md">
                         <Sparkle weight="fill" className="w-5 h-5" />
@@ -1967,7 +1967,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                 </div>
 
                 <div className="flex-1 min-h-0 overflow-y-auto bg-[#FAFAF9] overscroll-contain px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
-                  <div className="mx-auto w-full max-w-[1600px] space-y-4">
+                  <div className="mx-auto w-full max-w-[1080px] space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div className="rounded-2xl border border-[#EAE4DA] bg-white p-4">
                       <p className="text-[10px] uppercase tracking-[0.14em] text-[#737573]">Saldo actual</p>
@@ -2052,7 +2052,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                 </div>
 
                 <div className="sticky bottom-0 z-10 w-full border-t border-[#E6E6E3] bg-[#F5F4F1] px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex-shrink-0 pb-[calc(1rem+env(safe-area-inset-bottom,0px))]">
-                  <div className="mx-auto flex w-full max-w-[1600px] flex-col-reverse gap-3 sm:flex-row justify-end">
+                  <div className="mx-auto flex w-full max-w-[1080px] flex-col-reverse gap-3 sm:flex-row justify-end">
                   <button
                     type="button"
                     onClick={() => setGoalModalCard(null)}
@@ -2102,7 +2102,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                     className="relative h-[100dvh] min-h-screen w-screen max-w-none bg-white rounded-none shadow-none overflow-hidden flex flex-col min-h-0"
                   >
               <div className="sticky top-0 z-10 w-full border-b border-[#E6E6E3] bg-gradient-to-r from-[#F7FBF8] to-[#F4F8F5] px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex-shrink-0">
-                <div className="mx-auto flex w-full max-w-[1600px] items-start justify-between gap-4">
+                <div className="mx-auto flex w-full max-w-[1080px] items-start justify-between gap-4">
                   <div className="flex items-start gap-3">
                     <div className="mt-0.5 flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#2A4D3B] to-[#1E3A2B] text-white shadow-md">
                       <CurrencyDollar weight="fill" className="w-5 h-5" />
@@ -2125,7 +2125,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
               </div>
 
               <div className="flex-1 min-h-0 overflow-y-auto bg-[#FAFAF9] overscroll-contain px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
-                <div className="mx-auto w-full max-w-[1600px]">
+                <div className="mx-auto w-full max-w-[1080px]">
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                   <div>
                     <p className="text-xs sm:text-[13px] text-[#5E605D] leading-relaxed">
@@ -2219,7 +2219,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                   >
                     <form onSubmit={handleSubmit} className="flex h-full min-h-0 w-full flex-col bg-white">
                     <div className="sticky top-0 z-10 w-full border-b border-[#E6E6E3] bg-gradient-to-r from-[#FAFAF9] to-[#F5F4F1] px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex-shrink-0">
-                      <div className="mx-auto flex w-full max-w-[1600px] items-center justify-between gap-4">
+                      <div className="mx-auto flex w-full max-w-[1080px] items-center justify-between gap-4">
                         <div className="flex items-center gap-3 min-w-0">
                           <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#2A4D3B] to-[#1E3A2B] flex items-center justify-center shadow-lg shadow-[#2A4D3B]/20 flex-shrink-0">
                             <CreditCardIcon weight="fill" className="w-5 h-5 text-white" />
@@ -2246,13 +2246,13 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                     </div>
 
                     <div className="sticky top-[85px] sm:top-[93px] z-[9] w-full bg-white px-4 sm:px-6 lg:px-8 py-3 flex-shrink-0">
-                      <div className="mx-auto flex w-full max-w-[1600px] gap-2">
+                      <div className="mx-auto flex w-full max-w-[1080px] gap-2">
                         <div className="flex-1 h-1.5 rounded-full bg-gradient-to-r from-[#2A4D3B] to-[#1E3A2B]" />
                       </div>
                     </div>
 
                     <div className="flex-1 min-h-0 overflow-y-auto bg-[#FAFAF9] overscroll-contain px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
-                      <div className="mx-auto w-full max-w-[1600px] min-w-0 space-y-5 mobile-form-stack">
+                      <div className="mx-auto w-full max-w-[1080px] min-w-0 space-y-5 mobile-form-stack">
                         {error && (
                           <motion.div
                             initial={{ opacity: 0, y: -10 }}
@@ -2399,7 +2399,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                     </div>
 
                     <div className="sticky bottom-0 z-10 w-full border-t border-[#E6E6E3] bg-[#F5F4F1] px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex-shrink-0 pb-[calc(1rem+env(safe-area-inset-bottom,0px))]">
-                      <div className="mx-auto flex w-full max-w-[1600px] flex-col-reverse gap-3 sm:flex-row">
+                      <div className="mx-auto flex w-full max-w-[1080px] flex-col-reverse gap-3 sm:flex-row">
                         <button
                           type="button"
                           onClick={resetForm}

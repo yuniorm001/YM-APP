@@ -135,81 +135,96 @@ export default function ExpensesList({ expenses, cards = [], cardPayments = [], 
         </div>
       </div>
 
-      <div className="premium-card p-4">
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="flex-1">
+      <div className="expense-control-suite">
+        <div className="expense-search-command">
+          <div className="expense-search-shell">
+            <span className="expense-search-icon"><FadersHorizontal weight="duotone" /></span>
             <input
               type="text"
               placeholder="Buscar por nombre del gasto..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="premium-input px-5"
+              className="expense-search-input"
               data-testid="search-expenses"
             />
           </div>
 
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl border transition-colors ${
+            className={`expense-filter-main-btn ${
               showFilters || filter !== 'all' || methodFilter !== 'all'
-                ? 'bg-[#2A4D3B] text-white border-[#2A4D3B]'
-                : 'bg-white border-[#E6E6E3] text-[#737573] hover:border-[#2A4D3B]'
+                ? 'is-active'
+                : ''
             }`}
             data-testid="toggle-filters"
           >
-            <FadersHorizontal weight="duotone" className="w-5 h-5" />
-            <span className="font-medium">Filtros</span>
-            <CaretDown weight="bold" className={`w-4 h-4 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
+            <span className="expense-filter-main-icon"><FadersHorizontal weight="duotone" /></span>
+            <span>Filtros</span>
+            <CaretDown weight="bold" className={`expense-filter-caret ${showFilters ? 'rotate-180' : ''}`} />
           </button>
         </div>
 
         <AnimatePresence>
           {showFilters && (
-            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-              <div className="pt-4 border-t border-[#E6E6E3] mt-4 space-y-4">
-                <div className="rounded-2xl border border-[#E6E6E3] bg-[#FAF9F6] p-3 text-sm text-[#5F625F]">
-                  Usa estos filtros para entender si tus gastos salieron de una tarjeta o de tu efectivo disponible.
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-[#737573] mb-2">Forma de pago</p>
-                  <div className="flex flex-wrap gap-2">
-                    <button onClick={() => setMethodFilter('all')} className={`category-pill ${methodFilter === 'all' ? 'bg-[#1A1C1A] text-white' : 'bg-[#F2F0EB] text-[#737573] hover:bg-[#E6E6E3]'}`}>Ver todos</button>
-                    <button onClick={() => setMethodFilter('Tarjeta')} className={`category-pill ${methodFilter === 'Tarjeta' ? 'bg-[#2A4D3B] text-white' : 'bg-[#F2F0EB] text-[#737573] hover:bg-[#E6E6E3]'}`}>Pagados con tarjeta</button>
-                    <button onClick={() => setMethodFilter('Cash')} className={`category-pill ${methodFilter === 'Cash' ? 'bg-[#B65C47] text-white' : 'bg-[#F2F0EB] text-[#737573] hover:bg-[#E6E6E3]'}`}>Pagados en efectivo</button>
+            <motion.div
+              initial={{ height: 0, opacity: 0, y: -8 }}
+              animate={{ height: 'auto', opacity: 1, y: 0 }}
+              exit={{ height: 0, opacity: 0, y: -8 }}
+              transition={{ duration: 0.24, ease: 'easeOut' }}
+              className="overflow-hidden"
+            >
+              <div className="expense-filter-panel">
+                <div className="expense-filter-intro">
+                  <div>
+                    <span>Control de movimientos</span>
+                    <strong>Filtra tus gastos sin perder el diseño limpio.</strong>
                   </div>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-[#737573] mb-2">Categoría del gasto</p>
-                  <div className="flex flex-wrap gap-2">
-                    <button onClick={() => setFilter('all')} className={`category-pill ${filter === 'all' ? 'bg-[#2A4D3B] text-white' : 'bg-[#F2F0EB] text-[#737573] hover:bg-[#E6E6E3]'}`} data-testid="filter-all">Todas las categorías</button>
-                    {CATEGORIES.map((cat) => (
-                      <button
-                        key={cat}
-                        onClick={() => setFilter(cat)}
-                        className={`category-pill ${filter === cat ? 'text-white' : 'bg-[#F2F0EB] text-[#737573] hover:bg-[#E6E6E3]'}`}
-                        style={filter === cat ? { backgroundColor: CATEGORY_COLORS[cat] } : {}}
-                        data-testid={`filter-${cat.toLowerCase()}`}
-                      >
-                        {CATEGORY_ICONS[cat]} {cat}
-                      </button>
-                    ))}
-                  </div>
+                  <p>Separa lo que salió de cash, tarjetas o categorías específicas.</p>
                 </div>
 
-                <div>
-                  <p className="text-sm font-medium text-[#737573] mb-2">Ordenar por</p>
-                  <div className="flex flex-wrap gap-2">
-                    {[
-                      { id: 'recent', label: 'Más recientes' },
-                      { id: 'oldest', label: 'Más antiguos' },
-                      { id: 'highest', label: 'Mayor monto' },
-                      { id: 'lowest', label: 'Menor monto' },
-                      { id: 'name', label: 'Nombre A-Z' }
-                    ].map((option) => (
-                      <button key={option.id} onClick={() => setSortBy(option.id)} className={`category-pill ${sortBy === option.id ? 'bg-[#1A1C1A] text-white' : 'bg-[#F2F0EB] text-[#737573] hover:bg-[#E6E6E3]'}`} data-testid={`sort-${option.id}`}>
-                        {option.label}
-                      </button>
-                    ))}
+                <div className="expense-filter-grid">
+                  <div className="expense-filter-group expense-filter-group--method">
+                    <p>Forma de pago</p>
+                    <div className="expense-filter-pills">
+                      <button onClick={() => setMethodFilter('all')} className={`expense-filter-pill ${methodFilter === 'all' ? 'is-dark' : ''}`}>Ver todos</button>
+                      <button onClick={() => setMethodFilter('Tarjeta')} className={`expense-filter-pill ${methodFilter === 'Tarjeta' ? 'is-green' : ''}`}>Pagados con tarjeta</button>
+                      <button onClick={() => setMethodFilter('Cash')} className={`expense-filter-pill ${methodFilter === 'Cash' ? 'is-cash' : ''}`}>Pagados en efectivo</button>
+                    </div>
+                  </div>
+
+                  <div className="expense-filter-group expense-filter-group--category">
+                    <p>Categoría del gasto</p>
+                    <div className="expense-filter-pills">
+                      <button onClick={() => setFilter('all')} className={`expense-filter-pill ${filter === 'all' ? 'is-green' : ''}`} data-testid="filter-all">Todas las categorías</button>
+                      {CATEGORIES.map((cat) => (
+                        <button
+                          key={cat}
+                          onClick={() => setFilter(cat)}
+                          className={`expense-filter-pill ${filter === cat ? 'is-custom' : ''}`}
+                          style={filter === cat ? { '--pill-accent': CATEGORY_COLORS[cat] } : {}}
+                          data-testid={`filter-${cat.toLowerCase()}`}
+                        >
+                          <span>{CATEGORY_ICONS[cat]}</span> {cat}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="expense-filter-group expense-filter-group--sort">
+                    <p>Ordenar por</p>
+                    <div className="expense-filter-pills">
+                      {[
+                        { id: 'recent', label: 'Más recientes' },
+                        { id: 'oldest', label: 'Más antiguos' },
+                        { id: 'highest', label: 'Mayor monto' },
+                        { id: 'lowest', label: 'Menor monto' },
+                        { id: 'name', label: 'Nombre A-Z' }
+                      ].map((option) => (
+                        <button key={option.id} onClick={() => setSortBy(option.id)} className={`expense-filter-pill ${sortBy === option.id ? 'is-dark' : ''}`} data-testid={`sort-${option.id}`}>
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -218,8 +233,17 @@ export default function ExpensesList({ expenses, cards = [], cardPayments = [], 
         </AnimatePresence>
       </div>
 
-
-      <div className="space-y-4">
+      <div className="expense-ledger-section space-y-4">
+        <div className="expense-ledger-header">
+          <div>
+            <p className="expense-ledger-kicker">Registro financiero</p>
+            <h2>Últimos movimientos</h2>
+          </div>
+          <div className="expense-ledger-summary">
+            <span>{cashExpenses} cash</span>
+            <span>{cardExpenses} tarjeta</span>
+          </div>
+        </div>
         <>
           {filteredExpenses.length > 0 ? (
             filteredExpenses.map((expense, index) => {
@@ -230,11 +254,11 @@ export default function ExpensesList({ expenses, cards = [], cardPayments = [], 
               return (
                 <div
                   key={expense.id}
-                  className="group relative overflow-hidden rounded-[28px] border border-[#E6E6E3] bg-white p-0 shadow-[0_18px_50px_rgba(26,28,26,0.07)] transition-colors duration-200 hover:border-[#DAD7CF]"
+                  className="expense-ledger-card group relative overflow-hidden rounded-[30px] border border-[#E6E6E3] bg-white p-0 shadow-[0_18px_50px_rgba(26,28,26,0.07)] transition-colors duration-200 hover:border-[#DAD7CF]"
                   data-testid={`expense-item-${expense.id}`}
                 >
                   <div
-                    className="absolute inset-y-0 left-0 w-1.5"
+                    className="expense-ledger-rail absolute inset-y-0 left-0 w-1.5"
                     style={{ backgroundColor: expense.method === 'Cash' ? '#B65C47' : categoryColor }}
                   />
                   <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent" />
@@ -242,7 +266,7 @@ export default function ExpensesList({ expenses, cards = [], cardPayments = [], 
                   <div className="p-4 sm:p-5">
                     <div className="grid grid-cols-[52px_1fr] lg:grid-cols-[58px_minmax(0,1fr)_auto_auto] gap-3 sm:gap-4 lg:gap-5 items-center">
                       <div
-                        className="relative w-[52px] h-[52px] sm:w-[58px] sm:h-[58px] rounded-[20px] flex items-center justify-center flex-shrink-0 border shadow-[0_12px_28px_rgba(26,28,26,0.08)] transition-transform duration-300 group-hover:scale-[1.03]"
+                        className="expense-ledger-icon relative w-[52px] h-[52px] sm:w-[58px] sm:h-[58px] rounded-[20px] flex items-center justify-center flex-shrink-0 border shadow-[0_12px_28px_rgba(26,28,26,0.08)] transition-transform duration-300 group-hover:scale-[1.03]"
                         style={{ backgroundColor: `${categoryColor}12`, borderColor: `${categoryColor}24` }}
                       >
                         <span className="text-2xl sm:text-[26px]">{CATEGORY_ICONS[expense.category]}</span>
@@ -250,7 +274,7 @@ export default function ExpensesList({ expenses, cards = [], cardPayments = [], 
 
                       <div className="min-w-0">
                         <div className="flex items-center gap-2 min-w-0">
-                          <h3 className="font-heading text-xl sm:text-2xl font-semibold tracking-[-0.03em] text-[#1A1C1A] truncate">{expense.name}</h3>
+                          <h3 className="expense-ledger-title font-heading text-xl sm:text-2xl font-semibold tracking-[-0.03em] text-[#1A1C1A] truncate">{expense.name}</h3>
                           {expense.isEdited && (
                             <span className="hidden sm:inline-flex w-7 h-7 items-center justify-center rounded-full bg-[#1A1C1A]/5 text-[#1A1C1A] border border-[#1A1C1A]/10 flex-shrink-0">
                               <ClockCounterClockwise weight="duotone" className="w-3.5 h-3.5" />
@@ -277,14 +301,14 @@ export default function ExpensesList({ expenses, cards = [], cardPayments = [], 
                         </div>
                       </div>
 
-                      <div className="col-span-2 lg:col-span-1 rounded-[22px] border border-[#E6E6E3] bg-[#FAF9F6] px-4 py-3 text-right lg:min-w-[170px] shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]">
+                      <div className="expense-amount-panel col-span-2 lg:col-span-1 rounded-[22px] border border-[#E6E6E3] bg-[#FAF9F6] px-4 py-3 text-right lg:min-w-[170px] shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]">
                         {expense.isCardPayment && (
                           <p className="text-[10px] uppercase tracking-[0.12em] text-[#737573] font-semibold mb-1">Salió de tu cash</p>
                         )}
                         <p className="metric-value text-2xl sm:text-[28px] leading-none text-[#9C382A]">-${formatCurrency(expense.amount)}</p>
                       </div>
 
-                      <div className="col-span-2 lg:col-span-1 grid grid-cols-2 lg:grid-cols-1 gap-2 lg:min-w-[118px]">
+                      <div className="expense-action-panel col-span-2 lg:col-span-1 grid grid-cols-2 lg:grid-cols-1 gap-2 lg:min-w-[118px]">
                         {expense.isCardPayment ? (
                           <button
                             onClick={() => onGoToCard?.(expense.cardId)}
