@@ -690,22 +690,34 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
       action = 'Espera el estado';
       summary = 'Falta confirmar que ya llegó el estado de cuenta.';
       detail = 'No recomendada todavía: falta confirmar estado de cuenta. Si el estado no llegó, el consumo nuevo puede reportarse en este ciclo.';
-    } else if (Number(card.used || 0) > 0.009 && daysLeft !== null && daysLeft <= 3) {
+    } else if (
+      daysLeft !== null && daysLeft <= 3 &&
+      !statementStatus.isConfirmed
+    ) {
       score = -20 + Math.max(0, available / 1000);
       tone = 'danger';
       badge = 'Pago cerca';
       color = '#9C382A';
       action = 'Mejor esperar';
-      summary = 'Su fecha de pago está demasiado cerca.';
-      detail = 'Si la usas ahora, puedes complicar el manejo del pago o subir la utilización antes del corte.';
-    } else if (Number(card.used || 0) > 0.009 && daysLeft !== null && daysLeft <= 7) {
+      summary = Number(card.used || 0) > 0.009
+        ? 'Su fecha de pago está demasiado cerca.'
+        : 'Tu ciclo está limpio y el corte está cerca, mejor no romperlo.';
+      detail = Number(card.used || 0) > 0.009
+        ? 'Si la usas ahora, puedes complicar el manejo del pago o subir la utilización antes del corte.'
+        : 'Aunque no debes nada, un consumo ahora puede caer en el ciclo que está por cortarse y romper tu ciclo limpio.';
+    } else if (
+      daysLeft !== null && daysLeft <= 7 &&
+      !statementStatus.isConfirmed
+    ) {
       score = 10 + Math.max(0, available / 1200) - utilization;
       tone = 'warning';
       badge = 'Con cuidado';
       color = '#D48B3F';
       action = 'Uso moderado';
       summary = 'Se puede usar, pero no es la ideal.';
-      detail = 'Tiene pago relativamente próximo; conviene priorizar montos pequeños o dejarla en reserva.';
+      detail = Number(card.used || 0) > 0.009
+        ? 'Tiene pago relativamente próximo; conviene priorizar montos pequeños o dejarla en reserva.'
+        : 'Tu ciclo está limpio. Si usas la tarjeta ahora, el consumo podría reportarse antes del corte.';
     } else {
       score = 100 + Math.max(0, available / 150) - utilization * 1.6 + Math.min(daysLeft ?? 12, 20) * 2;
       tone = 'good';

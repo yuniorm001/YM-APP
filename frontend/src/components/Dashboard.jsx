@@ -549,7 +549,19 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
       statementClosedAt >= lastPaymentDate
     );
     const daysSincePayment = Math.floor((today - lastPaymentDate) / (1000 * 60 * 60 * 24));
-    const paymentArrivedOrPassed = daysSincePayment >= 0 && daysSincePayment < 32;
+    // La tarjeta entra en estado "esperando estado de cuenta" cuando ya pasó
+    // la fecha de pago de este ciclo (daysSincePayment > 0) y aún estamos en
+    // la ventana realista de 7 días en la que normalmente llega el estado
+    // de cuenta del banco. Pasada esa ventana, asumimos que el ciclo nuevo
+    // ya arrancó normal — el siguiente pago volverá a activar la regla.
+    //
+    // No se puede usar `daysLeft <= 0` porque getNextPaymentDate siempre
+    // adelanta al próximo mes cuando la fecha pasó, así que daysLeft nunca
+    // queda en 0 o negativo después del día exacto.
+    // Tampoco `daysSincePayment < 32`, porque lastPaymentDate siempre se
+    // reconstruye dentro del último mes y sería verdadero para toda
+    // tarjeta válida.
+    const paymentArrivedOrPassed = daysSincePayment > 0 && daysSincePayment <= 7;
 
     if (isConfirmed) {
       return {

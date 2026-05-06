@@ -237,10 +237,18 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cards, editingEx
       };
     }
 
-    if (daysSinceLastPayment !== null && daysSinceLastPayment >= 0 && daysSinceLastPayment < 32) {
-      const daysSinceText = daysSinceLastPayment === 0
-        ? 'La fecha de pago es hoy.'
-        : `La fecha de pago pasó hace ${daysSinceLastPayment} día${daysSinceLastPayment > 1 ? 's' : ''}.`;
+    // Pedir confirmar estado de cuenta cuando la fecha de pago de este ciclo
+    // ya pasó (daysSinceLastPayment > 0) y aún estamos dentro de la ventana
+    // realista en la que normalmente llega el estado de cuenta del banco
+    // (hasta 7 días después). Pasada esa ventana, asumimos que el ciclo ya
+    // arrancó normal y dejamos de molestar — la próxima fecha de pago
+    // volverá a activar la alerta.
+    //
+    // No usamos daysUntilPayment < 0 porque getDaysUntilCardPayment siempre
+    // adelanta al próximo mes cuando la fecha pasó, así que ese valor nunca
+    // es negativo.
+    if (daysSinceLastPayment !== null && daysSinceLastPayment > 0 && daysSinceLastPayment <= 7) {
+      const daysSinceText = `La fecha de pago pasó hace ${daysSinceLastPayment} día${daysSinceLastPayment > 1 ? 's' : ''}.`;
       return {
         type: 'statement-pending',
         color: '#D48B3F',

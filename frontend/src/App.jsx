@@ -792,6 +792,29 @@ function App() {
     });
   };
 
+  const goToCard = (cardId) => {
+    if (!cardId) return;
+    setActiveTab('cards');
+    // Esperar a que CardsPanel termine su animación de entrada antes de buscar el elemento.
+    // Usamos un par de rAF para asegurar que el layout esté pintado antes de medir.
+    const performScroll = () => {
+      const el = document.querySelector(`[data-testid="card-item-${cardId}"]`);
+      if (!el) return;
+      // Calcular posición exacta con offset (24px arriba para que no quede pegada al borde).
+      const rect = el.getBoundingClientRect();
+      const targetY = window.scrollY + rect.top - 24;
+      window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
+      el.classList.add('card-highlight-pulse');
+      setTimeout(() => {
+        el.classList.remove('card-highlight-pulse');
+      }, 2400);
+    };
+    // 350ms da tiempo a que la animación de entrada del tab (0.28s) termine.
+    setTimeout(() => {
+      requestAnimationFrame(() => requestAnimationFrame(performScroll));
+    }, 350);
+  };
+
   const updateSettings = (newSettings) => {
     setData((prev) => normalizeData({
       ...prev,
@@ -928,8 +951,10 @@ function App() {
               <ExpensesList
                 expenses={data.expenses}
                 cards={data.cards}
+                cardPayments={data.cash?.payments || []}
                 onEdit={handleOpenExpenseModal}
                 onDelete={deleteExpense}
+                onGoToCard={goToCard}
               />
             </motion.div>
           )}
