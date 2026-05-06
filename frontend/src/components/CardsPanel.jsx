@@ -832,16 +832,22 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
             </div>
             <button
               onClick={() => setShowForm(true)}
-              className="group relative flex min-h-[76px] w-full sm:min-w-[226px] items-center justify-center gap-3 overflow-hidden rounded-[26px] border border-[#D9B06F]/35 bg-[#173123] px-8 py-4 font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.22),inset_0_-18px_34px_rgba(0,0,0,0.22)] ring-1 ring-white/40 backdrop-blur transition-colors duration-200 hover:border-[#E7C98F]/60 hover:bg-[#1F422F] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.30),inset_0_-16px_30px_rgba(0,0,0,0.22),inset_0_0_0_999px_rgba(255,255,255,0.035)] active:bg-[#173123] active:shadow-[inset_0_2px_12px_rgba(0,0,0,0.26),inset_0_0_0_999px_rgba(0,0,0,0.035)]"
+              className="group relative flex min-h-[76px] w-full sm:min-w-[226px] items-center justify-start gap-3 overflow-hidden rounded-[24px] border border-[#D9B06F]/40 bg-gradient-to-br from-[#1F422F] via-[#173123] to-[#0E1E16] px-5 py-4 font-semibold text-white shadow-[0_18px_38px_rgba(23,49,35,0.22),inset_0_1px_0_rgba(255,255,255,0.24),inset_0_-20px_36px_rgba(0,0,0,0.18)] ring-1 ring-white/45 backdrop-blur transition-all duration-200 hover:-translate-y-0.5 hover:border-[#F0D69A]/70 hover:shadow-[0_22px_44px_rgba(23,49,35,0.28),inset_0_1px_0_rgba(255,255,255,0.32),inset_0_0_0_999px_rgba(255,255,255,0.035)] active:translate-y-0 active:shadow-[inset_0_2px_12px_rgba(0,0,0,0.28)]"
               data-testid="add-card-btn"
               style={{ color: '#FFFFFF' }}
             >
-              <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_0%,rgba(255,255,255,0.30),transparent_34%),radial-gradient(circle_at_84%_110%,rgba(217,176,111,0.22),transparent_36%),linear-gradient(135deg,rgba(255,255,255,0.13),transparent_44%)]" />
-              <span className="pointer-events-none absolute inset-x-5 top-0 h-px bg-gradient-to-r from-transparent via-[#F4E3BD]/80 to-transparent" />
-              <span className="relative flex h-10 w-10 items-center justify-center rounded-full border border-[#F4E3BD]/35 bg-white/95 text-[#1F422F] shadow-[0_12px_26px_rgba(0,0,0,0.20),inset_0_1px_0_rgba(255,255,255,0.95)]">
-                <Plus weight="bold" className="h-4 w-4" />
+              <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_0%,rgba(255,255,255,0.26),transparent_32%),radial-gradient(circle_at_82%_120%,rgba(217,176,111,0.24),transparent_38%),linear-gradient(135deg,rgba(255,255,255,0.12),transparent_44%)]" />
+              <span className="pointer-events-none absolute inset-x-5 top-0 h-px bg-gradient-to-r from-transparent via-[#F4E3BD]/85 to-transparent" />
+              <span className="relative flex h-12 w-[58px] shrink-0 items-center justify-center rounded-[18px] border border-[#F4E3BD]/35 bg-white/95 text-[#1F422F] shadow-[0_14px_28px_rgba(0,0,0,0.22),inset_0_1px_0_rgba(255,255,255,0.95)]">
+                <CreditCardIcon weight="duotone" className="h-6 w-6" />
+                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full border border-white bg-[#D9B06F] text-[#173123] shadow-[0_8px_18px_rgba(0,0,0,0.22)]">
+                  <Plus weight="bold" className="h-3 w-3" />
+                </span>
               </span>
-              <span style={{ color: '#FFFFFF' }} className="relative text-[15px] font-semibold tracking-[-0.01em] drop-shadow-[0_1px_2px_rgba(0,0,0,0.55)]">Nueva Tarjeta</span>
+              <span className="relative flex min-w-0 flex-col items-start leading-none">
+                <span style={{ color: '#FFFFFF' }} className="text-[15px] font-semibold tracking-[-0.01em] drop-shadow-[0_1px_2px_rgba(0,0,0,0.55)]">Nueva Tarjeta</span>
+                <span className="mt-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#F4E3BD]/80">Registrar crédito</span>
+              </span>
             </button>
           </div>
         </div>
@@ -1005,14 +1011,20 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                 setRecommendationIndex(0);
                 setShowRecommendationDetails(true);
               }}
-              className="group relative shrink-0 inline-flex items-center justify-center gap-3 overflow-hidden rounded-[30px] border border-[#D9B06F]/35 bg-[#173123] px-5 py-3.5 font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.22),inset_0_-18px_34px_rgba(0,0,0,0.22)] ring-1 ring-white/40 backdrop-blur transition-colors duration-200 hover:border-[#E7C98F]/60 hover:bg-[#1F422F] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.30),inset_0_-16px_30px_rgba(0,0,0,0.22),inset_0_0_0_999px_rgba(255,255,255,0.035)] active:bg-[#173123] active:shadow-[inset_0_2px_12px_rgba(0,0,0,0.26),inset_0_0_0_999px_rgba(0,0,0,0.035)]"
+              className="group relative shrink-0 inline-flex min-h-[58px] items-center justify-center gap-3 overflow-hidden rounded-[24px] border border-[#D9B06F]/38 bg-gradient-to-br from-[#22392C] via-[#173123] to-[#101813] px-4 py-3 font-semibold text-white shadow-[0_16px_34px_rgba(23,49,35,0.18),inset_0_1px_0_rgba(255,255,255,0.22),inset_0_-18px_32px_rgba(0,0,0,0.18)] ring-1 ring-white/45 backdrop-blur transition-all duration-200 hover:-translate-y-0.5 hover:border-[#F0D69A]/70 hover:shadow-[0_20px_38px_rgba(23,49,35,0.24),inset_0_1px_0_rgba(255,255,255,0.30),inset_0_0_0_999px_rgba(255,255,255,0.035)] active:translate-y-0 active:shadow-[inset_0_2px_12px_rgba(0,0,0,0.28)]"
               data-testid="toggle-card-recommendations"
               style={{ color: '#FFFFFF' }}
             >
-              <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_0%,rgba(255,255,255,0.30),transparent_34%),radial-gradient(circle_at_84%_110%,rgba(217,176,111,0.22),transparent_36%),linear-gradient(135deg,rgba(255,255,255,0.13),transparent_44%)]" />
+              <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_14%_0%,rgba(255,255,255,0.24),transparent_34%),radial-gradient(circle_at_92%_120%,rgba(217,176,111,0.22),transparent_38%),linear-gradient(135deg,rgba(255,255,255,0.12),transparent_44%)]" />
               <span className="pointer-events-none absolute inset-x-5 top-0 h-px bg-gradient-to-r from-transparent via-[#F4E3BD]/80 to-transparent" />
-              <span style={{ color: '#FFFFFF' }} className="relative text-[15px] font-semibold tracking-[-0.01em] drop-shadow-[0_1px_2px_rgba(0,0,0,0.55)]">Ver detalles</span>
-              <span className="relative flex h-10 w-10 items-center justify-center rounded-full border border-[#F4E3BD]/35 bg-white/95 text-[#1F422F] shadow-[0_12px_26px_rgba(0,0,0,0.20),inset_0_1px_0_rgba(255,255,255,0.95)]">
+              <span className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-[16px] border border-[#F4E3BD]/35 bg-white/95 text-[#1F422F] shadow-[0_12px_24px_rgba(0,0,0,0.20),inset_0_1px_0_rgba(255,255,255,0.95)]">
+                <Sparkle weight="fill" className="h-4 w-4" />
+              </span>
+              <span className="relative flex min-w-0 flex-col items-start leading-none">
+                <span style={{ color: '#FFFFFF' }} className="text-[15px] font-semibold tracking-[-0.01em] drop-shadow-[0_1px_2px_rgba(0,0,0,0.55)]">Ver detalles</span>
+                <span className="mt-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#F4E3BD]/78">Abrir análisis</span>
+              </span>
+              <span className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/18 bg-white/10 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] transition-transform duration-200 group-hover:translate-x-0.5">
                 <CaretRight className="h-4 w-4" />
               </span>
             </button>
