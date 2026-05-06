@@ -237,15 +237,10 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cards, editingEx
       };
     }
 
-    // Solo alertar de "estado de cuenta pendiente" cuando la fecha de pago YA PASÓ
-    // (daysUntilPayment <= 0). Durante el ciclo activo entre pagos, la tarjeta está
-    // en uso normal y no requiere confirmación. Esto alinea la lógica con
-    // getStatementCycleStatus en CardsPanel para evitar mensajes contradictorios.
-    if (
-      daysUntilPayment !== null && daysUntilPayment < 0 &&
-      daysSinceLastPayment !== null && daysSinceLastPayment >= 0 && daysSinceLastPayment < 32
-    ) {
-      const daysSinceText = `La fecha de pago pasó hace ${daysSinceLastPayment} día${daysSinceLastPayment > 1 ? 's' : ''}.`;
+    if (daysSinceLastPayment !== null && daysSinceLastPayment >= 0 && daysSinceLastPayment < 32) {
+      const daysSinceText = daysSinceLastPayment === 0
+        ? 'La fecha de pago es hoy.'
+        : `La fecha de pago pasó hace ${daysSinceLastPayment} día${daysSinceLastPayment > 1 ? 's' : ''}.`;
       return {
         type: 'statement-pending',
         color: '#D48B3F',
