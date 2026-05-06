@@ -215,7 +215,6 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cards, editingEx
     if (isStatementConfirmedForCurrentCycle(selectedCardData)) return null;
 
     const daysUntilPayment = getDaysUntilCardPayment(selectedCardData.paymentDate);
-    const daysSinceLastPayment = getDaysSinceLastPayment(selectedCardData.paymentDate);
 
     if (daysUntilPayment === 0) {
       return {
@@ -237,10 +236,17 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cards, editingEx
       };
     }
 
-    if (daysSinceLastPayment !== null && daysSinceLastPayment >= 0 && daysSinceLastPayment < 32) {
-      const daysSinceText = daysSinceLastPayment === 0
-        ? 'La fecha de pago es hoy.'
-        : `La fecha de pago pasó hace ${daysSinceLastPayment} día${daysSinceLastPayment > 1 ? 's' : ''}.`;
+    // Pedir confirmar estado de cuenta SOLO cuando la fecha de pago ya llegó
+    // o pasó (daysUntilPayment <= 0) y el usuario aún no presionó el botón
+    // "Ya llegó mi estado de cuenta". La app reconstruye paymentDate cada
+    // mes basada en el día calendario, así que daysUntilPayment <= 0 implica
+    // "hoy es el día de pago" (cubierto arriba por same-day) o "ya pasó la
+    // fecha de pago en este ciclo". Esto evita el bug donde tarjetas con
+    // pago lejano (ej. faltan 9 días) caían en esta alerta solo porque su
+    // último día de pago calendario fue hace 21 días en el mes anterior.
+    if (daysUntilPayment !== null && daysUntilPayment < 0) {
+      const daysOverdue = Math.abs(daysUntilPayment);
+      const daysSinceText = `La fecha de pago pasó hace ${daysOverdue} día${daysOverdue > 1 ? 's' : ''}.`;
       return {
         type: 'statement-pending',
         color: '#D48B3F',

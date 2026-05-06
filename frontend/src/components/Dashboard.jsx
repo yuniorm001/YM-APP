@@ -549,7 +549,13 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
       statementClosedAt >= lastPaymentDate
     );
     const daysSincePayment = Math.floor((today - lastPaymentDate) / (1000 * 60 * 60 * 24));
-    const paymentArrivedOrPassed = daysSincePayment >= 0 && daysSincePayment < 32;
+    // La fecha de pago "llegó o pasó" en este ciclo cuando daysLeft <= 0.
+    // (daysLeft es null o > 0 cuando la próxima fecha de pago aún no llega).
+    // No se puede usar `daysSincePayment < 32` porque lastPaymentDate siempre
+    // se reconstruye dentro del último mes, por lo que esa condición sería
+    // verdadera para toda tarjeta válida y marcaría como "no usar aún" hasta
+    // tarjetas con pago lejano.
+    const paymentArrivedOrPassed = daysLeft !== null && daysLeft <= 0;
 
     if (isConfirmed) {
       return {
