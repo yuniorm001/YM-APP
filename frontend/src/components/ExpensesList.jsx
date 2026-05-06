@@ -263,7 +263,9 @@ export default function ExpensesList({ expenses, cards = [], cardPayments = [], 
                             className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border"
                             style={{ backgroundColor: `${categoryColor}10`, color: categoryColor, borderColor: `${categoryColor}26` }}
                           >
-                            {expense.category}
+                            {expense.isCardPayment
+                              ? `Pago •••• ${(cards.find((c) => c.id === expense.cardId)?.number || '').toString().slice(-4) || '0000'}`
+                              : expense.category}
                           </span>
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-[#F7F6F3] text-[#5F625F] border border-[#E6E6E3]">
                             {expense.method === 'Cash' ? <Wallet weight="duotone" className="w-3.5 h-3.5" /> : <CreditCard weight="duotone" className="w-3.5 h-3.5" />}
