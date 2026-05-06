@@ -1124,7 +1124,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
             </div>
           </div>
 
-          <div className="admin-access-layout mt-5 grid grid-cols-1 gap-5 xl:grid-cols-[minmax(320px,0.86fr)_minmax(0,1.14fr)]">
+          <div className="admin-access-layout mt-5 grid grid-cols-1 gap-5">
             <div className="admin-create-panel">
               <div className="flex items-start justify-between gap-4">
                 <div>
