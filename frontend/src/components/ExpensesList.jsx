@@ -42,7 +42,7 @@ const CATEGORY_ICONS = {
 
 const formatCurrency = (value) => Number(value || 0).toLocaleString('es-MX', { minimumFractionDigits: 2 });
 
-export default function ExpensesList({ expenses, cards = [], cardPayments = [], onEdit, onDelete }) {
+export default function ExpensesList({ expenses, cards = [], cardPayments = [], onEdit, onDelete, onGoToCard }) {
   const [filter, setFilter] = useState('all');
   const [methodFilter, setMethodFilter] = useState('all');
   const [sortBy, setSortBy] = useState('recent');
@@ -276,14 +276,22 @@ export default function ExpensesList({ expenses, cards = [], cardPayments = [], 
                       </div>
 
                       <div className="col-span-2 lg:col-span-1 rounded-[22px] border border-[#E6E6E3] bg-[#FAF9F6] px-4 py-3 text-right lg:min-w-[170px] shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]">
+                        {expense.isCardPayment && (
+                          <p className="text-[10px] uppercase tracking-[0.12em] text-[#737573] font-semibold mb-1">Salió de tu cash</p>
+                        )}
                         <p className="metric-value text-2xl sm:text-[28px] leading-none text-[#9C382A]">-${formatCurrency(expense.amount)}</p>
                       </div>
 
                       <div className="col-span-2 lg:col-span-1 grid grid-cols-2 lg:grid-cols-1 gap-2 lg:min-w-[118px]">
                         {expense.isCardPayment ? (
-                          <div className="col-span-2 lg:col-span-1 inline-flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-semibold text-[#5F625F] bg-[#F2F0EB] border border-[#E6E6E3] text-center">
-                            Devolución de cash
-                          </div>
+                          <button
+                            onClick={() => onGoToCard?.(expense.cardId)}
+                            className="col-span-2 lg:col-span-1 inline-flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold text-[#1F3A5F] bg-white border border-[#1F3A5F]/30 hover:border-[#1F3A5F]/65 hover:bg-[#1F3A5F]/5 transition-all shadow-[0_8px_18px_rgba(31,58,95,0.07)]"
+                            data-testid={`goto-card-${expense.cardId}`}
+                          >
+                            <CreditCard weight="duotone" className="w-4 h-4" />
+                            Ver en mi tarjeta
+                          </button>
                         ) : (
                           <>
                             <button
