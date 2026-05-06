@@ -12,7 +12,7 @@ import {
 } from '@phosphor-icons/react';
 import { parseDateOnly, formatDayMonthShort } from '../lib/dateUtils';
 
-const CATEGORIES = ['Comida', 'Transporte', 'Hogar', 'Servicios', 'Salud', 'Trabajo', 'Ocio', 'Compras', 'Otros'];
+const CATEGORIES = ['Comida', 'Transporte', 'Hogar', 'Servicios', 'Salud', 'Trabajo', 'Ocio', 'Compras', 'Otros', 'Pago tarjeta'];
 
 const CATEGORY_COLORS = {
   Comida: '#2A4D3B',
@@ -23,7 +23,8 @@ const CATEGORY_COLORS = {
   Trabajo: '#8B6B5C',
   Ocio: '#6B8E7D',
   Compras: '#A67C52',
-  Otros: '#9CA39C'
+  Otros: '#9CA39C',
+  'Pago tarjeta': '#1F3A5F'
 };
 
 const CATEGORY_ICONS = {
@@ -35,19 +36,35 @@ const CATEGORY_ICONS = {
   Trabajo: '💼',
   Ocio: '🎮',
   Compras: '🛍️',
-  Otros: '📦'
+  Otros: '📦',
+  'Pago tarjeta': '💳'
 };
 
 const formatCurrency = (value) => Number(value || 0).toLocaleString('es-MX', { minimumFractionDigits: 2 });
 
-export default function ExpensesList({ expenses, cards = [], onEdit, onDelete }) {
+export default function ExpensesList({ expenses, cards = [], cardPayments = [], onEdit, onDelete }) {
   const [filter, setFilter] = useState('all');
   const [methodFilter, setMethodFilter] = useState('all');
   const [sortBy, setSortBy] = useState('recent');
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
 
-  const filteredExpenses = expenses
+  // Fusionamos los pagos de tarjeta como gastos virtuales (solo lectura).
+  // No se escribe nada nuevo en el storage; solo se muestran junto a los gastos.
+  const cardPaymentsAsExpenses = (cardPayments || []).map((payment) => ({
+    id: payment.id,
+    name: `Pago a ${payment.cardName || 'tarjeta'}`,
+    amount: Number(payment.amount || 0),
+    category: 'Pago tarjeta',
+    method: 'Cash',
+    date: (payment.date || payment.createdAt || new Date().toISOString()).slice(0, 10),
+    cardId: payment.cardId,
+    isCardPayment: true
+  }));
+
+  const allItems = [...(expenses || []), ...cardPaymentsAsExpenses];
+
+  const filteredExpenses = allItems
     .filter((expense) => {
       if (filter !== 'all' && expense.category !== filter) return false;
       if (methodFilter !== 'all' && expense.method !== methodFilter) return false;
@@ -263,22 +280,30 @@ export default function ExpensesList({ expenses, cards = [], onEdit, onDelete })
                       </div>
 
                       <div className="col-span-2 lg:col-span-1 grid grid-cols-2 lg:grid-cols-1 gap-2 lg:min-w-[118px]">
-                        <button
-                          onClick={() => onEdit(expense)}
-                          className="inline-flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold text-[#5F625F] bg-white border border-[#DAD7CF] hover:border-[#2A4D3B]/50 hover:bg-[#F7F6F3] hover:text-[#2A4D3B] transition-all shadow-[0_8px_18px_rgba(26,28,26,0.04)]"
-                          data-testid={`edit-expense-${expense.id}`}
-                        >
-                          <PencilSimple weight="duotone" className="w-4 h-4" />
-                          Editar
-                        </button>
-                        <button
-                          onClick={() => onDelete(expense.id)}
-                          className="inline-flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold text-[#B65C47] bg-[#FBF4F2] border border-[#B65C47]/30 hover:border-[#B65C47]/65 hover:bg-[#B65C47]/10 hover:text-[#9E4435] transition-all shadow-[0_8px_18px_rgba(182,92,71,0.07)]"
-                          data-testid={`delete-expense-${expense.id}`}
-                        >
-                          <Trash weight="duotone" className="w-4 h-4" />
-                          Eliminar
-                        </button>
+                        {expense.isCardPayment ? (
+                          <div className="col-span-2 lg:col-span-1 inline-flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-semibold text-[#5F625F] bg-[#F2F0EB] border border-[#E6E6E3] text-center">
+                            Devolución de cash
+                          </div>
+                        ) : (
+                          <>
+                            <button
+                              onClick={() => onEdit(expense)}
+                              className="inline-flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold text-[#5F625F] bg-white border border-[#DAD7CF] hover:border-[#2A4D3B]/50 hover:bg-[#F7F6F3] hover:text-[#2A4D3B] transition-all shadow-[0_8px_18px_rgba(26,28,26,0.04)]"
+                              data-testid={`edit-expense-${expense.id}`}
+                            >
+                              <PencilSimple weight="duotone" className="w-4 h-4" />
+                              Editar
+                            </button>
+                            <button
+                              onClick={() => onDelete(expense.id)}
+                              className="inline-flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold text-[#B65C47] bg-[#FBF4F2] border border-[#B65C47]/30 hover:border-[#B65C47]/65 hover:bg-[#B65C47]/10 hover:text-[#9E4435] transition-all shadow-[0_8px_18px_rgba(182,92,71,0.07)]"
+                              data-testid={`delete-expense-${expense.id}`}
+                            >
+                              <Trash weight="duotone" className="w-4 h-4" />
+                              Eliminar
+                            </button>
+                          </>
+                        )}
                       </div>
                     </div>
 
