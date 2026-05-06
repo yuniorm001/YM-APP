@@ -219,7 +219,17 @@ export default function ExpensesList({ expenses, cards = [], cardPayments = [], 
       </div>
 
 
-      <div className="space-y-4">
+      <div className="expense-ledger-section space-y-4">
+        <div className="expense-ledger-header">
+          <div>
+            <p className="expense-ledger-kicker">Registro financiero</p>
+            <h2>Últimos movimientos</h2>
+          </div>
+          <div className="expense-ledger-summary">
+            <span>{cashExpenses} cash</span>
+            <span>{cardExpenses} tarjeta</span>
+          </div>
+        </div>
         <>
           {filteredExpenses.length > 0 ? (
             filteredExpenses.map((expense, index) => {
@@ -230,11 +240,11 @@ export default function ExpensesList({ expenses, cards = [], cardPayments = [], 
               return (
                 <div
                   key={expense.id}
-                  className="group relative overflow-hidden rounded-[28px] border border-[#E6E6E3] bg-white p-0 shadow-[0_18px_50px_rgba(26,28,26,0.07)] transition-colors duration-200 hover:border-[#DAD7CF]"
+                  className="expense-ledger-card group relative overflow-hidden rounded-[30px] border border-[#E6E6E3] bg-white p-0 shadow-[0_18px_50px_rgba(26,28,26,0.07)] transition-colors duration-200 hover:border-[#DAD7CF]"
                   data-testid={`expense-item-${expense.id}`}
                 >
                   <div
-                    className="absolute inset-y-0 left-0 w-1.5"
+                    className="expense-ledger-rail absolute inset-y-0 left-0 w-1.5"
                     style={{ backgroundColor: expense.method === 'Cash' ? '#B65C47' : categoryColor }}
                   />
                   <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent" />
@@ -242,7 +252,7 @@ export default function ExpensesList({ expenses, cards = [], cardPayments = [], 
                   <div className="p-4 sm:p-5">
                     <div className="grid grid-cols-[52px_1fr] lg:grid-cols-[58px_minmax(0,1fr)_auto_auto] gap-3 sm:gap-4 lg:gap-5 items-center">
                       <div
-                        className="relative w-[52px] h-[52px] sm:w-[58px] sm:h-[58px] rounded-[20px] flex items-center justify-center flex-shrink-0 border shadow-[0_12px_28px_rgba(26,28,26,0.08)] transition-transform duration-300 group-hover:scale-[1.03]"
+                        className="expense-ledger-icon relative w-[52px] h-[52px] sm:w-[58px] sm:h-[58px] rounded-[20px] flex items-center justify-center flex-shrink-0 border shadow-[0_12px_28px_rgba(26,28,26,0.08)] transition-transform duration-300 group-hover:scale-[1.03]"
                         style={{ backgroundColor: `${categoryColor}12`, borderColor: `${categoryColor}24` }}
                       >
                         <span className="text-2xl sm:text-[26px]">{CATEGORY_ICONS[expense.category]}</span>
@@ -250,7 +260,7 @@ export default function ExpensesList({ expenses, cards = [], cardPayments = [], 
 
                       <div className="min-w-0">
                         <div className="flex items-center gap-2 min-w-0">
-                          <h3 className="font-heading text-xl sm:text-2xl font-semibold tracking-[-0.03em] text-[#1A1C1A] truncate">{expense.name}</h3>
+                          <h3 className="expense-ledger-title font-heading text-xl sm:text-2xl font-semibold tracking-[-0.03em] text-[#1A1C1A] truncate">{expense.name}</h3>
                           {expense.isEdited && (
                             <span className="hidden sm:inline-flex w-7 h-7 items-center justify-center rounded-full bg-[#1A1C1A]/5 text-[#1A1C1A] border border-[#1A1C1A]/10 flex-shrink-0">
                               <ClockCounterClockwise weight="duotone" className="w-3.5 h-3.5" />
@@ -277,14 +287,14 @@ export default function ExpensesList({ expenses, cards = [], cardPayments = [], 
                         </div>
                       </div>
 
-                      <div className="col-span-2 lg:col-span-1 rounded-[22px] border border-[#E6E6E3] bg-[#FAF9F6] px-4 py-3 text-right lg:min-w-[170px] shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]">
+                      <div className="expense-amount-panel col-span-2 lg:col-span-1 rounded-[22px] border border-[#E6E6E3] bg-[#FAF9F6] px-4 py-3 text-right lg:min-w-[170px] shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]">
                         {expense.isCardPayment && (
                           <p className="text-[10px] uppercase tracking-[0.12em] text-[#737573] font-semibold mb-1">Salió de tu cash</p>
                         )}
                         <p className="metric-value text-2xl sm:text-[28px] leading-none text-[#9C382A]">-${formatCurrency(expense.amount)}</p>
                       </div>
 
-                      <div className="col-span-2 lg:col-span-1 grid grid-cols-2 lg:grid-cols-1 gap-2 lg:min-w-[118px]">
+                      <div className="expense-action-panel col-span-2 lg:col-span-1 grid grid-cols-2 lg:grid-cols-1 gap-2 lg:min-w-[118px]">
                         {expense.isCardPayment ? (
                           <button
                             onClick={() => onGoToCard?.(expense.cardId)}

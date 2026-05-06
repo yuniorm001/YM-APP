@@ -1620,7 +1620,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: '100%', opacity: 0 }}
                     transition={{ type: 'spring', damping: 26, stiffness: 280 }}
-                    className="relative h-[100dvh] min-h-screen w-screen max-w-none bg-white rounded-none shadow-none overflow-hidden flex flex-col min-h-0"
+                    className="app-system-modal-shell relative h-[100dvh] min-h-screen w-screen max-w-none bg-white rounded-none shadow-none overflow-hidden flex flex-col min-h-0"
                   >
               <div className="sticky top-0 z-10 w-full border-b border-[#E6E6E3] bg-gradient-to-r from-[#FCFBF8] to-[#F7FBF8] px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex-shrink-0">
                 <div className="mx-auto flex w-full max-w-[1600px] items-start justify-between gap-4">
@@ -1941,7 +1941,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                       animate={{ y: 0, opacity: 1 }}
                       exit={{ y: '100%', opacity: 0 }}
                       transition={{ type: 'spring', damping: 26, stiffness: 280 }}
-                      className="relative h-[100dvh] min-h-screen w-screen max-w-none bg-white rounded-none shadow-none overflow-hidden flex flex-col min-h-0"
+                      className="app-system-modal-shell relative h-[100dvh] min-h-screen w-screen max-w-none bg-white rounded-none shadow-none overflow-hidden flex flex-col min-h-0"
                     >
                 <div className="sticky top-0 z-10 w-full border-b border-[#E6E6E3] bg-gradient-to-r from-[#FFF8EA] to-[#FCFBF8] px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex-shrink-0">
                   <div className="mx-auto flex w-full max-w-[1600px] items-start justify-between gap-4">
@@ -2099,7 +2099,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: '100%', opacity: 0 }}
                     transition={{ type: 'spring', damping: 26, stiffness: 280 }}
-                    className="relative h-[100dvh] min-h-screen w-screen max-w-none bg-white rounded-none shadow-none overflow-hidden flex flex-col min-h-0"
+                    className="app-system-modal-shell relative h-[100dvh] min-h-screen w-screen max-w-none bg-white rounded-none shadow-none overflow-hidden flex flex-col min-h-0"
                   >
               <div className="sticky top-0 z-10 w-full border-b border-[#E6E6E3] bg-gradient-to-r from-[#F7FBF8] to-[#F4F8F5] px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex-shrink-0">
                 <div className="mx-auto flex w-full max-w-[1600px] items-start justify-between gap-4">
@@ -2215,7 +2215,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: '100%', opacity: 0 }}
                     transition={{ type: 'spring', damping: 26, stiffness: 280 }}
-                    className="relative h-[100dvh] min-h-screen w-screen max-w-none bg-white rounded-none shadow-none overflow-hidden flex flex-col min-h-0"
+                    className="app-system-modal-shell relative h-[100dvh] min-h-screen w-screen max-w-none bg-white rounded-none shadow-none overflow-hidden flex flex-col min-h-0"
                   >
                     <form onSubmit={handleSubmit} className="flex h-full min-h-0 w-full flex-col bg-white">
                     <div className="sticky top-0 z-10 w-full border-b border-[#E6E6E3] bg-gradient-to-r from-[#FAFAF9] to-[#F5F4F1] px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex-shrink-0">
