@@ -19,7 +19,7 @@ import {
   CreditCard,
   Coins
 } from '@phosphor-icons/react';
-import { parseDateOnly } from '../lib/dateUtils';
+import { parseDateOnly, startOfToday } from '../lib/dateUtils';
 import { buildDashboardIntelligence, getSafeCardLabel } from '../lib/dashboardIntelligence';
 
 const containerVariants = {
@@ -512,8 +512,12 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
     const nextPaymentDate = getNextPaymentDate(paymentDate, currentDate);
     if (!nextPaymentDate) return null;
 
-    const today = new Date(currentDate);
-    today.setHours(0, 0, 0, 0);
+    // Parte C: usamos startOfToday() en vez de derivar "hoy" de currentDate.
+    // Esto garantiza que los días se cuenten contra la fecha real del
+    // dispositivo en el momento del render, incluso si currentDate del
+    // estado quedó congelado por algún motivo (cambio de día sin que la
+    // app se haya enterado todavía).
+    const today = startOfToday();
 
     const recentPaymentDate = new Date(nextPaymentDate);
     if (recentPaymentDate > today) {
@@ -525,8 +529,9 @@ export default function Dashboard({ data, onNavigate, onLogout = () => {} }) {
 
   const getStatementCycleStatus = (card, daysLeft) => {
     const lastPaymentDate = getMostRecentPaymentDate(card?.paymentDate);
-    const today = new Date(currentDate);
-    today.setHours(0, 0, 0, 0);
+    // Parte C: hora real del navegador, no derivada de currentDate.
+    // Misma justificación que en getMostRecentPaymentDate.
+    const today = startOfToday();
     const currentBalance = Number(card?.used || 0);
     const hasBalanceDue = currentBalance > 0.009;
 

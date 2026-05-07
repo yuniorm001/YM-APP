@@ -18,7 +18,7 @@ import {
   Wallet,
   X
 } from '@phosphor-icons/react';
-import { parseDateOnly, formatDayMonthShort, toDateOnlyString } from '../lib/dateUtils';
+import { parseDateOnly, formatDayMonthShort, toDateOnlyString, startOfToday } from '../lib/dateUtils';
 
 const CARD_TYPES = [
   { id: 'chase', name: 'Chase', mark: 'CH', gradient: 'linear-gradient(135deg, #0B2E69 0%, #0A5DB8 46%, #071D3F 100%)', accent: '#2B76D2', textTone: 'light' },
@@ -345,8 +345,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
     const nextPaymentDate = getNextPaymentDate(paymentDate);
     if (!nextPaymentDate) return null;
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const today = startOfToday();
 
     const recentPaymentDate = new Date(nextPaymentDate);
     if (recentPaymentDate > today) {
@@ -359,8 +358,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
   const getStatementCycleStatus = (card) => {
     const lastPaymentDate = getMostRecentPaymentDate(card?.paymentDate);
     const nextPaymentDate = getNextPaymentDate(card?.paymentDate);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const today = startOfToday();
 
     if (!lastPaymentDate || !nextPaymentDate) {
       return {
