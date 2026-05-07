@@ -832,6 +832,11 @@ function App() {
     setData((prev) => ({
       ...prev,
       cards: prev.cards.filter((card) => card.id !== id),
+      // También eliminamos los gastos hechos con esta tarjeta. Si la tarjeta
+      // ya no existe en la vida del usuario, sus gastos no deben seguir
+      // contando en el resumen del mes ni en estadísticas. El usuario lo
+      // confirma explícitamente desde el modal antes de llegar aquí.
+      expenses: (prev.expenses || []).filter((expense) => expense.cardId !== id),
       cash: {
         ...prev.cash,
         payments: (prev.cash?.payments || []).filter((payment) => payment.cardId !== id)
@@ -1068,6 +1073,7 @@ function App() {
             >
               <CardsPanel
                 cards={data.cards}
+                expenses={data.expenses}
                 cashAvailable={data.cash.income - data.expenses.filter((expense) => {
                   const expDate = parseDateOnly(expense.date);
                   const current = new Date(data.currentDate);
