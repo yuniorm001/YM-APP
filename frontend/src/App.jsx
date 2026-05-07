@@ -829,19 +829,37 @@ function App() {
   };
 
   const deleteCard = (id) => {
-    setData((prev) => ({
-      ...prev,
-      cards: prev.cards.filter((card) => card.id !== id),
-      // También eliminamos los gastos hechos con esta tarjeta. Si la tarjeta
-      // ya no existe en la vida del usuario, sus gastos no deben seguir
-      // contando en el resumen del mes ni en estadísticas. El usuario lo
-      // confirma explícitamente desde el modal antes de llegar aquí.
-      expenses: (prev.expenses || []).filter((expense) => expense.cardId !== id),
-      cash: {
-        ...prev.cash,
-        payments: (prev.cash?.payments || []).filter((payment) => payment.cardId !== id)
-      }
-    }));
+    setData((prev) => {
+      // Lista de IDs de tarjetas que SÍ van a sobrevivir tras la eliminación.
+      // La usamos para limpiar también gastos y pagos "huérfanos" que
+      // apuntaban a esta tarjeta o a cualquier otra tarjeta que ya no
+      // existe en la BD del usuario. Esto cubre casos raros donde el
+      // cardId tenga un formato distinto al esperado (string vs número,
+      // espacios, migraciones legacy) y aun así se haya quedado en datos.
+      const remainingCards = prev.cards.filter((card) => card.id !== id);
+      const survivingCardIds = new Set(remainingCards.map((card) => String(card.id)));
+
+      // Decide si un gasto/payment debe sobrevivir.
+      // Solo sobrevive si: NO tiene cardId (ej. gasto en efectivo),
+      // O si su cardId apunta a una tarjeta que sigue existiendo.
+      const itemBelongsToSurvivingCard = (item) => {
+        if (!item) return false;
+        if (item.cardId === null || item.cardId === undefined || item.cardId === '') {
+          return true; // gasto en cash, no toca
+        }
+        return survivingCardIds.has(String(item.cardId));
+      };
+
+      return {
+        ...prev,
+        cards: remainingCards,
+        expenses: (prev.expenses || []).filter(itemBelongsToSurvivingCard),
+        cash: {
+          ...prev.cash,
+          payments: (prev.cash?.payments || []).filter(itemBelongsToSurvivingCard)
+        }
+      };
+    });
   };
 
   const simulateCardPayment = ({ cardId, amount }) => {
