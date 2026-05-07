@@ -5712,3 +5712,102 @@ textarea.premium-input:focus {
     min-height: 3.7rem !important;
   }
 }
+
+/* Mobile modal header polish: reset-period and card-payment-goal popups */
+@media (max-width: 760px) {
+  .reset-period-modal-header,
+  .card-goal-modal-header {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    padding-top: max(1rem, env(safe-area-inset-top)) !important;
+  }
+
+  .reset-period-modal-head-inner,
+  .card-goal-modal-head-inner {
+    align-items: flex-start !important;
+    gap: 0.8rem !important;
+  }
+
+  .reset-period-title-wrap,
+  .card-goal-title-wrap {
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+    gap: 0.85rem !important;
+  }
+
+  .reset-period-title-wrap > div:last-child,
+  .card-goal-title-wrap > div:last-child {
+    min-width: 0 !important;
+  }
+
+  .reset-period-icon,
+  .card-goal-icon {
+    width: 3.2rem !important;
+    height: 3.2rem !important;
+    flex: 0 0 3.2rem !important;
+    border-radius: 1.2rem !important;
+  }
+
+  .reset-period-icon svg,
+  .card-goal-icon svg {
+    width: 1.42rem !important;
+    height: 1.42rem !important;
+  }
+
+  .reset-period-modal-header .modal-close-btn,
+  .card-goal-modal-header .modal-close-btn {
+    width: 3.2rem !important;
+    height: 3.2rem !important;
+    flex: 0 0 3.2rem !important;
+    border-radius: 1.2rem !important;
+  }
+
+  .reset-period-modal-header .modal-close-btn svg,
+  .card-goal-modal-header .modal-close-btn svg {
+    width: 1.28rem !important;
+    height: 1.28rem !important;
+  }
+
+  .reset-period-modal-header h3,
+  .card-goal-modal-header h3 {
+    font-size: clamp(1.5rem, 6.25vw, 1.95rem) !important;
+    line-height: 1.04 !important;
+    letter-spacing: -0.045em !important;
+  }
+
+  .reset-period-modal-header p,
+  .card-goal-modal-header p {
+    overflow-wrap: anywhere !important;
+  }
+
+  .expense-filter-main-btn {
+    padding-left: 1.75rem !important;
+    padding-right: 1.75rem !important;
+    gap: 1.08rem !important;
+  }
+
+  .expense-filter-main-icon {
+    width: 3.25rem !important;
+    height: 3.25rem !important;
+    flex: 0 0 3.25rem !important;
+    margin-left: 0.35rem !important;
+    margin-right: 0.15rem !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .reset-period-modal-header,
+  .card-goal-modal-header {
+    padding-left: 0.8rem !important;
+    padding-right: 0.8rem !important;
+  }
+
+  .reset-period-icon,
+  .card-goal-icon,
+  .reset-period-modal-header .modal-close-btn,
+  .card-goal-modal-header .modal-close-btn {
+    width: 2.9rem !important;
+    height: 2.9rem !important;
+    flex-basis: 2.9rem !important;
+  }
+}

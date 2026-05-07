@@ -1945,10 +1945,10 @@ export default function CardsPanel({ cards, expenses = [], cashAvailable = 0, on
                       transition={{ type: 'spring', damping: 26, stiffness: 280 }}
                       className="relative h-[100dvh] min-h-screen w-screen max-w-none bg-white rounded-none shadow-none overflow-hidden flex flex-col min-h-0 app-centered-modal-panel"
                     >
-                <div className="sticky top-0 z-10 w-full border-b border-[#E6E6E3] bg-gradient-to-r from-[#FFF8EA] to-[#FCFBF8] px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex-shrink-0">
-                  <div className="mx-auto flex w-full max-w-[1080px] items-start justify-between gap-4">
-                    <div className="flex items-start gap-3">
-                      <div className="mt-0.5 flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#D48B3F] to-[#B67A2E] text-white shadow-md">
+                <div className="sticky top-0 z-10 w-full border-b border-[#E6E6E3] bg-gradient-to-r from-[#FFF8EA] to-[#FCFBF8] px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex-shrink-0 card-goal-modal-header">
+                  <div className="mx-auto flex w-full max-w-[1080px] items-start justify-between gap-4 card-goal-modal-head-inner">
+                    <div className="flex items-start gap-3 card-goal-title-wrap">
+                      <div className="mt-0.5 flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#D48B3F] to-[#B67A2E] text-white shadow-md card-goal-icon">
                         <Sparkle weight="fill" className="w-5 h-5" />
                       </div>
                       <div>
