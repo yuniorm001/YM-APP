@@ -2486,8 +2486,11 @@ export default function CardsPanel({ cards, expenses = [], cashAvailable = 0, on
                         // Calculamos cuántos gastos están asociados a esta
                         // tarjeta y su total. Lo hacemos aquí para que el
                         // usuario vea exactamente qué va a desaparecer.
+                        // Comparamos como string para tolerar diferencias
+                        // de tipo (string vs número) entre cardId y card.id.
+                        const targetId = String(cardToDelete.id);
                         const associatedExpenses = (expenses || []).filter(
-                          (expense) => expense.cardId === cardToDelete.id
+                          (expense) => expense.cardId != null && String(expense.cardId) === targetId
                         );
                         const expenseCount = associatedExpenses.length;
                         const expenseTotal = associatedExpenses.reduce(
