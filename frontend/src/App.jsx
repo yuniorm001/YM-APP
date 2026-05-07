@@ -291,6 +291,11 @@ function App() {
   const [loginError, setLoginError] = useState('');
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [logoutStage, setLogoutStage] = useState('idle');
+  // Toast sutil que aparece cuando la app detecta que cambió el día calendario
+  // mientras estaba abierta (ej. el usuario la dejó corriendo de un día a
+  // otro). Sirve para que el usuario entienda por qué un contador como
+  // "5d desde pago" de pronto avanzó a "6d", en vez de pensar que es un bug.
+  const [dateRolledOver, setDateRolledOver] = useState(false);
   const isHydratingCloudRef = useRef(false);
   const cloudSaveTimeoutRef = useRef(null);
   const logoutTimeoutsRef = useRef([]);
@@ -421,8 +426,85 @@ function App() {
     setData(loadLocalDataForSession(session));
   }, [session?.provider, session?.email, session?.token]);
 
+  // ============================================================
+  // FECHA VIVA — mantiene currentDate sincronizado con la fecha real
+  // del dispositivo del usuario.
+  //
+  // Antes este useEffect solo corría una vez al montar la app, así que
+  // si el usuario dejaba la app abierta (PWA, pestaña en segundo plano,
+  // tableta encendida toda la noche), la fecha quedaba congelada y los
+  // contadores como "5d desde pago" no avanzaban al cambiar el día.
+  //
+  // Ahora se refresca en tres escenarios:
+  //   1. Al volver al foco de la ventana/PWA (focus).
+  //   2. Al volver a hacerse visible (visibilitychange) — cubre el caso
+  //      de cambiar de pestaña o salir/volver a la PWA en móvil.
+  //   3. Cada 5 minutos como red de seguridad — cubre el caso poco común
+  //      de tener la app siempre visible (kioskos, segundas pantallas).
+  //
+  // Solo dispara setData si el día calendario realmente cambió, para no
+  // generar re-renders innecesarios cada vez que el usuario cambia de
+  // pestaña.
+  // ============================================================
   useEffect(() => {
-    setData((prev) => normalizeData({ ...prev, currentDate: new Date().toISOString() }));
+    let isInitialMount = true;
+
+    const refreshCurrentDateIfStale = () => {
+      setData((prev) => {
+        if (!prev) return prev;
+        const now = new Date();
+        const previous = prev.currentDate ? new Date(prev.currentDate) : null;
+
+        // Si nunca se ha establecido, lo establecemos ahora (montaje inicial).
+        if (!previous || Number.isNaN(previous.getTime())) {
+          return normalizeData({ ...prev, currentDate: now.toISOString() });
+        }
+
+        // Solo actualizamos si cambió el día calendario LOCAL del usuario.
+        // Esto evita re-renders innecesarios y preserva el comportamiento
+        // estable durante un mismo día.
+        const sameDay =
+          previous.getFullYear() === now.getFullYear() &&
+          previous.getMonth() === now.getMonth() &&
+          previous.getDate() === now.getDate();
+
+        if (sameDay) return prev;
+
+        // El día calendario cambió mientras la app estaba abierta.
+        // Solo mostramos el toast si NO es el montaje inicial — al abrir la
+        // app la primera vez no queremos un mensaje de "actualizado".
+        if (!isInitialMount) {
+          setDateRolledOver(true);
+          window.setTimeout(() => setDateRolledOver(false), 4500);
+        }
+
+        return normalizeData({ ...prev, currentDate: now.toISOString() });
+      });
+      isInitialMount = false;
+    };
+
+    // 1) Disparo inicial al montar.
+    refreshCurrentDateIfStale();
+
+    // 2) Al recobrar foco (cambio de pestaña, volver a la PWA).
+    const handleFocus = () => refreshCurrentDateIfStale();
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        refreshCurrentDateIfStale();
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // 3) Red de seguridad: cada 5 minutos revisa si cambió el día.
+    const intervalId = window.setInterval(refreshCurrentDateIfStale, 5 * 60 * 1000);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.clearInterval(intervalId);
+    };
   }, []);
 
   useEffect(() => () => {
@@ -913,6 +995,23 @@ function App() {
 
   return (
     <div className="min-h-screen bg-[#FAFAF9] relative">
+      <AnimatePresence>
+        {dateRolledOver && (
+          <motion.div
+            key="date-rollover-toast"
+            initial={{ opacity: 0, y: -16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.32, ease: 'easeOut' }}
+            className="fixed top-4 left-1/2 -translate-x-1/2 z-[60] px-4 py-2.5 rounded-full bg-[#1A1C1A] text-white text-sm font-medium shadow-lg shadow-black/15 flex items-center gap-2"
+            role="status"
+            aria-live="polite"
+          >
+            <span className="text-base" aria-hidden="true">🌅</span>
+            <span>Día actualizado · Las tareas y contadores se ajustaron</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <Layout
         activeTab={activeTab}
         setActiveTab={setActiveTab}
