@@ -5811,3 +5811,75 @@ textarea.premium-input:focus {
     flex-basis: 2.9rem !important;
   }
 }
+
+/* Mobile modal header polish: card payment popup */
+@media (max-width: 760px) {
+  .card-payment-modal-header {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    padding-top: max(1rem, env(safe-area-inset-top)) !important;
+  }
+
+  .card-payment-modal-head-inner {
+    align-items: flex-start !important;
+    gap: 0.8rem !important;
+  }
+
+  .card-payment-title-wrap {
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+    gap: 0.85rem !important;
+  }
+
+  .card-payment-title-wrap > div:last-child {
+    min-width: 0 !important;
+  }
+
+  .card-payment-icon {
+    width: 3.2rem !important;
+    height: 3.2rem !important;
+    flex: 0 0 3.2rem !important;
+    border-radius: 1.2rem !important;
+  }
+
+  .card-payment-icon svg {
+    width: 1.42rem !important;
+    height: 1.42rem !important;
+  }
+
+  .card-payment-modal-header .modal-close-btn {
+    width: 3.2rem !important;
+    height: 3.2rem !important;
+    flex: 0 0 3.2rem !important;
+    border-radius: 1.2rem !important;
+  }
+
+  .card-payment-modal-header .modal-close-btn svg {
+    width: 1.28rem !important;
+    height: 1.28rem !important;
+  }
+
+  .card-payment-modal-header h2 {
+    font-size: clamp(1.5rem, 6.25vw, 1.95rem) !important;
+    line-height: 1.04 !important;
+    letter-spacing: -0.045em !important;
+  }
+
+  .card-payment-modal-header p {
+    overflow-wrap: anywhere !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .card-payment-modal-header {
+    padding-left: 0.8rem !important;
+    padding-right: 0.8rem !important;
+  }
+
+  .card-payment-icon,
+  .card-payment-modal-header .modal-close-btn {
+    width: 2.9rem !important;
+    height: 2.9rem !important;
+    flex-basis: 2.9rem !important;
+  }
+}
