@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   FadersHorizontal,
+  MagnifyingGlass,
   Trash,
   PencilSimple,
   CaretDown,
@@ -138,7 +139,7 @@ export default function ExpensesList({ expenses, cards = [], cardPayments = [], 
       <div className="expense-control-suite">
         <div className="expense-search-command">
           <div className="expense-search-shell">
-            <span className="expense-search-icon"><FadersHorizontal weight="duotone" /></span>
+            <span className="expense-search-icon"><MagnifyingGlass weight="bold" /></span>
             <input
               type="text"
               placeholder="Buscar por nombre del gasto..."
