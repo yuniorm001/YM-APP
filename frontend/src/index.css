@@ -5678,3 +5678,37 @@ textarea.premium-input:focus {
     flex-basis: 2.75rem !important;
   }
 }
+
+/* Mobile fullscreen treatment for delete-card confirmation, aligned with the rest of the mobile app modals. */
+@media (max-width: 760px) {
+  [data-testid="delete-card-confirm-modal"] {
+    align-items: stretch !important;
+    justify-content: stretch !important;
+    padding: 0 !important;
+  }
+
+  [data-testid="delete-card-confirm-modal"] > div {
+    width: 100vw !important;
+    max-width: none !important;
+    min-height: 100dvh !important;
+    height: 100dvh !important;
+    border-radius: 0 !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    padding: max(1.25rem, env(safe-area-inset-top)) 1rem max(1.25rem, env(safe-area-inset-bottom)) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    overflow-y: auto !important;
+  }
+
+  [data-testid="delete-card-confirm-modal"] .modal-close-btn {
+    top: max(1rem, env(safe-area-inset-top)) !important;
+    right: 1rem !important;
+  }
+
+  [data-testid="delete-card-confirm-modal"] [data-testid="cancel-delete-card"],
+  [data-testid="delete-card-confirm-modal"] [data-testid="confirm-delete-card"] {
+    min-height: 3.7rem !important;
+  }
+}
