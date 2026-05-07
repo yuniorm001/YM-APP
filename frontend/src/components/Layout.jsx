@@ -133,43 +133,60 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
           </div>
 
           {/* HERO HEADER */}
-          <div className={`relative border-b border-black/5 ${isDesktopSidebarCollapsed ? 'p-4' : 'px-4 py-6'}`}>
+          <div className={`relative border-b border-black/5 ${isDesktopSidebarCollapsed ? 'p-4' : 'px-5 py-5'}`}>
             {!isDesktopSidebarCollapsed ? (
-              <div className="flex min-h-[118px] w-full items-center justify-center">
+              <div className="flex w-full items-center justify-between gap-3">
+                {/* App brand */}
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-[linear-gradient(135deg,#1E3A2B_0%,#2A4D3B_100%)] shadow-[0_8px_20px_rgba(42,77,59,0.28),inset_0_1px_0_rgba(255,255,255,0.12)]">
+                    <span className="text-[18px] font-bold text-white/90 leading-none tracking-tight">P</span>
+                    <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-[#D48B3F] border-2 border-white shadow-[0_2px_6px_rgba(212,139,63,0.5)]" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[14px] font-bold tracking-tight text-[#1A2B22] leading-none">Pulso Smart</p>
+                    <p className="text-[10px] font-medium text-[#9A907F] leading-none mt-0.5 tracking-wide">Control financiero</p>
+                  </div>
+                </div>
+                {/* Collapse button */}
                 <motion.button
                   whileHover={{ scale: 1.035 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setIsDesktopSidebarCollapsed(true)}
-                  className="group relative flex h-[62px] w-[92px] items-center justify-center overflow-hidden rounded-[24px] border border-[#E6DCCA] bg-[linear-gradient(135deg,#FFFDF8_0%,#F4EEE3_58%,#ECE2D3_100%)] text-[#5E605D] transition-all duration-300 shadow-[0_16px_34px_rgba(118,91,50,0.12),inset_0_1px_0_rgba(255,255,255,0.88)]"
+                  className="group relative flex h-[42px] w-[56px] shrink-0 items-center justify-center overflow-hidden rounded-[16px] border border-[#E6DCCA] bg-[linear-gradient(135deg,#FFFDF8_0%,#F4EEE3_58%,#ECE2D3_100%)] text-[#5E605D] transition-all duration-300 shadow-[0_8px_20px_rgba(118,91,50,0.10),inset_0_1px_0_rgba(255,255,255,0.88)]"
                   data-testid="collapse-desktop-sidebar"
                   aria-label="Ocultar menú"
                   title="Ocultar menú"
                 >
                   <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(212,139,63,0.18),transparent_48%)] opacity-80 transition-opacity duration-300 group-hover:opacity-100" />
                   <span className="pointer-events-none absolute inset-y-0 -left-[45%] w-[46%] bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.62),transparent)] skew-x-[-22deg] opacity-0 transition-all duration-500 group-hover:left-[118%] group-hover:opacity-100" />
-                  <span className="relative z-10 flex h-11 w-11 items-center justify-center rounded-full border border-[#E2D6C4] bg-white/74 shadow-[inset_0_1px_0_rgba(255,255,255,0.92)]">
-                    <CaretRight weight="bold" className="h-5 w-5 rotate-180 text-[#4D584F]" />
+                  <span className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full border border-[#E2D6C4] bg-white/74 shadow-[inset_0_1px_0_rgba(255,255,255,0.92)]">
+                    <CaretRight weight="bold" className="h-4 w-4 rotate-180 text-[#4D584F]" />
                   </span>
                 </motion.button>
               </div>
             ) : (
               <>
-                <div className="flex items-center justify-center">
-                  <div className="h-1 w-full" aria-hidden="true" />
+                {/* Mini logo */}
+                <div className="flex items-center justify-center mb-3">
+                  <div className="relative flex h-11 w-11 items-center justify-center rounded-[14px] bg-[linear-gradient(135deg,#1E3A2B_0%,#2A4D3B_100%)] shadow-[0_8px_20px_rgba(42,77,59,0.28),inset_0_1px_0_rgba(255,255,255,0.12)]">
+                    <span className="text-[18px] font-bold text-white/90 leading-none tracking-tight">P</span>
+                    <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-[#D48B3F] border-2 border-white shadow-[0_2px_6px_rgba(212,139,63,0.5)]" />
+                  </div>
                 </div>
+                {/* Expand button */}
                 <motion.button
                   whileHover={{ scale: 1.035 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setIsDesktopSidebarCollapsed(false)}
-                  className="group relative mt-2 mx-auto flex h-[52px] w-[72px] items-center justify-center overflow-hidden rounded-[20px] border border-[#E6DCCA] bg-[linear-gradient(135deg,#FFFDF8_0%,#F4EEE3_58%,#ECE2D3_100%)] text-[#5E605D] transition-all duration-300 shadow-[0_14px_30px_rgba(118,91,50,0.10),inset_0_1px_0_rgba(255,255,255,0.85)]"
+                  className="group relative mx-auto flex h-[44px] w-full items-center justify-center overflow-hidden rounded-[16px] border border-[#E6DCCA] bg-[linear-gradient(135deg,#FFFDF8_0%,#F4EEE3_58%,#ECE2D3_100%)] text-[#5E605D] transition-all duration-300 shadow-[0_8px_18px_rgba(118,91,50,0.08),inset_0_1px_0_rgba(255,255,255,0.85)]"
                   data-testid="expand-desktop-sidebar"
                   aria-label="Mostrar menú"
                   title="Mostrar menú"
                 >
                   <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(212,139,63,0.16),transparent_48%)] opacity-80 transition-opacity duration-300 group-hover:opacity-100" />
                   <span className="pointer-events-none absolute inset-y-0 -left-[45%] w-[46%] bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.62),transparent)] skew-x-[-22deg] opacity-0 transition-all duration-500 group-hover:left-[118%] group-hover:opacity-100" />
-                  <span className="relative z-10 flex h-9 w-9 items-center justify-center rounded-full border border-[#E2D6C4] bg-white/72 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
-                    <CaretRight weight="bold" className="h-5 w-5 text-[#4D584F]" />
+                  <span className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full border border-[#E2D6C4] bg-white/72 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
+                    <CaretRight weight="bold" className="h-4 w-4 text-[#4D584F]" />
                   </span>
                 </motion.button>
               </>
@@ -182,6 +199,11 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
               <div className="px-1 pb-2 flex items-center gap-2">
                 <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#9A907F]">Navegar</span>
                 <div className="h-px flex-1 bg-gradient-to-r from-[#E5DCCB] to-transparent" />
+              </div>
+            )}
+            {isDesktopSidebarCollapsed && (
+              <div className="flex justify-center mb-2">
+                <div className="h-px w-8 bg-gradient-to-r from-transparent via-[#D8CFBF] to-transparent" />
               </div>
             )}
 
