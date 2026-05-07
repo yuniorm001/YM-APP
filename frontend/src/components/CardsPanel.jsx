@@ -84,7 +84,7 @@ const getDuplicateCard = (cards, formData, editingCard) => (
   ))
 );
 
-export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, onDelete, onSimulatePayment }) {
+export default function CardsPanel({ cards, expenses = [], cashAvailable = 0, onAdd, onEdit, onDelete, onSimulatePayment }) {
   const [showForm, setShowForm] = useState(false);
   const [editingCard, setEditingCard] = useState(null);
   const [formData, setFormData] = useState({
@@ -2482,16 +2482,43 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                         )}
                       </div>
 
-                      <div className="rounded-[1.2rem] border border-[#B65C47]/20 bg-[#FCF6F4] px-4 py-3 text-left mb-6">
-                        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#B65C47] mb-2">
-                          Esto pasará al continuar
-                        </p>
-                        <ul className="space-y-1.5 text-[13px] sm:text-sm text-[#5E605D]">
-                          <li>• Se eliminará la tarjeta de tu lista</li>
-                          <li>• Se borrará su historial de pagos registrados</li>
-                          <li>• Esta acción no se puede deshacer</li>
-                        </ul>
-                      </div>
+                      {(() => {
+                        // Calculamos cuántos gastos están asociados a esta
+                        // tarjeta y su total. Lo hacemos aquí para que el
+                        // usuario vea exactamente qué va a desaparecer.
+                        const associatedExpenses = (expenses || []).filter(
+                          (expense) => expense.cardId === cardToDelete.id
+                        );
+                        const expenseCount = associatedExpenses.length;
+                        const expenseTotal = associatedExpenses.reduce(
+                          (sum, expense) => sum + Number(expense.amount || 0),
+                          0
+                        );
+                        const formattedTotal = expenseTotal.toLocaleString('es-MX', {
+                          minimumFractionDigits: 0,
+                          maximumFractionDigits: 0
+                        });
+
+                        return (
+                          <div className="rounded-[1.2rem] border border-[#B65C47]/20 bg-[#FCF6F4] px-4 py-3 text-left mb-6">
+                            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#B65C47] mb-2">
+                              Esto pasará al continuar
+                            </p>
+                            <ul className="space-y-1.5 text-[13px] sm:text-sm text-[#5E605D]">
+                              <li>• Se eliminará la tarjeta de tu lista</li>
+                              {expenseCount > 0 ? (
+                                <li className="font-semibold text-[#9C382A]">
+                                  • Se eliminarán {expenseCount} {expenseCount === 1 ? 'gasto hecho' : 'gastos hechos'} con esta tarjeta (${formattedTotal} en total)
+                                </li>
+                              ) : (
+                                <li>• No hay gastos registrados con esta tarjeta</li>
+                              )}
+                              <li>• Se borrará su historial de pagos registrados</li>
+                              <li>• Esta acción no se puede deshacer</li>
+                            </ul>
+                          </div>
+                        );
+                      })()}
 
                       <div className="flex flex-col sm:flex-row gap-2.5">
                         <button
