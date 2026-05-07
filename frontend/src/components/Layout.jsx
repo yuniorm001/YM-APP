@@ -194,7 +194,7 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
           </div>
 
           {/* MAIN NAV */}
-          <nav className={`relative min-h-0 overflow-y-auto overscroll-contain ${isDesktopSidebarCollapsed ? 'px-3 py-3 flex-none mt-auto' : 'px-4 py-6 flex-1'} flex flex-col`}>
+          <nav className={`relative min-h-0 overflow-hidden ${isDesktopSidebarCollapsed ? 'px-3 py-3 flex-none mt-auto' : 'px-4 py-6 flex-1'} flex flex-col`}>
             {!isDesktopSidebarCollapsed && (
               <div className="px-1 pb-2 flex items-center gap-2">
                 <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#9A907F]">Navegar</span>
@@ -302,52 +302,13 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
               </div>
             </motion.div>
 
-            {/* AMBIENT ART — decorative filler between acciones and tip card */}
-            {!isDesktopSidebarCollapsed && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.55, duration: 0.6 }}
-                aria-hidden
-                className="pointer-events-none flex-1 flex items-center justify-center px-2 py-2 min-h-[72px]"
-              >
-                <svg viewBox="0 0 220 72" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full">
-                  <path d="M 20 60 Q 65 8 110 36 Q 155 64 200 16" stroke="#2A4D3B" strokeWidth="1" strokeOpacity="0.15" strokeLinecap="round" fill="none"/>
-                  <path d="M 10 65 Q 58 18 110 44 Q 162 70 210 24" stroke="#2A4D3B" strokeWidth="0.7" strokeOpacity="0.09" strokeLinecap="round" fill="none"/>
-                  <path d="M 30 56 Q 68 4 110 30 Q 152 56 196 10" stroke="#D48B3F" strokeWidth="0.7" strokeOpacity="0.13" strokeLinecap="round" fill="none"/>
-                  <circle cx="38" cy="50" r="2.2" fill="#2A7B5F" fillOpacity="0.22"/>
-                  <circle cx="72" cy="22" r="1.6" fill="#D48B3F" fillOpacity="0.28"/>
-                  <circle cx="110" cy="36" r="2.8" fill="#2A4D3B" fillOpacity="0.13"/>
-                  <circle cx="148" cy="24" r="1.8" fill="#2A7B5F" fillOpacity="0.20"/>
-                  <circle cx="183" cy="44" r="2.2" fill="#D48B3F" fillOpacity="0.18"/>
-                  <circle cx="56" cy="40" r="1.2" fill="#2A4D3B" fillOpacity="0.16"/>
-                  <circle cx="166" cy="14" r="1.4" fill="#2A4D3B" fillOpacity="0.13"/>
-                  <line x1="38" y1="50" x2="72" y2="22" stroke="#2A4D3B" strokeWidth="0.55" strokeOpacity="0.09"/>
-                  <line x1="72" y1="22" x2="110" y2="36" stroke="#2A4D3B" strokeWidth="0.55" strokeOpacity="0.09"/>
-                  <line x1="110" y1="36" x2="148" y2="24" stroke="#2A4D3B" strokeWidth="0.55" strokeOpacity="0.09"/>
-                  <line x1="148" y1="24" x2="183" y2="44" stroke="#2A4D3B" strokeWidth="0.55" strokeOpacity="0.09"/>
-                  <line x1="56" y1="40" x2="72" y2="22" stroke="#2A4D3B" strokeWidth="0.45" strokeOpacity="0.07"/>
-                  <line x1="148" y1="24" x2="166" y2="14" stroke="#2A4D3B" strokeWidth="0.45" strokeOpacity="0.07"/>
-                  <path d="M 108 6 L 113 12 L 108 18 L 103 12 Z" stroke="#D48B3F" strokeWidth="0.8" strokeOpacity="0.18" fill="none"/>
-                  <rect x="60" y="66" width="100" height="1" rx="0.5" fill="url(#fadeBarA)" fillOpacity="0.25"/>
-                  <defs>
-                    <linearGradient id="fadeBarA" x1="0" y1="0" x2="1" y2="0">
-                      <stop offset="0%" stopColor="transparent"/>
-                      <stop offset="50%" stopColor="#2A4D3B"/>
-                      <stop offset="100%" stopColor="transparent"/>
-                    </linearGradient>
-                  </defs>
-                </svg>
-              </motion.div>
-            )}
-
-            {/* PREMIUM TIP CARD — fills empty space, only when expanded */}
+            {/* PREMIUM TIP CARD — pushed to bottom */}
             {!isDesktopSidebarCollapsed && (
               <motion.div
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.45, duration: 0.4 }}
-                className="premium-tip-card mt-6 mb-2 relative shrink-0 overflow-hidden rounded-[22px] border border-[#1E3328]/10 bg-[linear-gradient(135deg,#0F2A1F_0%,#1E3A2B_45%,#2A4D3B_100%)] p-4 shadow-[0_18px_40px_rgba(15,42,31,0.22)]"
+                className="premium-tip-card mt-auto mb-2 relative shrink-0 overflow-hidden rounded-[22px] border border-[#1E3328]/10 bg-[linear-gradient(135deg,#0F2A1F_0%,#1E3A2B_45%,#2A4D3B_100%)] p-4 shadow-[0_18px_40px_rgba(15,42,31,0.22)]"
               >
                 <div className="pointer-events-none absolute inset-0">
                   <div className="absolute -top-10 -right-10 h-32 w-32 rounded-full bg-[radial-gradient(circle,rgba(212,139,63,0.32),transparent_60%)] blur-xl" />
