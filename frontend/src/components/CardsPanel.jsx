@@ -104,6 +104,10 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
   const [paymentErrors, setPaymentErrors] = useState({});
   const [paymentModalCard, setPaymentModalCard] = useState(null);
   const [goalModalCard, setGoalModalCard] = useState(null);
+  // Confirmación de eliminación: guarda la tarjeta seleccionada para borrar
+  // y abre un modal antes de ejecutar la acción. Esto evita que un toque
+  // accidental en el botón "Eliminar" borre datos sin advertencia.
+  const [cardToDelete, setCardToDelete] = useState(null);
 
   useEffect(() => {
     const id = setInterval(() => setPulseOn(p => !p), 3000);
@@ -1538,7 +1542,7 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                           Editar
                         </button>
                         <button
-                          onClick={() => onDelete(card.id)}
+                          onClick={() => setCardToDelete(card)}
                           className="flex items-center justify-center gap-2 py-3 rounded-[18px] border border-[#F1CFC5] text-[13px] font-semibold text-[#B65C47] bg-[#FFF9F7] hover:bg-[#FFF1EC] hover:border-[#E8B3A5] hover:-translate-y-0.5 hover:shadow-[0_10px_22px_rgba(182,92,71,0.10)] transition-all duration-200"
                           data-testid={`delete-card-${card.id}`}
                         >
@@ -2419,6 +2423,102 @@ export default function CardsPanel({ cards, cashAvailable = 0, onAdd, onEdit, on
                   </motion.div>
                 </motion.div>
               ) : null}
+            </AnimatePresence>,
+            document.body
+          )
+        : null}
+
+      {/* Modal de confirmación para eliminar tarjeta */}
+      {typeof document !== 'undefined'
+        ? createPortal(
+            <AnimatePresence>
+              {cardToDelete && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="fixed inset-0 z-[110] flex items-center justify-center modal-overlay overflow-hidden p-4"
+                  onClick={(e) => e.target === e.currentTarget && setCardToDelete(null)}
+                  data-testid="delete-card-confirm-modal"
+                >
+                  <motion.div
+                    initial={{ y: 24, opacity: 0, scale: 0.96 }}
+                    animate={{ y: 0, opacity: 1, scale: 1 }}
+                    exit={{ y: 16, opacity: 0, scale: 0.97 }}
+                    transition={{ type: 'spring', damping: 26, stiffness: 320 }}
+                    className="relative w-full max-w-md rounded-[2rem] border border-[#E6E6E3] bg-white p-6 sm:p-7 shadow-[0_28px_70px_rgba(24,28,24,0.18)]"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setCardToDelete(null)}
+                      className="absolute top-4 right-4 w-9 h-9 flex items-center justify-center rounded-full bg-[#F4F2EE] hover:bg-[#EAE6DE] text-[#5E605D] transition-colors"
+                      aria-label="Cerrar"
+                    >
+                      <X weight="bold" className="w-4 h-4" />
+                    </button>
+
+                    <div className="text-center">
+                      <div className="w-16 h-16 mx-auto mb-4 rounded-[1.4rem] bg-[#B65C47]/10 flex items-center justify-center">
+                        <Trash weight="fill" className="w-8 h-8 text-[#B65C47]" />
+                      </div>
+                      <h3 className="font-heading font-semibold text-xl sm:text-2xl text-[#1A1C1A] mb-2">
+                        ¿Eliminar esta tarjeta?
+                      </h3>
+                      <p className="text-[#737573] text-sm sm:text-[15px] mb-5">
+                        Estás a punto de eliminar:
+                      </p>
+
+                      <div className="rounded-[1.4rem] border border-[#E6E6E3] bg-[#FAFAF9] px-4 py-4 mb-5">
+                        <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#737573] mb-1">
+                          Tarjeta seleccionada
+                        </p>
+                        <p className="font-heading text-lg font-semibold text-[#1A1C1A]">
+                          {cardToDelete.name || 'Sin nombre'}
+                        </p>
+                        {cardToDelete.lastDigits && (
+                          <p className="text-sm text-[#5E605D] mt-0.5">
+                            Termina en •••• {cardToDelete.lastDigits}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="rounded-[1.2rem] border border-[#B65C47]/20 bg-[#FCF6F4] px-4 py-3 text-left mb-6">
+                        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#B65C47] mb-2">
+                          Esto pasará al continuar
+                        </p>
+                        <ul className="space-y-1.5 text-[13px] sm:text-sm text-[#5E605D]">
+                          <li>• Se eliminará la tarjeta de tu lista</li>
+                          <li>• Se borrará su historial de pagos registrados</li>
+                          <li>• Esta acción no se puede deshacer</li>
+                        </ul>
+                      </div>
+
+                      <div className="flex flex-col sm:flex-row gap-2.5">
+                        <button
+                          type="button"
+                          onClick={() => setCardToDelete(null)}
+                          className="flex-1 py-3 rounded-[18px] border border-[#DADAD5] text-[14px] font-semibold text-[#1A1C1A] bg-white hover:bg-[#F7F5F0] transition-colors"
+                          data-testid="cancel-delete-card"
+                        >
+                          Cancelar
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            onDelete(cardToDelete.id);
+                            setCardToDelete(null);
+                          }}
+                          className="flex-1 py-3 rounded-[18px] text-[14px] font-semibold text-white bg-[#B65C47] hover:bg-[#A04E3B] transition-colors flex items-center justify-center gap-2"
+                          data-testid="confirm-delete-card"
+                        >
+                          <Trash weight="fill" className="w-4 h-4" />
+                          Sí, eliminar
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                </motion.div>
+              )}
             </AnimatePresence>,
             document.body
           )
