@@ -302,92 +302,42 @@ export default function Layout({ children, activeTab, setActiveTab, onAddExpense
               </div>
             </motion.div>
 
-            {/* BOTTOM BLOCK — tip card + health widget, fills remaining space */}
+            {/* PREMIUM TIP CARD — fills empty space, only when expanded */}
             {!isDesktopSidebarCollapsed && (
-              <div className="mt-6 mb-2 flex flex-col gap-3 flex-1 justify-end">
-
-                {/* PREMIUM TIP CARD */}
-                <motion.div
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.45, duration: 0.4 }}
-                  className="premium-tip-card relative shrink-0 overflow-hidden rounded-[22px] border border-[#1E3328]/10 bg-[linear-gradient(135deg,#0F2A1F_0%,#1E3A2B_45%,#2A4D3B_100%)] p-4 shadow-[0_18px_40px_rgba(15,42,31,0.22)]"
-                >
-                  <div className="pointer-events-none absolute inset-0">
-                    <div className="absolute -top-10 -right-10 h-32 w-32 rounded-full bg-[radial-gradient(circle,rgba(212,139,63,0.32),transparent_60%)] blur-xl" />
-                    <div className="absolute -bottom-12 -left-8 h-32 w-32 rounded-full bg-[radial-gradient(circle,rgba(109,255,151,0.18),transparent_60%)] blur-2xl" />
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.10),transparent_55%)]" />
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.45, duration: 0.4 }}
+                className="premium-tip-card mt-6 mb-2 relative shrink-0 overflow-hidden rounded-[22px] border border-[#1E3328]/10 bg-[linear-gradient(135deg,#0F2A1F_0%,#1E3A2B_45%,#2A4D3B_100%)] p-4 shadow-[0_18px_40px_rgba(15,42,31,0.22)]"
+              >
+                <div className="pointer-events-none absolute inset-0">
+                  <div className="absolute -top-10 -right-10 h-32 w-32 rounded-full bg-[radial-gradient(circle,rgba(212,139,63,0.32),transparent_60%)] blur-xl" />
+                  <div className="absolute -bottom-12 -left-8 h-32 w-32 rounded-full bg-[radial-gradient(circle,rgba(109,255,151,0.18),transparent_60%)] blur-2xl" />
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.10),transparent_55%)]" />
+                </div>
+                <div className="relative z-10">
+                  <div className="flex items-center gap-2">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/10 border border-white/15 backdrop-blur">
+                      <Info weight="duotone" className="h-3.5 w-3.5 text-[#F0C99A]" />
+                    </span>
+                    <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#F0C99A]">Consejo Inteligente</span>
                   </div>
-                  <div className="relative z-10">
-                    <div className="flex items-center gap-2">
-                      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/10 border border-white/15 backdrop-blur">
-                        <Info weight="duotone" className="h-3.5 w-3.5 text-[#F0C99A]" />
+                  <p className="mt-2.5 text-[13px] font-semibold leading-snug text-white">
+                    Registra cada gasto al momento — tu yo del futuro lo va a agradecer.
+                  </p>
+                  <div className="mt-3 flex items-center gap-2">
+                    <div className="flex -space-x-1.5">
+                      <span className="h-5 w-5 rounded-full bg-[#D48B3F] border-2 border-[#1E3A2B] flex items-center justify-center text-[9px] font-bold text-white">
+                        $
                       </span>
-                      <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#F0C99A]">Consejo Inteligente</span>
+                      <span className="h-5 w-5 rounded-full bg-[#2A7B5F] border-2 border-[#1E3A2B] flex items-center justify-center">
+                        <CaretRight weight="bold" className="h-2.5 w-2.5 text-white" />
+                      </span>
                     </div>
-                    <p className="mt-2.5 text-[13px] font-semibold leading-snug text-white">
-                      Registra cada gasto al momento — tu yo del futuro lo va a agradecer.
-                    </p>
-                    <div className="mt-3 flex items-center gap-2">
-                      <div className="flex -space-x-1.5">
-                        <span className="h-5 w-5 rounded-full bg-[#D48B3F] border-2 border-[#1E3A2B] flex items-center justify-center text-[9px] font-bold text-white">
-                          $
-                        </span>
-                        <span className="h-5 w-5 rounded-full bg-[#2A7B5F] border-2 border-[#1E3A2B] flex items-center justify-center">
-                          <CaretRight weight="bold" className="h-2.5 w-2.5 text-white" />
-                        </span>
-                      </div>
-                      <span className="text-[10px] font-medium text-white/60">Hábito diario · 2 min</span>
-                    </div>
+                    <span className="text-[10px] font-medium text-white/60">Hábito diario · 2 min</span>
                   </div>
-                </motion.div>
-
-                {/* CLIMA FINANCIERO WIDGET */}
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.58, duration: 0.38 }}
-                  className="relative shrink-0 overflow-hidden rounded-[22px] border border-[#E2EDE8] bg-[linear-gradient(145deg,#F0F7F3_0%,#E8F2ED_100%)] p-4 shadow-[0_8px_24px_rgba(42,77,59,0.07)]"
-                >
-                  <div className="pointer-events-none absolute inset-0">
-                    <div className="absolute -top-6 -right-6 h-24 w-24 rounded-full bg-[radial-gradient(circle,rgba(42,123,95,0.12),transparent_65%)] blur-xl" />
-                    <div className="absolute bottom-0 left-0 h-16 w-16 rounded-full bg-[radial-gradient(circle,rgba(212,139,63,0.08),transparent_65%)] blur-lg" />
-                  </div>
-                  <div className="relative z-10">
-                    <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#6B9E82]">Clima financiero</span>
-                    <div className="mt-2.5 flex items-center gap-3">
-                      {/* Big weather icon */}
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[16px] bg-white/70 border border-[#C8E0D4] shadow-[0_4px_12px_rgba(42,77,59,0.10)]">
-                        <span className="text-[26px] leading-none" role="img" aria-label="clima">🌤️</span>
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-[14px] font-bold text-[#1A2B22] leading-tight">Parcialmente estable</p>
-                        <p className="text-[11px] text-[#6B8C7A] leading-snug mt-0.5">Más ingresos que gastos este mes</p>
-                      </div>
-                    </div>
-                    {/* Balance bar */}
-                    <div className="mt-3">
-                      <div className="flex justify-between mb-1">
-                        <span className="text-[9px] font-semibold text-[#2A7B5F] uppercase tracking-wide">Ingresos</span>
-                        <span className="text-[9px] font-semibold text-[#B85C3A] uppercase tracking-wide">Gastos</span>
-                      </div>
-                      <div className="relative h-2 w-full rounded-full bg-white/60 border border-[#C8E0D4] overflow-hidden">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: '62%' }}
-                          transition={{ delay: 0.72, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                          className="absolute left-0 top-0 h-full rounded-full bg-[linear-gradient(90deg,#2A7B5F,#3BAB82)]"
-                        />
-                      </div>
-                      <div className="flex justify-between mt-1">
-                        <span className="text-[9px] text-[#6B8C7A]">62%</span>
-                        <span className="text-[9px] text-[#9A7060]">38%</span>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-
-              </div>
+                </div>
+              </motion.div>
             )}
           </nav>
 
