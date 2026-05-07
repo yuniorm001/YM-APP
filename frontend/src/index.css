@@ -163,6 +163,7 @@ body::before {
 .modal-close-btn {
   width: 2.75rem;
   height: 2.75rem;
+  flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -185,8 +186,19 @@ body::before {
   box-shadow: inset 0 2px 8px rgba(17,24,39,0.10);
 }
 .modal-close-btn svg {
-  width: 1.1rem;
-  height: 1.1rem;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+@media (max-width: 639px) {
+  .modal-close-btn {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 0.875rem;
+  }
+  .modal-close-btn svg {
+    width: 1.375rem;
+    height: 1.375rem;
+  }
 }
 
 .btn-modal-primary,

@@ -1627,8 +1627,8 @@ export default function CardsPanel({ cards, expenses = [], cashAvailable = 0, on
               <div className="sticky top-0 z-10 w-full border-b border-[#E6E6E3] bg-gradient-to-r from-[#FCFBF8] to-[#F7FBF8] px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex-shrink-0">
                 <div className="mx-auto flex w-full max-w-[1080px] items-start justify-between gap-4">
                   <div className="flex items-start gap-3">
-                    <div className="mt-0.5 flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#2A4D3B] to-[#1E3A2B] text-white shadow-md">
-                      <Clock weight="fill" className="w-5 h-5" />
+                    <div className="mt-0.5 flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#2A4D3B] to-[#1E3A2B] text-white shadow-md">
+                      <Clock weight="fill" className="w-6 h-6" />
                     </div>
                     <div>
                       <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#2A4D3B]">Guía inteligente de uso</p>
@@ -1948,8 +1948,8 @@ export default function CardsPanel({ cards, expenses = [], cashAvailable = 0, on
                 <div className="sticky top-0 z-10 w-full border-b border-[#E6E6E3] bg-gradient-to-r from-[#FFF8EA] to-[#FCFBF8] px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex-shrink-0 card-goal-modal-header">
                   <div className="mx-auto flex w-full max-w-[1080px] items-start justify-between gap-4 card-goal-modal-head-inner">
                     <div className="flex items-start gap-3 card-goal-title-wrap">
-                      <div className="mt-0.5 flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#D48B3F] to-[#B67A2E] text-white shadow-md card-goal-icon">
-                        <Sparkle weight="fill" className="w-5 h-5" />
+                      <div className="mt-0.5 flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#D48B3F] to-[#B67A2E] text-white shadow-md card-goal-icon">
+                        <Sparkle weight="fill" className="w-6 h-6" />
                       </div>
                       <div>
                         <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#6A4B16]">Objetivo de pago</p>
