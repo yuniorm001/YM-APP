@@ -178,7 +178,7 @@ export default function ExpensesList({ expenses, cards = [], cardPayments = [], 
                 <div className="expense-filter-intro">
                   <div>
                     <span>Control de movimientos</span>
-                    <strong>Filtra tus gastos sin perder el diseño limpio.</strong>
+                    <strong>Usa los filtros para ver gastos por método, categoría u orden.</strong>
                   </div>
                   <p>Separa lo que salió de cash, tarjetas o categorías específicas.</p>
                 </div>

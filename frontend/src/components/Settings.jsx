@@ -1814,7 +1814,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="fixed inset-0 z-[110] flex items-stretch justify-stretch modal-overlay overflow-hidden"
+                  className="fixed inset-0 z-[110] flex items-stretch justify-stretch modal-overlay app-centered-modal-overlay overflow-hidden"
                   onClick={(e) => e.target === e.currentTarget && setShowIncomeHistoryModal(false)}
                 >
                   <motion.div
@@ -1822,7 +1822,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: '100%', opacity: 0 }}
                     transition={{ type: 'spring', damping: 26, stiffness: 280 }}
-                    className="relative h-[100dvh] min-h-screen w-screen max-w-none bg-white rounded-none shadow-none overflow-hidden flex flex-col min-h-0"
+                    className="relative h-[100dvh] min-h-screen w-screen max-w-none bg-white rounded-none shadow-none overflow-hidden flex flex-col min-h-0 app-centered-modal-panel"
                     data-testid="income-history-modal"
                   >
                     <div className="sticky top-0 z-10 w-full border-b border-[#E6E6E3] bg-gradient-to-r from-[#FCFBF8] to-[#F4F8F4] px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex-shrink-0">
@@ -1923,7 +1923,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="fixed inset-0 z-[100] flex items-stretch justify-stretch modal-overlay overflow-hidden"
+                  className="fixed inset-0 z-[100] flex items-stretch justify-stretch modal-overlay app-centered-modal-overlay overflow-hidden"
                   onClick={(e) => e.target === e.currentTarget && setShowAllAccessModal(false)}
                 >
                   <motion.div
@@ -2041,7 +2041,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="fixed inset-0 z-[100] flex items-stretch justify-stretch modal-overlay overflow-hidden"
+                  className="fixed inset-0 z-[100] flex items-stretch justify-stretch modal-overlay app-centered-modal-overlay overflow-hidden"
                   onClick={(e) => e.target === e.currentTarget && setShowResetConfirm(false)}
                 >
                   <motion.div
@@ -2049,7 +2049,7 @@ export default function Settings({ data, onUpdate, onReset, session = null }) {
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: '100%', opacity: 0 }}
                     transition={{ type: 'spring', damping: 26, stiffness: 280 }}
-                    className="relative h-[100dvh] min-h-screen w-screen max-w-none bg-white rounded-none shadow-none overflow-hidden flex flex-col min-h-0"
+                    className="relative h-[100dvh] min-h-screen w-screen max-w-none bg-white rounded-none shadow-none overflow-hidden flex flex-col min-h-0 app-centered-modal-panel"
                   >
                     <div className="sticky top-0 z-10 w-full border-b border-[#E6E6E3] bg-gradient-to-r from-[#FCFBF8] to-[#FCF6F4] px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex-shrink-0">
                       <div className="mx-auto flex w-full max-w-[980px] items-start justify-between gap-4">

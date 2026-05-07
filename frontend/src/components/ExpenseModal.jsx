@@ -829,7 +829,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cards, editingEx
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[60] flex items-stretch justify-stretch modal-overlay overflow-hidden"
+            className="fixed inset-0 z-[60] flex items-stretch justify-stretch modal-overlay app-centered-modal-overlay overflow-hidden"
             style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}
           >
             <motion.div
@@ -837,7 +837,7 @@ export default function ExpenseModal({ isOpen, onClose, onSave, cards, editingEx
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: '100%', opacity: 0 }}
               transition={{ type: 'spring', damping: 26, stiffness: 280 }}
-              className="relative h-[100dvh] min-h-screen w-screen max-w-none bg-white rounded-none shadow-none overflow-hidden flex flex-col min-h-0"
+              className="relative h-[100dvh] min-h-screen w-screen max-w-none bg-white rounded-none shadow-none overflow-hidden flex flex-col min-h-0 app-centered-modal-panel app-centered-modal-panel--compact"
               data-testid="coverage-alert-modal"
             >
               <div className="border-b border-[#9C382A]/15 bg-gradient-to-r from-[#FCF7F5] via-[#FBF7F4] to-[#F6F3EE] px-5 py-5 flex-shrink-0">
