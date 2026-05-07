@@ -2451,10 +2451,10 @@ export default function CardsPanel({ cards, expenses = [], cashAvailable = 0, on
                     <button
                       type="button"
                       onClick={() => setCardToDelete(null)}
-                      className="absolute top-4 right-4 w-9 h-9 flex items-center justify-center rounded-full bg-[#F4F2EE] hover:bg-[#EAE6DE] text-[#5E605D] transition-colors"
+                      className="modal-close-btn absolute top-4 right-4"
                       aria-label="Cerrar"
                     >
-                      <X weight="bold" className="w-4 h-4" />
+                      <X weight="bold" />
                     </button>
 
                     <div className="text-center">
@@ -2527,7 +2527,7 @@ export default function CardsPanel({ cards, expenses = [], cashAvailable = 0, on
                         <button
                           type="button"
                           onClick={() => setCardToDelete(null)}
-                          className="flex-1 py-3 rounded-[18px] border border-[#DADAD5] text-[14px] font-semibold text-[#1A1C1A] bg-white hover:bg-[#F7F5F0] transition-colors"
+                          className="btn-modal-secondary flex-1"
                           data-testid="cancel-delete-card"
                         >
                           Cancelar
@@ -2538,7 +2538,7 @@ export default function CardsPanel({ cards, expenses = [], cashAvailable = 0, on
                             onDelete(cardToDelete.id);
                             setCardToDelete(null);
                           }}
-                          className="flex-1 py-3 rounded-[18px] text-[14px] font-semibold text-white bg-[#B65C47] hover:bg-[#A04E3B] transition-colors flex items-center justify-center gap-2"
+                          className="btn-modal-danger flex-1"
                           data-testid="confirm-delete-card"
                         >
                           <Trash weight="fill" className="w-4 h-4" />

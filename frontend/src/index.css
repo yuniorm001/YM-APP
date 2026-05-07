@@ -5592,3 +5592,89 @@ textarea.premium-input:focus {
     margin-right: 0.15rem;
   }
 }
+
+/* Targeted polish requested: income history header, mobile filter button spacing, and delete-card modal controls */
+@media (max-width: 760px) {
+  .income-history-modal-header {
+    padding-left: 0.95rem !important;
+    padding-right: 0.95rem !important;
+  }
+
+  .income-history-modal-head-inner {
+    align-items: flex-start !important;
+    gap: 0.75rem !important;
+  }
+
+  .income-history-title-wrap {
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+    gap: 0.75rem !important;
+  }
+
+  .income-history-title-wrap > div:last-child {
+    min-width: 0 !important;
+  }
+
+  .income-history-wallet-icon {
+    width: 3rem !important;
+    height: 3rem !important;
+    border-radius: 1.15rem !important;
+    flex: 0 0 3rem !important;
+  }
+
+  .income-history-wallet-icon svg {
+    width: 1.35rem !important;
+    height: 1.35rem !important;
+  }
+
+  .income-history-modal-header .modal-close-btn {
+    width: 3rem !important;
+    height: 3rem !important;
+    border-radius: 1.15rem !important;
+    flex: 0 0 3rem !important;
+  }
+
+  .income-history-modal-header h3 {
+    font-size: clamp(1.42rem, 6vw, 1.85rem) !important;
+    line-height: 1.05 !important;
+    letter-spacing: -0.045em !important;
+  }
+
+  .income-history-modal-header p {
+    overflow-wrap: anywhere !important;
+  }
+
+  .expense-filter-main-btn {
+    min-height: 4.45rem !important;
+    padding-left: 1.55rem !important;
+    padding-right: 1.55rem !important;
+    gap: 1rem !important;
+  }
+
+  .expense-filter-main-icon {
+    width: 3.15rem !important;
+    height: 3.15rem !important;
+    border-radius: 1.15rem !important;
+    margin-left: 0.25rem !important;
+    margin-right: 0.1rem !important;
+  }
+
+  .expense-filter-main-icon svg {
+    width: 1.18rem !important;
+    height: 1.18rem !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .income-history-modal-header {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+
+  .income-history-wallet-icon,
+  .income-history-modal-header .modal-close-btn {
+    width: 2.75rem !important;
+    height: 2.75rem !important;
+    flex-basis: 2.75rem !important;
+  }
+}
